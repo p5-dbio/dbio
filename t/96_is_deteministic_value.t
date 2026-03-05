@@ -8,9 +8,9 @@ use lib qw(t/lib);
 use DBICTest;
 
 BEGIN {
-  require DBIx::Class;
-  plan skip_all => 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('test_dt')
-    unless DBIx::Class::Optional::Dependencies->req_ok_for ('test_dt');
+  require DBIO;
+  plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('test_dt')
+    unless DBIO::Optional::Dependencies->req_ok_for ('test_dt');
 }
 
 my $schema = DBICTest->init_schema();

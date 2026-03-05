@@ -6,7 +6,7 @@ use lib qw(t/lib);
 use DBI;
 use DBICTest;
 use DBICTest::Schema;
-use DBIx::Class::Storage::DBI;
+use DBIO::Storage::DBI;
 
 # !!! do not replace this with done_testing - tests reside in the callbacks
 # !!! number of calls is important
@@ -17,14 +17,14 @@ use Test::Warn;
 my $schema = DBICTest::Schema->clone;
 
 {
-  *DBIx::Class::Storage::DBI::connect_call_foo = sub {
-    isa_ok $_[0], 'DBIx::Class::Storage::DBI',
+  *DBIO::Storage::DBI::connect_call_foo = sub {
+    isa_ok $_[0], 'DBIO::Storage::DBI',
       'got storage in connect_call method';
     is $_[1], 'bar', 'got param in connect_call method';
   };
 
-  *DBIx::Class::Storage::DBI::disconnect_call_foo = sub {
-    isa_ok $_[0], 'DBIx::Class::Storage::DBI',
+  *DBIO::Storage::DBI::disconnect_call_foo = sub {
+    isa_ok $_[0], 'DBIO::Storage::DBI',
       'got storage in disconnect_call method';
   };
 
@@ -56,13 +56,13 @@ my $schema = DBICTest::Schema->clone;
 }
 
 {
-  *DBIx::Class::Storage::DBI::connect_call_foo = sub {
-    isa_ok $_[0], 'DBIx::Class::Storage::DBI',
+  *DBIO::Storage::DBI::connect_call_foo = sub {
+    isa_ok $_[0], 'DBIO::Storage::DBI',
       'got storage in connect_call method';
   };
 
-  *DBIx::Class::Storage::DBI::connect_call_bar = sub {
-    isa_ok $_[0], 'DBIx::Class::Storage::DBI',
+  *DBIO::Storage::DBI::connect_call_bar = sub {
+    isa_ok $_[0], 'DBIO::Storage::DBI',
       'got storage in connect_call method';
   };
 

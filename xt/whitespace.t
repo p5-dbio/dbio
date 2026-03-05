@@ -6,9 +6,9 @@ use File::Glob 'bsd_glob';
 use lib 't/lib';
 use DBICTest ':GlobalLock';
 
-require DBIx::Class;
-unless ( DBIx::Class::Optional::Dependencies->req_ok_for ('test_whitespace') ) {
-  my $missing = DBIx::Class::Optional::Dependencies->req_missing_for ('test_whitespace');
+require DBIO;
+unless ( DBIO::Optional::Dependencies->req_ok_for ('test_whitespace') ) {
+  my $missing = DBIO::Optional::Dependencies->req_missing_for ('test_whitespace');
   $ENV{RELEASE_TESTING}
     ? die ("Failed to load release-testing module requirements: $missing")
     : plan skip_all => "Test needs: $missing"

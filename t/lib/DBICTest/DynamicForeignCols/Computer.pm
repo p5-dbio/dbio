@@ -3,7 +3,7 @@ package DBICTest::DynamicForeignCols::Computer;
 use warnings;
 use strict;
 
-use base 'DBIx::Class::Core';
+use base 'DBIO::Core';
 
 __PACKAGE__->table('Computers');
 

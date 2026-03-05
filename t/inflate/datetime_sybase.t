@@ -5,15 +5,15 @@ use Test::More;
 use Test::Exception;
 use Scope::Guard ();
 use Try::Tiny;
-use DBIx::Class::Optional::Dependencies ();
+use DBIO::Optional::Dependencies ();
 use lib qw(t/lib);
 use DBICTest;
 
-plan skip_all => 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('test_dt')
+plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('test_dt')
 . ' and ' .
-DBIx::Class::Optional::Dependencies->req_missing_for ('test_rdbms_ase')
-  unless DBIx::Class::Optional::Dependencies->req_ok_for ('test_dt')
-    && DBIx::Class::Optional::Dependencies->req_ok_for ('test_rdbms_ase');
+DBIO::Optional::Dependencies->req_missing_for ('test_rdbms_ase')
+  unless DBIO::Optional::Dependencies->req_ok_for ('test_dt')
+    && DBIO::Optional::Dependencies->req_ok_for ('test_rdbms_ase');
 
 my ($dsn, $user, $pass) = @ENV{map { "DBICTEST_SYBASE_${_}" } qw/DSN USER PASS/};
 
@@ -46,7 +46,7 @@ for my $storage_type (@storage_types) {
 
   $schema->storage->ensure_connected;
 
-  isa_ok( $schema->storage, "DBIx::Class::Storage::$storage_type" );
+  isa_ok( $schema->storage, "DBIO::Storage::$storage_type" );
 
   eval { $schema->storage->dbh->do("DROP TABLE track") };
   $schema->storage->dbh->do(<<"SQL");

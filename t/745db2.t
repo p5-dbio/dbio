@@ -4,12 +4,12 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Try::Tiny;
-use DBIx::Class::Optional::Dependencies ();
+use DBIO::Optional::Dependencies ();
 use lib qw(t/lib);
 use DBICTest;
 
-plan skip_all => 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('test_rdbms_db2')
-  unless DBIx::Class::Optional::Dependencies->req_ok_for ('test_rdbms_db2');
+plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('test_rdbms_db2')
+  unless DBIO::Optional::Dependencies->req_ok_for ('test_rdbms_db2');
 
 my ($dsn, $user, $pass) = @ENV{map { "DBICTEST_DB2_${_}" } qw/DSN USER PASS/};
 

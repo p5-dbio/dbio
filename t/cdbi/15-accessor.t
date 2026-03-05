@@ -18,7 +18,7 @@ INIT {
 
 # Install the deprecation warning intercept here for the rest of the 08 dev cycle
 local $SIG{__WARN__} = sub {
-  warn @_ unless (DBIx::Class->VERSION < 0.09 and $_[0] =~ /Query returned more than one row/);
+  warn @_ unless (DBIO->VERSION < 0.09 and $_[0] =~ /Query returned more than one row/);
 };
 
 sub Film::mutator_name {

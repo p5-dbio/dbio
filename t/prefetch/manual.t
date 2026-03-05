@@ -66,7 +66,7 @@ my $rs = $schema->resultset ('CD')->search ({}, {
   order_by => [{ -desc => 'cds.year' }, { -desc => 'me.title'}, 'tracks.title', 'tracks_2.title' ],
 });
 
-my $hri_rs = $rs->search({}, { result_class => 'DBIx::Class::ResultClass::HashRefInflator' });
+my $hri_rs = $rs->search({}, { result_class => 'DBIO::ResultClass::HashRefInflator' });
 
 cmp_deeply (
   [$hri_rs->all],
@@ -307,14 +307,14 @@ $schema->is_executed_querycount( sub {
 # can't cmp_deeply a random set - need *some* order
 my $ord_rs = $rs->search({}, {
   order_by => [ 'tracks_2.title', 'tracks.title', 'cds.cdid', \ 'RANDOM()' ],
-  result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+  result_class => 'DBIO::ResultClass::HashRefInflator',
 });
 my @hris_all = sort { $a->{year} cmp $b->{year} } $ord_rs->all;
 is (@hris_all, 6, 'hri count matches' );
 
 my $iter_rs = $rs->search({}, {
   order_by => [ 'me.year', 'me.cdid', 'tracks_2.title', 'tracks.title', 'cds.cdid', \ 'RANDOM()' ],
-  result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+  result_class => 'DBIO::ResultClass::HashRefInflator',
 });
 my @hris_iter;
 while (my $r = $iter_rs->next) {

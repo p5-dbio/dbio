@@ -4,7 +4,7 @@ use lib qw(t/lib);
 use DBICTest;
 use Test::More;
 use Test::Exception;
-use DBIx::Class::_Util 'sigwarn_silencer';
+use DBIO::_Util 'sigwarn_silencer';
 
 BEGIN { delete @ENV{qw(DBI_DSN DBI_DRIVER)} }
 
@@ -24,7 +24,7 @@ sub count_sheep {
           |
         \QUnable to extract a driver name from connect info\E
           |
-        \QYour storage class (DBIx::Class::Storage::DBI) does not set sql_limit_dialect\E
+        \QYour storage class (DBIO::Storage::DBI) does not set sql_limit_dialect\E
       /x
     );
 
@@ -35,26 +35,26 @@ sub count_sheep {
 $schema = DBICTest::Schema->connect("dbi::$dbname");
 throws_ok { count_sheep($schema) } qr{I can't work out what driver to use},
     'Driver in DSN empty';
-isa_ok $schema->storage, 'DBIx::Class::Storage::DBI';
+isa_ok $schema->storage, 'DBIO::Storage::DBI';
 
 $schema = DBICTest::Schema->connect("dbi:Test_NonExistant_DBD:$dbname");
 throws_ok { count_sheep($schema) }
     qr{Can't locate DBD/Test_NonExistant_DBD\.pm in \@INC},
     "Driver class doesn't exist";
-isa_ok $schema->storage, 'DBIx::Class::Storage::DBI';
+isa_ok $schema->storage, 'DBIO::Storage::DBI';
 
 $ENV{DBI_DSN} = "dbi::$dbname";
 $schema = DBICTest::Schema->connect;
 throws_ok { count_sheep($schema) } qr{I can't work out what driver to use},
     "Driver class not defined in DBI_DSN either.";
-isa_ok $schema->storage, 'DBIx::Class::Storage::DBI';
+isa_ok $schema->storage, 'DBIO::Storage::DBI';
 
 $ENV{DBI_DSN} = "dbi:Test_NonExistant_DBD2:$dbname";
 $schema = DBICTest::Schema->connect;
 throws_ok { count_sheep($schema) }
     qr{Can't locate DBD/Test_NonExistant_DBD2\.pm in \@INC},
     "Driver class defined in DBI_DSN doesn't exist";
-isa_ok $schema->storage, 'DBIx::Class::Storage::DBI';
+isa_ok $schema->storage, 'DBIO::Storage::DBI';
 
 $ENV{DBI_DSN} = "dbi::$dbname";
 $ENV{DBI_DRIVER} = 'Test_NonExistant_DBD3';
@@ -62,46 +62,46 @@ $schema = DBICTest::Schema->connect;
 throws_ok { count_sheep($schema) }
     qr{Can't locate DBD/Test_NonExistant_DBD3\.pm in \@INC},
     "Driver class defined in DBI_DRIVER doesn't exist";
-isa_ok $schema->storage, 'DBIx::Class::Storage::DBI';
+isa_ok $schema->storage, 'DBIO::Storage::DBI';
 
 $ENV{DBI_DSN} = "dbi:Test_NonExistant_DBD4:$dbname";
 $schema = DBICTest::Schema->connect;
 throws_ok { count_sheep($schema) }
 qr{Can't locate DBD/Test_NonExistant_DBD4\.pm in \@INC},
     "Driver class defined in DBI_DSN doesn't exist";
-isa_ok $schema->storage, 'DBIx::Class::Storage::DBI';
+isa_ok $schema->storage, 'DBIO::Storage::DBI';
 
 delete @ENV{qw(DBI_DSN DBI_DRIVER)};
 
 $schema = DBICTest::Schema->connect("dbi:SQLite:$dbname");
 lives_ok { count_sheep($schema) } 'SQLite passed to connect_info';
-isa_ok $schema->storage, 'DBIx::Class::Storage::DBI::SQLite';
+isa_ok $schema->storage, 'DBIO::Storage::DBI::SQLite';
 
 $schema = DBICTest::Schema->connect("dbi:SQLite(ReadOnly=1):$dbname");
 lives_ok { count_sheep($schema) } 'SQLite passed to connect_info despite extra arguments present';
-isa_ok $schema->storage, 'DBIx::Class::Storage::DBI::SQLite';
+isa_ok $schema->storage, 'DBIO::Storage::DBI::SQLite';
 
 $ENV{DBI_DRIVER} = 'SQLite';
 $schema = DBICTest::Schema->connect("dbi::$dbname");
 lives_ok { count_sheep($schema) } 'SQLite in DBI_DRIVER';
-isa_ok $schema->storage, 'DBIx::Class::Storage::DBI::SQLite';
+isa_ok $schema->storage, 'DBIO::Storage::DBI::SQLite';
 
 delete $ENV{DBI_DRIVER};
 $ENV{DBI_DSN} = "dbi:SQLite:$dbname";
 $schema = DBICTest::Schema->connect;
 lives_ok { count_sheep($schema) } 'SQLite in DBI_DSN';
-isa_ok $schema->storage, 'DBIx::Class::Storage::DBI::SQLite';
+isa_ok $schema->storage, 'DBIO::Storage::DBI::SQLite';
 
 $ENV{DBI_DRIVER} = 'SQLite';
 $schema = DBICTest::Schema->connect;
 lives_ok { count_sheep($schema) } 'SQLite in DBI_DSN (and DBI_DRIVER)';
-isa_ok $schema->storage, 'DBIx::Class::Storage::DBI::SQLite';
+isa_ok $schema->storage, 'DBIO::Storage::DBI::SQLite';
 
 $ENV{DBI_DSN} = "dbi::$dbname";
 $ENV{DBI_DRIVER} = 'SQLite';
 $schema = DBICTest::Schema->connect;
 lives_ok { count_sheep($schema) } 'SQLite in DBI_DRIVER (not DBI_DSN)';
-isa_ok $schema->storage, 'DBIx::Class::Storage::DBI::SQLite';
+isa_ok $schema->storage, 'DBIO::Storage::DBI::SQLite';
 
 # make sure that dynamically setting DBI_DSN post-connect works
 {
@@ -117,7 +117,7 @@ isa_ok $schema->storage, 'DBIx::Class::Storage::DBI::SQLite';
   $ENV{DBI_DSN} = 'dbi:SQLite::memory:';
 
   lives_ok { $s->storage->ensure_connected } 'Second connection attempt worked';
-  isa_ok ( $s->storage, 'DBIx::Class::Storage::DBI::SQLite' );
+  isa_ok ( $s->storage, 'DBIO::Storage::DBI::SQLite' );
 }
 
 done_testing;

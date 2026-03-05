@@ -23,7 +23,7 @@ use Test::More;
 plan skip_all => 'DBIC does not actively support threads before perl 5.8.5'
   if $] < '5.008005';
 
-use DBIx::Class::Optional::Dependencies ();
+use DBIO::Optional::Dependencies ();
 use Scalar::Util 'weaken';
 use lib qw(t/lib);
 use DBICTest;
@@ -32,8 +32,8 @@ my ($dsn, $user, $pass) = @ENV{map { "DBICTEST_PG_${_}" } qw/DSN USER PASS/};
 plan skip_all => 'Set $ENV{DBICTEST_PG_DSN}, _USER and _PASS to run this test'
       . ' (note: creates and drops a table named artist!)' unless ($dsn && $user);
 
-plan skip_all => 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('rdbms_pg')
-  unless DBIx::Class::Optional::Dependencies->req_ok_for ('rdbms_pg');
+plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('rdbms_pg')
+  unless DBIO::Optional::Dependencies->req_ok_for ('rdbms_pg');
 
 my $num_children = $ENV{DBICTEST_THREAD_STRESS} || 1;
 if($num_children !~ /^[0-9]+$/ || $num_children < 10) {

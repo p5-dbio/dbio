@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-use DBIx::Class::ResultSet::Pager;
+use DBIO::ResultSet::Pager;
 
 my $name;
 
@@ -20,11 +20,11 @@ foreach my $line (<DATA>) {
     my @vals = map { /^undef$/ ? undef : /^''$/ ? '' : $_ } split /\s+/,
         $line;
 
-    my $page = DBIx::Class::ResultSet::Pager->new( @vals[ 0, 1, 2 ] );
+    my $page = DBIO::ResultSet::Pager->new( @vals[ 0, 1, 2 ] );
     print "Old style\n";
     check( $page, $name, @vals );
 
-    $page = DBIx::Class::ResultSet::Pager->new();
+    $page = DBIO::ResultSet::Pager->new();
     $page->total_entries( $vals[0] );
     $page->entries_per_page( $vals[1] );
     $page->current_page( $vals[2] );
@@ -32,15 +32,15 @@ foreach my $line (<DATA>) {
     check( $page, $name, @vals );
 }
 
-my $page = DBIx::Class::ResultSet::Pager->new( 0, 10 );
-isa_ok( $page, 'DBIx::Class::ResultSet::Pager' );
+my $page = DBIO::ResultSet::Pager->new( 0, 10 );
+isa_ok( $page, 'DBIO::ResultSet::Pager' );
 my @empty;
 my @spliced = $page->splice( \@empty );
 is( scalar(@spliced), 0, "Splice on empty is empty" );
 
 sub check {
     my ( $page, $name, @vals ) = @_;
-    isa_ok( $page, 'DBIx::Class::ResultSet::Pager' );
+    isa_ok( $page, 'DBIO::ResultSet::Pager' );
 
     is( $page->first_page,    $vals[3], "$name: first page" );
     is( $page->last_page,     $vals[4], "$name: last page" );

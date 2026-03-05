@@ -8,12 +8,12 @@ use DBIC::Test::SQLite (); # this will issue the necessary SKIPs on missing reqs
 
 {
     package Thing;
-    use base qw(DBIx::Class::CDBICompat);
+    use base qw(DBIO::CDBICompat);
 }
 
 {
     package Stuff;
-    use base qw(DBIx::Class::CDBICompat);
+    use base qw(DBIO::CDBICompat);
 }
 
 # There was a bug where looking at a column group before any were

@@ -6,8 +6,8 @@ use Test::More;
 use lib qw(t/lib);
 use DBICTest ':DiffSQL';
 
-my $ROWS = DBIx::Class::SQLMaker::ClassicExtensions->__rows_bindtype;
-my $OFFSET = DBIx::Class::SQLMaker::ClassicExtensions->__offset_bindtype;
+my $ROWS = DBIO::SQLMaker::ClassicExtensions->__rows_bindtype;
+my $OFFSET = DBIO::SQLMaker::ClassicExtensions->__offset_bindtype;
 
 my $schema = DBICTest->init_schema();
 

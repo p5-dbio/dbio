@@ -5,7 +5,7 @@ use Test::More;
 use lib qw(t/lib);
 use DBICTest;
 use B::Deparse;
-use DBIx::Class::_Util 'perlstring';
+use DBIO::_Util 'perlstring';
 
 # globally set for the rest of test
 # the rowparser maker does not order its hashes by default for the miniscule
@@ -753,7 +753,7 @@ my $deparser;
 sub is_same_src { SKIP: {
 
   skip "Skipping comparison of unicode-posioned source", 1
-    if DBIx::Class::_ENV_::STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE;
+    if DBIO::_ENV_::STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE;
 
   $deparser ||= B::Deparse->new;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -763,7 +763,7 @@ sub is_same_src { SKIP: {
   skip "Not testing equality of source containing defined-or operator on this perl $]", 1
     if ($] < 5.010 and$expect =~ m!\Q//=!);
 
-  $expect =~ s/__NBC__/perlstring($DBIx::Class::ResultSource::RowParser::Util::null_branch_class)/ge;
+  $expect =~ s/__NBC__/perlstring($DBIO::ResultSource::RowParser::Util::null_branch_class)/ge;
 
   $expect = "  { use strict; use warnings FATAL => 'uninitialized';\n$expect\n  }";
 

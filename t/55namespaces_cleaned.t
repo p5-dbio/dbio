@@ -72,8 +72,8 @@ use File::Spec;
 use B qw/svref_2object/;
 
 # makes sure we can load at least something
-use DBIx::Class;
-use DBIx::Class::Carp;
+use DBIO;
+use DBIO::Carp;
 
 my @modules = grep {
   my ($mod) = $_ =~ /(.+)/;
@@ -93,20 +93,20 @@ my @modules = grep {
 # have an exception table for old and/or weird code we are not sure
 # we *want* to clean in the first place
 my $skip_idx = { map { $_ => 1 } (
-  (grep { /^DBIx::Class::CDBICompat/ } @modules), # too crufty to touch
-  'SQL::Translator::Producer::DBIx::Class::File', # ditto
+  (grep { /^DBIO::CDBICompat/ } @modules), # too crufty to touch
+  'SQL::Translator::Producer::DBIO::File', # ditto
 
   # not sure how to handle type libraries
-  'DBIx::Class::Storage::DBI::Replicated::Types',
-  'DBIx::Class::Admin::Types',
+  'DBIO::Storage::DBI::Replicated::Types',
+  'DBIO::Admin::Types',
 
   # G::L::D is unclean, but we never inherit from it
-  'DBIx::Class::Admin::Descriptive',
-  'DBIx::Class::Admin::Usage',
+  'DBIO::Admin::Descriptive',
+  'DBIO::Admin::Usage',
 
   # utility classes, not part of the inheritance chain
-  'DBIx::Class::ResultSource::RowParser::Util',
-  'DBIx::Class::_Util',
+  'DBIO::ResultSource::RowParser::Util',
+  'DBIO::_Util',
 ) };
 
 my $has_moose = eval { require Moose::Util };

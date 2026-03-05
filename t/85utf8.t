@@ -8,7 +8,7 @@ use DBICTest;
 
 {
   package A::Comp;
-  use base 'DBIx::Class';
+  use base 'DBIO';
   sub store_column { shift->next::method (@_) };
   1;
 }
@@ -24,7 +24,7 @@ warnings_are (
   sub {
     local $ENV{DBIC_UTF8COLUMNS_OK} = 1;
     package A::Test1;
-    use base 'DBIx::Class::Core';
+    use base 'DBIO::Core';
     __PACKAGE__->load_components(qw(Core +A::Comp Ordered UTF8Columns));
     __PACKAGE__->load_components(qw(Ordered +A::SubComp Row UTF8Columns Core));
     sub store_column { shift->next::method (@_) };
@@ -38,13 +38,13 @@ warnings_like (
   sub {
     local $ENV{DBIC_UTF8COLUMNS_OK};
     package A::Test1Loud;
-    use base 'DBIx::Class::Core';
+    use base 'DBIO::Core';
     __PACKAGE__->load_components(qw(Core +A::Comp Ordered UTF8Columns));
     __PACKAGE__->load_components(qw(Ordered +A::SubComp Row UTF8Columns Core));
     sub store_column { shift->next::method (@_) };
     1;
   },
-  [qr/Use of DBIx::Class::UTF8Columns is strongly discouraged/],
+  [qr/Use of DBIO::UTF8Columns is strongly discouraged/],
   'issued deprecation warning',
 );
 
@@ -56,38 +56,38 @@ for (@{mro::get_linear_isa ('A::Test1')} ) {
 }
 
 cmp_ok ($test1_mro->{'A::SubComp'}, '<', $test1_mro->{'A::Comp'}, 'mro of Test1 correct (A::SubComp before A::Comp)' );
-cmp_ok ($test1_mro->{'A::Comp'}, '<', $test1_mro->{'DBIx::Class::UTF8Columns'}, 'mro of Test1 correct (A::Comp before UTF8Col)' );
-cmp_ok ($test1_mro->{'DBIx::Class::UTF8Columns'}, '<', $test1_mro->{'DBIx::Class::Core'}, 'mro of Test1 correct (UTF8Col before Core)' );
-cmp_ok ($test1_mro->{'DBIx::Class::Core'}, '<', $test1_mro->{'DBIx::Class::Row'}, 'mro of Test1 correct (Core before Row)' );
+cmp_ok ($test1_mro->{'A::Comp'}, '<', $test1_mro->{'DBIO::UTF8Columns'}, 'mro of Test1 correct (A::Comp before UTF8Col)' );
+cmp_ok ($test1_mro->{'DBIO::UTF8Columns'}, '<', $test1_mro->{'DBIO::Core'}, 'mro of Test1 correct (UTF8Col before Core)' );
+cmp_ok ($test1_mro->{'DBIO::Core'}, '<', $test1_mro->{'DBIO::Row'}, 'mro of Test1 correct (Core before Row)' );
 
 warnings_like (
   sub {
     package A::Test2;
-    use base 'DBIx::Class::Core';
+    use base 'DBIO::Core';
     __PACKAGE__->load_components(qw(UTF8Columns +A::Comp));
     sub store_column { shift->next::method (@_) };
     1;
   },
-  [qr/Incorrect loading order of DBIx::Class::UTF8Columns.+affect other components overriding 'store_column' \(A::Comp\)/],
+  [qr/Incorrect loading order of DBIO::UTF8Columns.+affect other components overriding 'store_column' \(A::Comp\)/],
   'incorrect order warning issued (violator defines)',
 );
 
 warnings_like (
   sub {
     package A::Test3;
-    use base 'DBIx::Class::Core';
+    use base 'DBIO::Core';
     __PACKAGE__->load_components(qw(UTF8Columns +A::SubComp));
     sub store_column { shift->next::method (@_) };
     1;
   },
-  [qr/Incorrect loading order of DBIx::Class::UTF8Columns.+affect other components overriding 'store_column' \(A::SubComp \(via A::Comp\)\)/],
+  [qr/Incorrect loading order of DBIO::UTF8Columns.+affect other components overriding 'store_column' \(A::SubComp \(via A::Comp\)\)/],
   'incorrect order warning issued (violator inherits)',
 );
 
 my $schema = DBICTest->init_schema();
 DBICTest::Schema::CD->load_components('UTF8Columns');
 DBICTest::Schema::CD->utf8_columns('title');
-Class::C3->reinitialize() if DBIx::Class::_ENV_::OLD_MRO;
+Class::C3->reinitialize() if DBIO::_ENV_::OLD_MRO;
 
 # as per http://search.cpan.org/dist/Test-Simple/lib/Test/More.pm#utf8
 binmode (Test::More->builder->$_, ':utf8') for qw/output failure_output todo_output/;

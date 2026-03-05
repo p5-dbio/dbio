@@ -156,7 +156,7 @@ $it = $rs->search({}, { rows => 3, cache => 1 })->page(2);
 is ($it->count, 3, '3 rows');
 is (scalar $it->all, 3, '3 objects');
 
-isa_ok($it->pager,'DBIx::Class::ResultSet::Pager','Get a pager back ok');
+isa_ok($it->pager,'DBIO::ResultSet::Pager','Get a pager back ok');
 is($it->pager->total_entries,7);
 is($it->pager->current_page,2);
 is($it->pager->entries_on_this_page,3);
@@ -165,7 +165,7 @@ $it = $it->page(3);
 is ($it->count, 1, 'One row');
 is (scalar $it->all, 1, 'One object');
 
-isa_ok($it->pager,'DBIx::Class::ResultSet::Pager','Get a pager back ok');
+isa_ok($it->pager,'DBIO::ResultSet::Pager','Get a pager back ok');
 is($it->pager->total_entries,7);
 is($it->pager->current_page,3);
 is($it->pager->entries_on_this_page,1);
@@ -197,7 +197,7 @@ $it = $rs->search(
 $pager = $it->pager;
 is ($qcnt, 0, 'No queries on rs/pager creation');
 
-$it = do { local $DBIx::Class::ResultSourceHandle::thaw_schema = $schema; dclone ($it) };
+$it = do { local $DBIO::ResultSourceHandle::thaw_schema = $schema; dclone ($it) };
 is ($qcnt, 0, 'No queries on rs/pager freeze/thaw');
 
 is( $it->pager->entries_on_this_page, 1, "entries_on_this_page ok for page 2" );
@@ -207,7 +207,7 @@ is ($qcnt, 1, 'Count fired to get pager page entries');
 $rs->create({ title => 'bah', artist => 1, year => 2011 });
 
 $qcnt = 0;
-$it = do { local $DBIx::Class::ResultSourceHandle::thaw_schema = $schema; dclone ($it) };
+$it = do { local $DBIO::ResultSourceHandle::thaw_schema = $schema; dclone ($it) };
 is ($qcnt, 0, 'No queries on rs/pager freeze/thaw');
 
 is( $it->pager->entries_on_this_page, 1, "entries_on_this_page ok for page 2, even though underlying count changed" );

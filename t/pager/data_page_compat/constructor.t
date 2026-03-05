@@ -4,25 +4,25 @@ use strict;
 use Test::More;
 use Test::Exception;
 
-use DBIx::Class::ResultSet::Pager;
+use DBIO::ResultSet::Pager;
 
-my $page = DBIx::Class::ResultSet::Pager->new(7, 10, 12);
-isa_ok($page, 'DBIx::Class::ResultSet::Pager');
+my $page = DBIO::ResultSet::Pager->new(7, 10, 12);
+isa_ok($page, 'DBIO::ResultSet::Pager');
 
 is($page->first_page, 1, "Adjusted to first possible page");
 
-$page = DBIx::Class::ResultSet::Pager->new(0, 10, -1);
-isa_ok($page, 'DBIx::Class::ResultSet::Pager');
+$page = DBIO::ResultSet::Pager->new(0, 10, -1);
+isa_ok($page, 'DBIO::ResultSet::Pager');
 
 is($page->first_page, 1, "Adjusted to first possible page");
 
 throws_ok {
-  my $page = DBIx::Class::ResultSet::Pager->new(12, -1, 1);
+  my $page = DBIO::ResultSet::Pager->new(12, -1, 1);
   }
   qr/one entry per page/, "Can't have entries-per-page less than 1";
 
 # The new empty constructor means we might be empty, let's check for sensible defaults
-$page = DBIx::Class::ResultSet::Pager->new;
+$page = DBIO::ResultSet::Pager->new;
 is($page->entries_per_page,     10);
 is($page->total_entries,        0);
 is($page->entries_on_this_page, 0);

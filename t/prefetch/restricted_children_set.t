@@ -21,7 +21,7 @@ my $cds_rs = $schema->resultset('CD')->search(
   {
     order_by => [qw(me.cdid cds.title)],
     prefetch => { artist => 'cds' },
-    result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+    result_class => 'DBIO::ResultClass::HashRefInflator',
   },
 );
 

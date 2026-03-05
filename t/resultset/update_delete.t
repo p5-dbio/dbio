@@ -16,7 +16,7 @@ BEGIN {
   DBICTest::Schema::CD->table('cd');
 }
 
-use DBIx::Class::_Util 'scope_guard';
+use DBIO::_Util 'scope_guard';
 use DBICTest;
 
 my $schema = DBICTest->init_schema;

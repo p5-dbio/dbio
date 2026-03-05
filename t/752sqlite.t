@@ -9,7 +9,7 @@ use Math::BigInt;
 
 use lib qw(t/lib);
 use DBICTest;
-use DBIx::Class::_Util qw( sigwarn_silencer modver_gt_or_eq modver_gt_or_eq_and_lt );
+use DBIO::_Util qw( sigwarn_silencer modver_gt_or_eq modver_gt_or_eq_and_lt );
 
 # make one deploy() round before we load anything else - need this in order
 # to prime SQLT if we are using it (deep depchain is deep)
@@ -275,13 +275,13 @@ for my $bi ( qw(
 
     # the test will not pass an == if we are running under 32 bit ivsize
     # use 'eq' on the numified (and possibly "scientificied") returned value
-    (DBIx::Class::_ENV_::IV_SIZE < 8 and $v_bits > 32) ? 'eq' : '==',
+    (DBIO::_ENV_::IV_SIZE < 8 and $v_bits > 32) ? 'eq' : '==',
 
     # in 1.37 DBD::SQLite switched to proper losless representation of bigints
     # regardless of ivize
     # before this use 'eq' (from above) on the numified (and possibly
     # "scientificied") returned value
-    (DBIx::Class::_ENV_::IV_SIZE < 8 and ! modver_gt_or_eq('DBD::SQLite', '1.37')) ? $bi+0 : $bi,
+    (DBIO::_ENV_::IV_SIZE < 8 and ! modver_gt_or_eq('DBD::SQLite', '1.37')) ? $bi+0 : $bi,
 
     "value in database correct ($v_desc)"
   );
@@ -320,7 +320,7 @@ SKIP: {
 
       ==
 
-      (DBIx::Class::_ENV_::IV_SIZE < 8 and ! modver_gt_or_eq('DBD::SQLite', '1.37')) ? $expect->bstr + 0 : $expect
+      (DBIO::_ENV_::IV_SIZE < 8 and ! modver_gt_or_eq('DBD::SQLite', '1.37')) ? $expect->bstr + 0 : $expect
     , "simple integer math with@{[ $dtype ? '' : 'out' ]} bindtype in database correct (base $v_desc)")
       or diag sprintf '%s != %s', $row->bigint, $expect;
   }

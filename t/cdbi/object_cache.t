@@ -10,7 +10,7 @@ INIT {
 }
 
 plan skip_all => "Object cache is turned off"
-    if Film->isa("DBIx::Class::CDBICompat::NoObjectIndex");
+    if Film->isa("DBIO::CDBICompat::NoObjectIndex");
 
 plan tests => 5;
 

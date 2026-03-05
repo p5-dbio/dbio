@@ -10,7 +10,7 @@ use DBICTest; # do not remove even though it is not used
 lives_ok (sub {
   warnings_exist ( sub {
       package DBICNSTestOther;
-      use base qw/DBIx::Class::Schema/;
+      use base qw/DBIO::Schema/;
       __PACKAGE__->load_namespaces(
           result_namespace => [ '+DBICNSTest::Rslt', '+DBICNSTest::OtherRslt' ],
           resultset_namespace => '+DBICNSTest::RSet',
@@ -21,16 +21,16 @@ lives_ok (sub {
 });
 
 my $source_a = DBICNSTestOther->source('A');
-isa_ok($source_a, 'DBIx::Class::ResultSource::Table');
+isa_ok($source_a, 'DBIO::ResultSource::Table');
 my $rset_a   = DBICNSTestOther->resultset('A');
 isa_ok($rset_a, 'DBICNSTest::RSet::A');
 
 my $source_b = DBICNSTestOther->source('B');
-isa_ok($source_b, 'DBIx::Class::ResultSource::Table');
+isa_ok($source_b, 'DBIO::ResultSource::Table');
 my $rset_b   = DBICNSTestOther->resultset('B');
-isa_ok($rset_b, 'DBIx::Class::ResultSet');
+isa_ok($rset_b, 'DBIO::ResultSet');
 
 my $source_d = DBICNSTestOther->source('D');
-isa_ok($source_d, 'DBIx::Class::ResultSource::Table');
+isa_ok($source_d, 'DBIO::ResultSource::Table');
 
 done_testing;

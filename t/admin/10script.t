@@ -15,10 +15,10 @@ use lib qw(t/lib);
 use DBICTest;
 
 BEGIN {
-  require DBIx::Class;
+  require DBIO;
   plan skip_all => 'Test needs ' .
-    DBIx::Class::Optional::Dependencies->req_missing_for('test_admin_script')
-      unless DBIx::Class::Optional::Dependencies->req_ok_for('test_admin_script');
+    DBIO::Optional::Dependencies->req_missing_for('test_admin_script')
+      unless DBIO::Optional::Dependencies->req_ok_for('test_admin_script');
 
   # just in case the user env has stuff in it
   delete $ENV{JSON_ANY_ORDER};

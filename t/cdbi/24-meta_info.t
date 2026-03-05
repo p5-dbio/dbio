@@ -10,7 +10,7 @@ eval { require Time::Piece }
   or plan skip_all => 'Time::Piece required for this test';
 
 package Temp::DBI;
-use base qw(DBIx::Class::CDBICompat);
+use base qw(DBIO::CDBICompat);
 Temp::DBI->columns(All => qw(id date));
 
 my $strptime_inflate = sub {

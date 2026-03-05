@@ -17,7 +17,7 @@ my $rs = $schema->resultset ('CD')->search ({}, {
   as => [qw/title_initial cnt/],
   group_by => ['initial'],
   order_by => { -desc => 'initial' },
-  result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+  result_class => 'DBIO::ResultClass::HashRefInflator',
 });
 
 is_deeply (

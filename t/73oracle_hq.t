@@ -9,7 +9,7 @@ use Test::More;
 BEGIN { $ENV{DBIC_SHUFFLE_UNORDERED_RESULTSETS} = 0 }
 
 
-use DBIx::Class::Optional::Dependencies ();
+use DBIO::Optional::Dependencies ();
 use lib qw(t/lib);
 
 $ENV{NLS_SORT} = "BINARY";
@@ -21,8 +21,8 @@ my ($dsn,  $user,  $pass)  = @ENV{map { "DBICTEST_ORA_${_}" }  qw/DSN USER PASS/
 plan skip_all => 'Set $ENV{DBICTEST_ORA_DSN}, _USER and _PASS to run this test.'
  unless ($dsn && $user && $pass);
 
-plan skip_all => 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('rdbms_oracle')
-  unless DBIx::Class::Optional::Dependencies->req_ok_for ('rdbms_oracle');
+plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('rdbms_oracle')
+  unless DBIO::Optional::Dependencies->req_ok_for ('rdbms_oracle');
 
 use DBICTest::Schema::Artist;
 BEGIN {

@@ -3,9 +3,9 @@ package    # hide from PAUSE
 
 use strict;
 use warnings;
-use base 'DBIx::Class::Core';
+use base 'DBIO::Core';
 
-__PACKAGE__->table_class('DBIx::Class::ResultSource::View');
+__PACKAGE__->table_class('DBIO::ResultSource::View');
 __PACKAGE__->table('aba_name_artists_and_2010_cds_with_many_tracks');
 __PACKAGE__->result_source_instance->view_definition(
     "SELECT aba.id,aba.name,cd.title,cd.year,cd.number_tracks FROM aba_name_artists aba JOIN year_2010_cds_with_many_tracks cd on (aba.id = cd.artist)"

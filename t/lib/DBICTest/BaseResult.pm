@@ -4,9 +4,9 @@ package #hide from pause
 use strict;
 use warnings;
 
-use base qw(DBICTest::Base DBIx::Class::Core);
+use base qw(DBICTest::Base DBIO::Core);
 
-#use base qw/DBIx::Class::Relationship::Cascade::Rekey DBIx::Class::Core/;
+#use base qw/DBIO::Relationship::Cascade::Rekey DBIO::Core/;
 
 __PACKAGE__->table ('bogus');
 __PACKAGE__->resultset_class ('DBICTest::BaseResultSet');

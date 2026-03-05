@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-use DBIx::Class::Optional::Dependencies ();
+use DBIO::Optional::Dependencies ();
 
 use lib qw(t/lib);
 use DBICTest;
@@ -22,11 +22,11 @@ for my $type (qw/PG MYSQL SQLite/) {
 
     if ($type eq 'PG') {
       skip "skipping Pg tests without dependencies installed", 1
-        unless DBIx::Class::Optional::Dependencies->req_ok_for('test_rdbms_pg');
+        unless DBIO::Optional::Dependencies->req_ok_for('test_rdbms_pg');
     }
     elsif ($type eq 'MYSQL') {
       skip "skipping MySQL tests without dependencies installed", 1
-        unless DBIx::Class::Optional::Dependencies->req_ok_for('test_rdbms_mysql');
+        unless DBIO::Optional::Dependencies->req_ok_for('test_rdbms_mysql');
     }
 
     my $schema = DBICTest::Schema->connect (@dsn);

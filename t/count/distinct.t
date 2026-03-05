@@ -20,7 +20,7 @@ my $in_rs = $schema->resultset('Tag')->search({ tag => [ 'Blue', 'Cheesy' ] });
 
 for my $get_count (
   sub { shift->count },
-  sub { my $crs = shift->count_rs; isa_ok ($crs, 'DBIx::Class::ResultSetColumn'); $crs->next }
+  sub { my $crs = shift->count_rs; isa_ok ($crs, 'DBIO::ResultSetColumn'); $crs->next }
 ) {
   $rs = $schema->resultset('Tag')->search({ tag => 'Blue' });
   is($get_count->($rs), 4, 'Count without DISTINCT');

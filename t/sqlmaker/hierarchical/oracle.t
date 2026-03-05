@@ -4,9 +4,9 @@ use warnings;
 use Test::More;
 use lib qw(t/lib);
 
-use DBIx::Class::Optional::Dependencies;
-plan skip_all => 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('id_shortener')
-  unless DBIx::Class::Optional::Dependencies->req_ok_for ('id_shortener');
+use DBIO::Optional::Dependencies;
+plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('id_shortener')
+  unless DBIO::Optional::Dependencies->req_ok_for ('id_shortener');
 
 use DBICTest::Schema::Artist;
 BEGIN {
@@ -25,13 +25,13 @@ BEGIN {
 
 use DBICTest ':DiffSQL';
 
-my $ROWS = DBIx::Class::SQLMaker::ClassicExtensions->__rows_bindtype;
-my $TOTAL = DBIx::Class::SQLMaker::ClassicExtensions->__total_bindtype;
+my $ROWS = DBIO::SQLMaker::ClassicExtensions->__rows_bindtype;
+my $TOTAL = DBIO::SQLMaker::ClassicExtensions->__total_bindtype;
 
 for my $q ( '', '"' ) {
 
   my $schema = DBICTest->init_schema(
-    storage_type => 'DBIx::Class::Storage::DBI::Oracle::Generic',
+    storage_type => 'DBIO::Storage::DBI::Oracle::Generic',
     no_deploy => 1,
     quote_char => $q,
   );

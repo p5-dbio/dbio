@@ -9,7 +9,7 @@ use DBICTest;
 warnings_exist { DBICTest->init_schema( compose_connection => 1, sqlite_use_file => 1 ) }
   [
     qr/compose_connection deprecated as of 0\.08000/,
-    qr/\QDBIx::Class::ResultSetProxy is DEPRECATED/,
+    qr/\QDBIO::ResultSetProxy is DEPRECATED/,
   ],
   'got expected deprecation warnings'
 ;

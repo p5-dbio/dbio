@@ -16,7 +16,7 @@ BEGIN { push @INC, '.' unless grep { $_ eq '.' } @INC }
 BEGIN {
   die <<'EOE' if $^V =~ /c/;
 
-Currently DBIx::Class is not attempting to be compatible with CPerl
+Currently DBIO is not attempting to be compatible with CPerl
 For more info: https://irclog.perlgeek.de/perl11/2016-06-08#i_12624929
 
 EOE
@@ -36,13 +36,13 @@ BEGIN {
   $Module::Install::AUTHOR = 0 if (grep { $ENV{"PERL5_${_}_IS_RUNNING"} } (qw/CPANM CPANPLUS CPAN/) );
 }
 
-name         'DBIx-Class';
-version_from 'lib/DBIx/Class.pm';
+name         'DBIO';
+version_from 'lib/DBIO.pm';
 perl_version '5.008001';
 
 ###
 ### DO NOT ADD OPTIONAL DEPENDENCIES HERE, EVEN AS recommends()
-### All of them *MUST* go to DBIx::Class::Optional::Dependencies
+### All of them *MUST* go to DBIO::Optional::Dependencies
 ###
 my $runtime_requires = {
 
@@ -121,8 +121,8 @@ my $test_requires = {
 # to keep the pieces
 if ($ENV{DBICTEST_SQLT_DEPLOY}) {
   local @INC = ('lib', @INC);
-  require DBIx::Class::Optional::Dependencies;
-  my $dep_req = DBIx::Class::Optional::Dependencies->req_list_for('deploy');
+  require DBIO::Optional::Dependencies;
+  my $dep_req = DBIO::Optional::Dependencies->req_list_for('deploy');
   for (keys %$dep_req) {
     test_requires ($_ => $dep_req->{$_})
   }
@@ -137,7 +137,7 @@ tests_recursive ('xt') if (
   (
     ( $ENV{TRAVIS}||'' ) eq 'true'
       and
-    ($ENV{TRAVIS_REPO_SLUG}||'') =~ m|\w+/DBIx-Class$|
+    ($ENV{TRAVIS_REPO_SLUG}||'') =~ m|\w+/DBIO$|
   )
     or
   ( $ENV{AUTOMATED_TESTING} and ! $ENV{PERL5_CPANM_IS_RUNNING} and ! $ENV{RELEASE_TESTING} )

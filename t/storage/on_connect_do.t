@@ -39,7 +39,7 @@ ok $schema->connection(
         # DO NOT REMOVE - this seems like an unrelated piece of info,
         # but is in fact a test for a bug where setting an accessor-via-option
         # would trigger an early connect *bypassing* the on_connect_* pieces
-        cursor_class => 'DBIx::Class::Storage::Cursor',
+        cursor_class => 'DBIO::Storage::Cursor',
 
         on_connect_do       => [
             'CREATE TABLE TEST_empty (id INTEGER)',
@@ -81,7 +81,7 @@ ok ! $disconnected, 'on_disconnect_do() not called after connect()';
 $schema->storage->disconnect();
 ok $disconnected, 'on_disconnect_do() called after disconnect()';
 
-isa_ok($cb_args[0], 'DBIx::Class::Storage', 'first arg to on_connect_do hook');
+isa_ok($cb_args[0], 'DBIO::Storage', 'first arg to on_connect_do hook');
 @cb_args = ();
 
 sub check_exists {

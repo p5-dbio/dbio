@@ -474,13 +474,13 @@ INFTYPE: for ('', '(native inflator)') {
 sub null_branch {
   cmp_deeply(
     $_[0][0],
-    $native_inflator ? undef : bless( $_[1], $DBIx::Class::ResultSource::RowParser::Util::null_branch_class ),
+    $native_inflator ? undef : bless( $_[1], $DBIO::ResultSource::RowParser::Util::null_branch_class ),
   );
 }
 sub null_collapsed_branch {
   cmp_deeply(
     $_[0][0],
-    $native_inflator ? [] : bless( $_[1], $DBIx::Class::ResultSource::RowParser::Util::null_branch_class ),
+    $native_inflator ? [] : bless( $_[1], $DBIO::ResultSource::RowParser::Util::null_branch_class ),
   );
 }
 
@@ -510,7 +510,7 @@ sub cmp_structures {
 
   sub inflate_result {
     my $class = shift;
-    return map { DBIx::Class::ResultClass::HashRefInflator->inflate_result(@_) } (1,2);
+    return map { DBIO::ResultClass::HashRefInflator->inflate_result(@_) } (1,2);
   }
 }
 

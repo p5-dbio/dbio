@@ -12,7 +12,7 @@ use DBICTest ':DiffSQL';
 
 {
   package DBICTest::SQLMaker::CustomDialect;
-  use base qw/DBIx::Class::SQLMaker/;
+  use base qw/DBIO::SQLMaker/;
   sub emulate_limit {
     my ($self, $sql, $rs_attrs, $limit, $offset) = @_;
     return sprintf ('shiny sproc ((%s), %d, %d)',

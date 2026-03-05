@@ -303,7 +303,7 @@ SKIP: {
 
 # Change after_update policy
 SKIP: {
-        skip "DBIx::Class compat doesn't handle the exists stuff quite right yet", 4;
+        skip "DBIO compat doesn't handle the exists stuff quite right yet", 4;
   my $bt = Film->retrieve($btaste->id);
   $bt->autoupdate(1);
 
@@ -373,7 +373,7 @@ if (0) {
 
 SKIP: {
     skip "Caching has been removed", 5
-        if Film->isa("DBIx::Class::CDBICompat::NoObjectIndex");
+        if Film->isa("DBIO::CDBICompat::NoObjectIndex");
 
   # my bad taste is your bad taste
   my $btaste  = Film->retrieve('Bad Taste');

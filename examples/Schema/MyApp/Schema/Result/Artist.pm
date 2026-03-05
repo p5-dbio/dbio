@@ -3,7 +3,7 @@ package MyApp::Schema::Result::Artist;
 use warnings;
 use strict;
 
-use base qw( DBIx::Class::Core );
+use base qw( DBIO::Core );
 
 __PACKAGE__->table('artist');
 

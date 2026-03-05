@@ -12,7 +12,7 @@ for (1 .. $src_count) {
   eval <<EOM or die $@;
 
   package DBICTest::NS::Stress::Schema::Result::T$_;
-  use base qw/DBIx::Class::Core/;
+  use base qw/DBIO::Core/;
   __PACKAGE__->table($_);
   __PACKAGE__->add_columns (
     id => { data_type => 'integer', is_auto_increment => 1 },
@@ -27,7 +27,7 @@ EOM
 {
   package DBICTest::NS::Stress::Schema;
 
-  use base qw/DBIx::Class::Schema/;
+  use base qw/DBIO::Schema/;
 
   sub _findallmod {
     return $_[1] eq ( __PACKAGE__ . '::Result' )

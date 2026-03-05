@@ -11,7 +11,7 @@ my $warnings;
 eval {
     local $SIG{__WARN__} = sub { $warnings .= shift };
     package DBICNSTest;
-    use base qw/DBIx::Class::Schema/;
+    use base qw/DBIO::Schema/;
     __PACKAGE__->load_namespaces(
         result_namespace => 'Rslt',
         resultset_namespace => 'RSet',
@@ -21,11 +21,11 @@ ok(!$@) or diag $@;
 like($warnings, qr/load_namespaces found ResultSet class 'DBICNSTest::RSet::C' with no corresponding Result class/);
 
 my $source_a = DBICNSTest->source('A');
-isa_ok($source_a, 'DBIx::Class::ResultSource::Table');
+isa_ok($source_a, 'DBIO::ResultSource::Table');
 my $rset_a   = DBICNSTest->resultset('A');
 isa_ok($rset_a, 'DBICNSTest::RSet::A');
 
 my $source_b = DBICNSTest->source('B');
-isa_ok($source_b, 'DBIx::Class::ResultSource::Table');
+isa_ok($source_b, 'DBIO::ResultSource::Table');
 my $rset_b   = DBICNSTest->resultset('B');
-isa_ok($rset_b, 'DBIx::Class::ResultSet');
+isa_ok($rset_b, 'DBIO::ResultSet');

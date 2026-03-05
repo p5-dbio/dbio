@@ -6,14 +6,14 @@ use Test::Exception;
 use Test::Warn;
 use Sub::Name;
 use Config;
-use DBIx::Class::Optional::Dependencies ();
+use DBIO::Optional::Dependencies ();
 use lib qw(t/lib);
 use DBICTest;
 use SQL::Abstract::Util 'is_literal_value';
-use DBIx::Class::_Util qw( is_exception sigwarn_silencer );
+use DBIO::_Util qw( is_exception sigwarn_silencer );
 
-plan skip_all => 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('test_rdbms_pg')
-  unless DBIx::Class::Optional::Dependencies->req_ok_for ('test_rdbms_pg');
+plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('test_rdbms_pg')
+  unless DBIO::Optional::Dependencies->req_ok_for ('test_rdbms_pg');
 
 my ($dsn, $user, $pass) = @ENV{map { "DBICTEST_PG_${_}" } qw/DSN USER PASS/};
 
@@ -40,12 +40,12 @@ DBICTest::Schema->load_classes( map {s/.+:://;$_} @test_classes ) if @test_class
     # Check that datetime_parser returns correctly before we explicitly connect.
     SKIP: {
         skip (
-          "Pg parser detection test needs " . DBIx::Class::Optional::Dependencies->req_missing_for ('test_dt_pg'),
+          "Pg parser detection test needs " . DBIO::Optional::Dependencies->req_missing_for ('test_dt_pg'),
           2
-        ) unless DBIx::Class::Optional::Dependencies->req_ok_for ('test_dt_pg');
+        ) unless DBIO::Optional::Dependencies->req_ok_for ('test_dt_pg');
 
         my $store = ref $s->storage;
-        is($store, 'DBIx::Class::Storage::DBI', 'Started with generic storage');
+        is($store, 'DBIO::Storage::DBI', 'Started with generic storage');
 
         my $parser = $s->storage->datetime_parser;
         is( $parser, 'DateTime::Format::Pg', 'datetime_parser is as expected');
@@ -319,7 +319,7 @@ for my $use_insert_returning ($test_server_supports_insert_returning
 
     use strict;
     use warnings;
-    use base 'DBIx::Class::Core';
+    use base 'DBIO::Core';
 
     __PACKAGE__->table('dbic_t_schema.casecheck');
     __PACKAGE__->add_columns(qw/id name NAME uc_name/);
@@ -401,8 +401,8 @@ lives_ok { $cds->update({ year => '2010' }) } 'Update on prefetched rs';
 
               # FIXME - this needs to go away in lieu of a non-retrying runner
               # ( i.e. after solving RT#47005 )
-              local *DBIx::Class::Storage::DBI::_ping = sub { 1 }, DBIx::Class::_ENV_::OLD_MRO && Class::C3->reinitialize()
-                if DBIx::Class::_Util::modver_gt_or_eq( 'DBD::Pg' => '3.5.0' );
+              local *DBIO::Storage::DBI::_ping = sub { 1 }, DBIO::_ENV_::OLD_MRO && Class::C3->reinitialize()
+                if DBIO::_Util::modver_gt_or_eq( 'DBD::Pg' => '3.5.0' );
 
               alarm(1);
               $artist2->update;
@@ -707,7 +707,7 @@ BEGIN {
 
   use strict;
   use warnings;
-  use base 'DBIx::Class::Core';
+  use base 'DBIO::Core';
 
   __PACKAGE__->table('apk');
 

@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Scalar::Util 'weaken';
-use DBIx::Class::Optional::Dependencies ();
+use DBIO::Optional::Dependencies ();
 use lib qw(t/lib);
 use DBICTest;
 
@@ -14,8 +14,8 @@ plan skip_all => 'Set $ENV{DBICTEST_MSSQL_DSN}, _USER and _PASS to run this test
   unless ($dsn);
 
 
-plan skip_all => 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('test_rdbms_mssql_sybase')
-  unless DBIx::Class::Optional::Dependencies->req_ok_for ('test_rdbms_mssql_sybase');
+plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('test_rdbms_mssql_sybase')
+  unless DBIO::Optional::Dependencies->req_ok_for ('test_rdbms_mssql_sybase');
 
 {
   my $srv_ver = DBICTest::Schema->connect($dsn, $user, $pass)->storage->_server_info->{dbms_version};
@@ -50,7 +50,7 @@ for my $storage_type (@test_storages) {
       'prepare_cached disabled for NoBindVars';
   }
 
-  isa_ok($schema->storage, "DBIx::Class::Storage::$storage_type");
+  isa_ok($schema->storage, "DBIO::Storage::$storage_type");
 
   SKIP: {
     skip 'This version of DBD::Sybase segfaults on disconnect', 1 if DBD::Sybase->VERSION < 1.08;

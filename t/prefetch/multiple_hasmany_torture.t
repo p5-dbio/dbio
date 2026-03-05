@@ -6,7 +6,7 @@ use Test::Deep;
 use Test::Exception;
 use lib qw(t/lib);
 use DBICTest;
-use DBIx::Class::_Util 'sigwarn_silencer';
+use DBIO::_Util 'sigwarn_silencer';
 
 my $schema = DBICTest->init_schema();
 
@@ -110,7 +110,7 @@ my $art_rs = $schema->resultset('Artist')->search({ 'me.artistid' => 4 });
 
 my $art_rs_prefetch = $art_rs->search({}, {
   order_by => [qw/tracks.position tracks.trackid producer.producerid tracks_2.trackid artwork.cd_id/],
-  result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+  result_class => 'DBIO::ResultClass::HashRefInflator',
   prefetch => [
     {
       cds => [
@@ -134,7 +134,7 @@ for my $order (
 
   my $cds_rs_prefetch = $art_rs->related_resultset('cds')->search({}, {
     order_by => [ $order->[0], qw(producer.name tracks_2.position) ],
-    result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+    result_class => 'DBIO::ResultClass::HashRefInflator',
     prefetch => [
       { tracks => { cd_single => 'tracks' } },
       { cd_to_producer => 'producer' },

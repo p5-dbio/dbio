@@ -8,9 +8,9 @@ use DBICTest ':DiffSQL';
 
 my $schema = DBICTest::Schema->connect (DBICTest->_database, { quote_char => '`' });
 # cheat
-require DBIx::Class::Storage::DBI::mysql;
-*DBIx::Class::Storage::DBI::mysql::_get_server_version = sub { 5 };
-bless ( $schema->storage, 'DBIx::Class::Storage::DBI::mysql' );
+require DBIO::Storage::DBI::mysql;
+*DBIO::Storage::DBI::mysql::_get_server_version = sub { 5 };
+bless ( $schema->storage, 'DBIO::Storage::DBI::mysql' );
 
 # check that double-subqueries are properly wrapped
 {
@@ -133,7 +133,7 @@ for (
     $schema->storage->_sql_maker(undef);
 
     no warnings 'redefine';
-    local *DBIx::Class::Storage::DBI::mysql::_get_server_version = sub { $ver };
+    local *DBIO::Storage::DBI::mysql::_get_server_version = sub { $ver };
 
     $schema->storage->ensure_connected;
     $schema->storage->sql_maker;

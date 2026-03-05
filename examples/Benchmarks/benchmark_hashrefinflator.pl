@@ -20,7 +20,7 @@ use DBICTest;
 
 # for git reporting to work, and to use it as INC key directly
 chdir ("$FindBin::Bin/../../lib");
-my $hri_fn = 'DBIx/Class/ResultClass/HashRefInflator.pm';
+my $hri_fn = 'DBIO/ResultClass/HashRefInflator.pm';
 
 require Getopt::Long;
 my $getopt = Getopt::Long::Parser->new(
@@ -79,7 +79,7 @@ for my $commit (`git log --format=%h HEAD ^8330454^ $hri_fn `) {
         $not_latest ? '' : 'LATEST, ',
         $age,
       ),
-      code => scalar `git show $commit:lib/DBIx/Class/ResultClass/HashRefInflator.pm`,
+      code => scalar `git show $commit:lib/DBIO/ResultClass/HashRefInflator.pm`,
     };
 
     last if @to_bench == $args->{'bench-commits'};
@@ -154,7 +154,7 @@ my %bench_dataset = (
 my %num_iters;
 my %bench = ( map { $_ => eval "sub {
   for (1 .. (\$num_iters{$_}||1) ) {
-    DBIx::Class::ResultClass::HashRefInflator->inflate_result(\$bench_dataset{$_})
+    DBIO::ResultClass::HashRefInflator->inflate_result(\$bench_dataset{$_})
   }
 }" } qw/simple complex/ );
 
@@ -164,7 +164,7 @@ print "\nPre-timing current HRI to determine iteration counts...";
 # designed to return a value so that there ~ 1/$div runs in a second
 # (based on the current @INC implementation)
 my $div = 1;
-require DBIx::Class::ResultClass::HashRefInflator;
+require DBIO::ResultClass::HashRefInflator;
 for (qw/simple complex/) {
   local $SIG{__WARN__} = sub {};
   my $tst = Benchmark::timethis(-1, $bench{$_}, '', 'none');
@@ -176,9 +176,9 @@ print " done\n\nBenchmarking - this can taka a LOOOOOONG time\n\n";
 my %results;
 
 for my $bch (@to_bench) {
-  Class::Unload->unload('DBIx::Class::ResultClass::HashRefInflator');
+  Class::Unload->unload('DBIO::ResultClass::HashRefInflator');
   eval $bch->{code} or die $@;
-  $INC{'DBIx/Class/ResultClass/HashRefInflator.pm'} = $bch->{title};
+  $INC{'DBIO/ResultClass/HashRefInflator.pm'} = $bch->{title};
 
   for my $t (qw/simple complex/) {
     my $label = "Timing $num_iters{$t} $t iterations of $bch->{desc}";

@@ -11,7 +11,7 @@ ok( DBICTest::ForeignComponent->foreign_test_method, 'foreign component' );
 
 #   Test for inject_base to filter out duplicates
 {   package DBICTest::_InjectBaseTest;
-    use base qw/ DBIx::Class /;
+    use base qw/ DBIO /;
     package DBICTest::_InjectBaseTest::A;
     package DBICTest::_InjectBaseTest::B;
     package DBICTest::_InjectBaseTest::C;
@@ -27,12 +27,12 @@ is_deeply( \@DBICTest::_InjectBaseTest::ISA,
         DBICTest::_InjectBaseTest::A
         DBICTest::_InjectBaseTest::B
         DBICTest::_InjectBaseTest::C
-        DBIx::Class
+        DBIO
     /],
     'inject_base filters duplicates'
 );
 
-use_ok('DBIx::Class::AccessorGroup');
-use_ok('DBIx::Class::Componentised');
+use_ok('DBIO::AccessorGroup');
+use_ok('DBIO::Componentised');
 
 done_testing;

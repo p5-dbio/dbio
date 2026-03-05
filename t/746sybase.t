@@ -4,7 +4,7 @@ no warnings 'uninitialized';
 
 use Test::More;
 use Test::Exception;
-use DBIx::Class::Optional::Dependencies ();
+use DBIO::Optional::Dependencies ();
 use lib qw(t/lib);
 use DBICTest;
 
@@ -17,14 +17,14 @@ if (not ($dsn && $user)) {
   ;
 };
 
-plan skip_all => 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('test_rdbms_ase')
-  unless DBIx::Class::Optional::Dependencies->req_ok_for ('test_rdbms_ase');
+plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('test_rdbms_ase')
+  unless DBIO::Optional::Dependencies->req_ok_for ('test_rdbms_ase');
 
 my @storage_types = (
   'DBI::Sybase::ASE',
   'DBI::Sybase::ASE::NoBindVars',
 );
-eval "require DBIx::Class::Storage::$_;" for @storage_types;
+eval "require DBIO::Storage::$_;" for @storage_types;
 
 my $schema;
 my $storage_idx = -1;
@@ -39,8 +39,8 @@ sub get_schema {
 
 my $ping_count = 0;
 {
-  my $ping = DBIx::Class::Storage::DBI::Sybase::ASE->can('_ping');
-  *DBIx::Class::Storage::DBI::Sybase::ASE::_ping = sub {
+  my $ping = DBIO::Storage::DBI::Sybase::ASE->can('_ping');
+  *DBIO::Storage::DBI::Sybase::ASE::_ping = sub {
     $ping_count++;
     goto $ping;
   };
@@ -58,13 +58,13 @@ for my $storage_type (@storage_types) {
   $schema->storage->ensure_connected;
 
   if ($storage_idx == 0 &&
-      $schema->storage->isa('DBIx::Class::Storage::DBI::Sybase::ASE::NoBindVars')) {
+      $schema->storage->isa('DBIO::Storage::DBI::Sybase::ASE::NoBindVars')) {
       # no placeholders in this version of Sybase or DBD::Sybase (or using FreeTDS)
       skip "Skipping entire test for $storage_type - no placeholder support", 1;
       next;
   }
 
-  isa_ok( $schema->storage, "DBIx::Class::Storage::$storage_type" );
+  isa_ok( $schema->storage, "DBIO::Storage::$storage_type" );
 
   $schema->storage->_dbh->disconnect;
   lives_ok (sub { $schema->storage->dbh }, 'reconnect works');
@@ -168,8 +168,8 @@ SQL
     };
 
     my $txn_used = 0;
-    my $txn_commit = \&DBIx::Class::Storage::DBI::txn_commit;
-    local *DBIx::Class::Storage::DBI::txn_commit = sub {
+    my $txn_commit = \&DBIO::Storage::DBI::txn_commit;
+    local *DBIO::Storage::DBI::txn_commit = sub {
       $txn_used = 1;
       goto &$txn_commit;
     };

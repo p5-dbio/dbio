@@ -9,8 +9,8 @@ use List::Util 'min';
 use DBICTest ':DiffSQL';
 
 my ($ROWS, $OFFSET) = (
-   DBIx::Class::SQLMaker::ClassicExtensions->__rows_bindtype,
-   DBIx::Class::SQLMaker::ClassicExtensions->__offset_bindtype,
+   DBIO::SQLMaker::ClassicExtensions->__rows_bindtype,
+   DBIO::SQLMaker::ClassicExtensions->__offset_bindtype,
 );
 
 my $schema = DBICTest->init_schema(quote_names => 1);

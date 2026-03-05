@@ -7,7 +7,7 @@ use DBIC::Test::SQLite (); # this will issue the necessary SKIPs on missing reqs
 
 package Foo;
 
-use base qw(DBIx::Class::CDBICompat);
+use base qw(DBIO::CDBICompat);
 
 eval {
     Foo->table("foo");

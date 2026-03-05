@@ -1,6 +1,6 @@
 package DBICVersion::Table;
 
-use base 'DBIx::Class::Core';
+use base 'DBIO::Core';
 use strict;
 use warnings;
 
@@ -43,7 +43,7 @@ use warnings;
 our $VERSION = '2.0';
 
 __PACKAGE__->register_class('Table', 'DBICVersion::Table');
-__PACKAGE__->load_components('+DBIx::Class::Schema::Versioned');
+__PACKAGE__->load_components('+DBIO::Schema::Versioned');
 __PACKAGE__->upgrade_directory("t/var/versioning_ddl-$$");
 __PACKAGE__->backup_directory("t/var/versioning_backup-$$");
 

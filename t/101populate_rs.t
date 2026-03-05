@@ -59,7 +59,7 @@ SCHEMA_POPULATE1: {
     ]],
   ]) } qr/\QFast-path populate() of non-uniquely identifiable rows with related data is not possible/;
 
-  isa_ok $schema, 'DBIx::Class::Schema';
+  isa_ok $schema, 'DBIO::Schema';
 
   my ( $preexisting_undef, $artist1, $artist2, $artist3, $undef ) = $schema->resultset('Artist')->search({
     name=>["001First Artist","002Second Artist","003Third Artist", undef]},

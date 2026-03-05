@@ -89,7 +89,7 @@ is $@, '', "No errors";
 # Iterators
 #----------------------------------------------------------------------
 
-my $it_class = 'DBIx::Class::ResultSet';
+my $it_class = 'DBIO::ResultSet';
 
 sub test_normal_iterator {
   my $it = $film->actors;

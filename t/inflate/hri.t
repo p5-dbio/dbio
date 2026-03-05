@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-use DBIx::Class::_Util 'modver_gt_or_eq_and_lt';
+use DBIO::_Util 'modver_gt_or_eq_and_lt';
 use base();
 BEGIN {
   plan skip_all => 'base.pm 2.20 (only present in perl 5.19.7) is known to break this test'
@@ -38,9 +38,9 @@ my $schema = DBICTest->init_schema();
     is (ref $cd, $orig_resclass, 'result_class override does not propagate over seach+find');
 
 # set as attr - should propagate
-    my $hri_rs = $rs->search ({}, { result_class => 'DBIx::Class::ResultClass::HashRefInflator' });
+    my $hri_rs = $rs->search ({}, { result_class => 'DBIO::ResultClass::HashRefInflator' });
     is ($rs->result_class, 'DBICTest::CDSubclass', 'original class unchanged');
-    is ($hri_rs->result_class, 'DBIx::Class::ResultClass::HashRefInflator', 'result_class accessor pre-set via attribute');
+    is ($hri_rs->result_class, 'DBIO::ResultClass::HashRefInflator', 'result_class accessor pre-set via attribute');
 
     my $datahashref1 = $hri_rs->next;
     is_deeply(
@@ -56,9 +56,9 @@ my $schema = DBICTest->init_schema();
     $cd = $hri_rs->search({ cdid => 1 })->single;
     is_deeply ( $cd, $datahashref1, 'first/search+single return the same thing (result_class attr propagates)');
 
-    $hri_rs->result_class ('DBIx::Class::Row'); # something bogus
+    $hri_rs->result_class ('DBIO::Row'); # something bogus
     is(
-        $hri_rs->search->result_class, 'DBIx::Class::ResultClass::HashRefInflator',
+        $hri_rs->search->result_class, 'DBIO::ResultClass::HashRefInflator',
         'result_class set using accessor does not propagate over unused search'
     );
 
@@ -123,7 +123,7 @@ my $rs_hashrefinf = $schema->resultset('CD')->search(undef,
     {
         prefetch    => [ qw/ artist tracks / ],
         order_by    => [ 'me.cdid', 'tracks.position' ],
-        result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+        result_class => 'DBIO::ResultClass::HashRefInflator',
     }
 );
 
@@ -149,7 +149,7 @@ $rs_hashrefinf = $schema->resultset ('Artist')->search ({ 'me.artistid' => 1}, {
     select   => [qw/name   tracks.title      tracks.cd       /],
     as       => [qw/name   cds.tracks.title  cds.tracks.cd   /],
     order_by => [qw/cds.cdid tracks.trackid/],
-    result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+    result_class => 'DBIO::ResultClass::HashRefInflator',
 });
 
 @dbic = map { $_->tracks->all } ($rs_dbic->first->cds->all);
@@ -173,14 +173,14 @@ $rs_hashrefinf = $schema->resultset ('Artist')->search ({ 'me.artistid' => 1}, {
     columns  => {name => 'name', 'cds.tracks.title' => 'tracks.title', 'cds.tracks.cd' => 'tracks.cd'},
     order_by => [qw/cds.cdid tracks.trackid/],
 });
-$rs_hashrefinf->result_class('DBIx::Class::ResultClass::HashRefInflator');
+$rs_hashrefinf->result_class('DBIO::ResultClass::HashRefInflator');
 is_deeply [$rs_hashrefinf->all], \@hashrefinf, 'Check query using extended columns syntax';
 
 # check nested prefetching of has_many relationships which return nothing
 my $artist = $schema->resultset ('Artist')->create ({ name => 'unsuccessful artist without CDs'});
 $artist->discard_changes;
 my $rs_artists = $schema->resultset ('Artist')->search ({ 'me.artistid' => $artist->id}, {
-    prefetch => { cds => 'tracks' }, result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+    prefetch => { cds => 'tracks' }, result_class => 'DBIO::ResultClass::HashRefInflator',
 });
 is_deeply(
   [$rs_artists->all],

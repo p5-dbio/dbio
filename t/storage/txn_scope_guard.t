@@ -44,7 +44,7 @@ use DBICTest;
       # The 0 arg says don't die, just let the scope guard go out of scope
       # forcing a txn_rollback to happen
       outer($s, 0);
-    }, qr/A DBIx::Class::Storage::TxnScopeGuard went out of scope without explicit commit or error. Rolling back./, 'Out of scope warning detected');
+    }, qr/A DBIO::Storage::TxnScopeGuard went out of scope without explicit commit or error. Rolling back./, 'Out of scope warning detected');
 
     ok(!$artist_rs->find({name => 'Death Cab for Cutie'}), "Artist not created");
 
@@ -93,8 +93,8 @@ use DBICTest;
   no strict 'refs';
   no warnings 'redefine';
 
-  local *{DBIx::Class::Storage::DBI::txn_rollback} = sub { die 'die die my darling' };
-  Class::C3->reinitialize() if DBIx::Class::_ENV_::OLD_MRO;
+  local *{DBIO::Storage::DBI::txn_rollback} = sub { die 'die die my darling' };
+  Class::C3->reinitialize() if DBIO::_ENV_::OLD_MRO;
 
   throws_ok (sub {
     my $guard = $schema->txn_scope_guard;
@@ -124,8 +124,8 @@ for my $post_poison (0,1) {
 
   no strict 'refs';
   no warnings 'redefine';
-  local *{DBIx::Class::Storage::DBI::txn_rollback} = sub { die 'die die my darling' };
-  Class::C3->reinitialize() if DBIx::Class::_ENV_::OLD_MRO;
+  local *{DBIO::Storage::DBI::txn_rollback} = sub { die 'die die my darling' };
+  Class::C3->reinitialize() if DBIO::_ENV_::OLD_MRO;
 
 #The warn from within a DESTROY callback freaks out Test::Warn, do it old-school
 =begin
@@ -140,7 +140,7 @@ for my $post_poison (0,1) {
       #$schema->storage->_dbh( $schema->storage->_dbh->clone );
     },
     [
-      qr/A DBIx::Class::Storage::TxnScopeGuard went out of scope without explicit commit or error. Rolling back./,
+      qr/A DBIO::Storage::TxnScopeGuard went out of scope without explicit commit or error. Rolling back./,
       qr/\*+ ROLLBACK FAILED\!\!\! \*+/,
     ],
     'proper warnings generated on out-of-scope+rollback failure'
@@ -149,7 +149,7 @@ for my $post_poison (0,1) {
 
 # delete this once the above works properly (same test)
   my @want = (
-    qr/A DBIx::Class::Storage::TxnScopeGuard went out of scope without explicit commit or error. Rolling back./,
+    qr/A DBIO::Storage::TxnScopeGuard went out of scope without explicit commit or error. Rolling back./,
     qr/\*+ ROLLBACK FAILED\!\!\! \*+/,
   );
 
@@ -238,7 +238,7 @@ for my $post_poison (0,1) {
 
   warnings_exist
     { @arg_capture = () }
-    qr/\QPreventing *MULTIPLE* DESTROY() invocations on DBIx::Class::Storage::TxnScopeGuard/
+    qr/\QPreventing *MULTIPLE* DESTROY() invocations on DBIO::Storage::TxnScopeGuard/
   ;
 }
 

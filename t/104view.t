@@ -27,7 +27,7 @@ is_deeply (
     $schema->resultset('Year1999CDs')->search (
       {},
       {
-        result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+        result_class => 'DBIO::ResultClass::HashRefInflator',
         prefetch => ['artist', { tracks => [qw/cd year1999cd year2000cd/] } ],
         order_by => 'tracks.trackid',
       },
@@ -37,7 +37,7 @@ is_deeply (
     $schema->resultset('CD')->search (
       { 'me.year' => '1999'},
       {
-        result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+        result_class => 'DBIO::ResultClass::HashRefInflator',
         prefetch => ['artist', { tracks => [qw/cd year1999cd year2000cd/] } ],
         columns => [qw/cdid single_track title/],   # to match the columns retrieved by the virtview
         order_by => 'tracks.trackid',
@@ -52,7 +52,7 @@ is_deeply (
     $schema->resultset('Year2000CDs')->search (
       {},
       {
-        result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+        result_class => 'DBIO::ResultClass::HashRefInflator',
         prefetch => ['artist', { tracks => [qw/cd year1999cd year2000cd/] } ],
       },
     )->all
@@ -61,7 +61,7 @@ is_deeply (
     $schema->resultset('CD')->search (
       { 'me.year' => '2000'},
       {
-        result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+        result_class => 'DBIO::ResultClass::HashRefInflator',
         prefetch => ['artist', { tracks => [qw/cd year1999cd year2000cd/] } ],
       },
     )->all

@@ -6,7 +6,7 @@ use Test::Exception;
 
 use lib qw(t/lib);
 use DBICTest ':DiffSQL';
-use DBIx::Class::_Util 'UNRESOLVABLE_CONDITION';
+use DBIO::_Util 'UNRESOLVABLE_CONDITION';
 
 use Data::Dumper;
 BEGIN {

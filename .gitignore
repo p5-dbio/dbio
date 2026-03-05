@@ -9,8 +9,8 @@ Makefile.old
 _build/
 blib/
 inc/
-DBIx-Class-*/
-DBIx-Class-*.tar.*
+DBIO-*/
+DBIO-*.tar.*
 pm_to_blib
 t/var/
 .*.sw?

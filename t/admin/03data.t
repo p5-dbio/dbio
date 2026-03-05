@@ -8,12 +8,12 @@ use lib 't/lib';
 use DBICTest;
 
 BEGIN {
-    require DBIx::Class;
-    plan skip_all => 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for('admin')
-      unless DBIx::Class::Optional::Dependencies->req_ok_for('admin');
+    require DBIO;
+    plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for('admin')
+      unless DBIO::Optional::Dependencies->req_ok_for('admin');
 }
 
-use_ok 'DBIx::Class::Admin';
+use_ok 'DBIO::Admin';
 
 
 { # test data maniplulation functions
@@ -23,13 +23,13 @@ use_ok 'DBIx::Class::Admin';
     sqlite_use_file => 1,
   );
 
-  my $admin = DBIx::Class::Admin->new(
+  my $admin = DBIO::Admin->new(
     schema_class=> "DBICTest::Schema",
     connect_info => $schema->storage->connect_info(),
     quiet  => 1,
     _confirm=>1,
   );
-  isa_ok ($admin, 'DBIx::Class::Admin', 'create the admin object');
+  isa_ok ($admin, 'DBIO::Admin', 'create the admin object');
 
   $admin->insert('Employee', { name => 'Matt' });
   my $employees = $schema->resultset('Employee');

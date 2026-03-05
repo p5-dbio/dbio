@@ -128,7 +128,7 @@ $rs = $schema->resultset('CD')->search({'tracks.position' => { -in => [2] } },
     '+as' => ['track_position'],
 
     # get a hashref of CD1 only (the first with a second track)
-    result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+    result_class => 'DBIO::ResultClass::HashRefInflator',
     order_by => 'cdid',
     rows => 1,
   }
@@ -180,7 +180,7 @@ my $weird_rs = $rs->search({}, {
   join => 'cds',
 });
 
-my $weird_rs_hri = $weird_rs->search({}, { result_class => 'DBIx::Class::ResultClass::HashRefInflator' });
+my $weird_rs_hri = $weird_rs->search({}, { result_class => 'DBIO::ResultClass::HashRefInflator' });
 
 for my $rs ($weird_rs, $weird_rs_hri) {
   is ($rs->count, $relations_or_1_count, 'count on rhs data injection matches');
@@ -192,7 +192,7 @@ for my $rs ($weird_rs, $weird_rs_hri) {
 
   is (scalar @all, $relations_or_1_count, 'object count on rhs data injection matches');
   is_deeply (
-    ( $rs->result_class eq 'DBIx::Class::ResultClass::HashRefInflator'
+    ( $rs->result_class eq 'DBIO::ResultClass::HashRefInflator'
         ? \@all
         : [ map { +{$_->get_columns} } @all ]
     ),

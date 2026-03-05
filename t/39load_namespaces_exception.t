@@ -9,7 +9,7 @@ plan tests => 1;
 
 eval {
     package DBICNSTest;
-    use base qw/DBIx::Class::Schema/;
+    use base qw/DBIO::Schema/;
     __PACKAGE__->load_namespaces(
         result_namespace => 'Bogus',
         resultset_namespace => 'RSet',

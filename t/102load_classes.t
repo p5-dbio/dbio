@@ -9,15 +9,15 @@ my $warnings;
 eval {
     local $SIG{__WARN__} = sub { $warnings .= shift };
     package DBICTest::Schema;
-    use base qw/DBIx::Class::Schema/;
+    use base qw/DBIO::Schema/;
     __PACKAGE__->load_classes;
 };
 ok(!$@, 'Loaded all loadable classes') or diag $@;
 like($warnings, qr/Failed to load DBICTest::Schema::NoSuchClass. Can't find source_name method. Is DBICTest::Schema::NoSuchClass really a full DBIC result class?/, 'Warned about broken result class');
 
 my $source_a = DBICTest::Schema->source('Artist');
-isa_ok($source_a, 'DBIx::Class::ResultSource::Table');
+isa_ok($source_a, 'DBIO::ResultSource::Table');
 my $rset_a   = DBICTest::Schema->resultset('Artist');
-isa_ok($rset_a, 'DBIx::Class::ResultSet');
+isa_ok($rset_a, 'DBIO::ResultSet');
 
 done_testing;

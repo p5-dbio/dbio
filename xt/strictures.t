@@ -8,8 +8,8 @@ use Config;
 use lib 't/lib';
 use DBICTest;
 
-unless ( DBIx::Class::Optional::Dependencies->req_ok_for ('test_strictures') ) {
-  my $missing = DBIx::Class::Optional::Dependencies->req_missing_for ('test_strictures');
+unless ( DBIO::Optional::Dependencies->req_ok_for ('test_strictures') ) {
+  my $missing = DBIO::Optional::Dependencies->req_missing_for ('test_strictures');
   $ENV{RELEASE_TESTING}
     ? die ("Failed to load release-testing module requirements: $missing")
     : plan skip_all => "Test needs: $missing"
@@ -21,10 +21,10 @@ use File::Find;
 # that are related to lib/ - then we should be able to run
 # perl -c checks (via syntax_ok), and all should just work
 my $missing_groupdeps_present = grep
-  { ! DBIx::Class::Optional::Dependencies->req_ok_for($_) }
+  { ! DBIO::Optional::Dependencies->req_ok_for($_) }
   grep
     { $_ !~ /^ (?: test | rdbms | dist ) _ /x }
-    keys %{DBIx::Class::Optional::Dependencies->req_group_list}
+    keys %{DBIO::Optional::Dependencies->req_group_list}
 ;
 
 # don't test syntax when RT#106935 is triggered (mainly CI)

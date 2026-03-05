@@ -114,7 +114,7 @@ ok(!State->find_column('HGLAGAGlAG'), '!find_column HGLAGAGlAG');
 #{
 #
 #        package DieTest;
-#        @DieTest::ISA = qw(DBIx::Class);
+#        @DieTest::ISA = qw(DBIO);
 #        DieTest->load_components(qw/CDBICompat::Retrieve Core/);
 #        package main;
 #  local $SIG{__WARN__} = sub { };
@@ -128,7 +128,7 @@ ok(!State->find_column('HGLAGAGlAG'), '!find_column HGLAGAGlAG');
 package State;
 
 package A;
-@A::ISA = qw(DBIx::Class);
+@A::ISA = qw(DBIO);
 __PACKAGE__->load_components(qw/CDBICompat Core/);
 __PACKAGE__->table('dummy');
 __PACKAGE__->columns(Primary => 'id');

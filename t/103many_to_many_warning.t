@@ -46,7 +46,7 @@ use warnings;
 {
   package #
     DBICTest::Schema::Foo${suffix};
-  use base 'DBIx::Class::Core';
+  use base 'DBIO::Core';
 
   __PACKAGE__->table('foo');
   __PACKAGE__->add_columns(
@@ -65,7 +65,7 @@ use warnings;
   package #
     DBICTest::Schema::FooToBar${suffix};
 
-  use base 'DBIx::Class::Core';
+  use base 'DBIO::Core';
   __PACKAGE__->table('foo_to_bar');
   __PACKAGE__->add_columns(
     'foo' => {
@@ -82,7 +82,7 @@ use warnings;
   package #
     DBICTest::Schema::Bar${suffix};
 
-  use base 'DBIx::Class::Core';
+  use base 'DBIO::Core';
 
   __PACKAGE__->table('bar');
   __PACKAGE__->add_columns(

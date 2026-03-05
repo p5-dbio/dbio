@@ -10,13 +10,13 @@ use DBICTest;
   package DBICTest::ArtistRS;
   use strict;
   use warnings;
-  use base qw/DBIx::Class::ResultSet/;
+  use base qw/DBIO::ResultSet/;
 }
 
 my $schema = DBICTest->init_schema();
 my $artist_source = $schema->source('Artist');
 
-my $new_source = DBIx::Class::ResultSource::Table->new({
+my $new_source = DBIO::ResultSource::Table->new({
   %$artist_source,
   name            => 'artist_preview',
   resultset_class => 'DBICTest::ArtistRS',
@@ -51,8 +51,8 @@ warnings_like (
 
     my $original_source = $schema->source('Artist');
     ok(! $original_source->has_column('other_col'), 'column definition did not leak to original source');
-    isa_ok ($original_source->resultset, 'DBIx::Class::ResultSet');
-    isa_ok ($schema->resultset('Artist'), 'DBIx::Class::ResultSet');
+    isa_ok ($original_source->resultset, 'DBIO::ResultSet');
+    isa_ok ($schema->resultset('Artist'), 'DBIO::ResultSet');
   },
   [
     qr/DBICTest::Artist already had a registered source which was replaced by this call/

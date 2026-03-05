@@ -9,7 +9,7 @@ use DBICTest; # do not remove even though it is not used (pulls in MRO::Compat i
 {
   package AAA;
 
-  use base "DBIx::Class::Core";
+  use base "DBIO::Core";
 }
 
 {
@@ -27,7 +27,7 @@ use DBICTest; # do not remove even though it is not used (pulls in MRO::Compat i
   use base 'AAA';
 
   #Injecting an indirect parent.
-  __PACKAGE__->inject_base( __PACKAGE__, 'DBIx::Class::Core' );
+  __PACKAGE__->inject_base( __PACKAGE__, 'DBIO::Core' );
 }
 
 eval { mro::get_linear_isa('BBB'); };
@@ -36,34 +36,34 @@ ok (! $@, "Correctly skipped injecting a direct parent of class BBB");
 eval { mro::get_linear_isa('CCC'); };
 ok (! $@, "Correctly skipped injecting an indirect parent of class BBB");
 
-use DBIx::Class::Storage::DBI::Sybase::Microsoft_SQL_Server;
+use DBIO::Storage::DBI::Sybase::Microsoft_SQL_Server;
 
 is_deeply (
-  mro::get_linear_isa('DBIx::Class::Storage::DBI::Sybase::Microsoft_SQL_Server'),
+  mro::get_linear_isa('DBIO::Storage::DBI::Sybase::Microsoft_SQL_Server'),
   [qw/
-    DBIx::Class::Storage::DBI::Sybase::Microsoft_SQL_Server
-    DBIx::Class::Storage::DBI::Sybase
-    DBIx::Class::Storage::DBI::MSSQL
-    DBIx::Class::Storage::DBI::UniqueIdentifier
-    DBIx::Class::Storage::DBI::IdentityInsert
-    DBIx::Class::Storage::DBI
-    DBIx::Class::Storage::DBIHacks
-    DBIx::Class::Storage
-    DBIx::Class
-    DBIx::Class::Componentised
+    DBIO::Storage::DBI::Sybase::Microsoft_SQL_Server
+    DBIO::Storage::DBI::Sybase
+    DBIO::Storage::DBI::MSSQL
+    DBIO::Storage::DBI::UniqueIdentifier
+    DBIO::Storage::DBI::IdentityInsert
+    DBIO::Storage::DBI
+    DBIO::Storage::DBIHacks
+    DBIO::Storage
+    DBIO
+    DBIO::Componentised
     Class::C3::Componentised
-    DBIx::Class::AccessorGroup
+    DBIO::AccessorGroup
     Class::Accessor::Grouped
   /],
-  'Correctly ordered ISA of DBIx::Class::Storage::DBI::Sybase::Microsoft_SQL_Server'
+  'Correctly ordered ISA of DBIO::Storage::DBI::Sybase::Microsoft_SQL_Server'
 );
 
-my $storage = DBIx::Class::Storage::DBI::Sybase::Microsoft_SQL_Server->new;
+my $storage = DBIO::Storage::DBI::Sybase::Microsoft_SQL_Server->new;
 $storage->connect_info(['dbi:SQLite::memory:']); # determine_driver's init() connects for this subclass
 $storage->_determine_driver;
 is (
   $storage->can('sql_limit_dialect'),
-  'DBIx::Class::Storage::DBI::MSSQL'->can('sql_limit_dialect'),
+  'DBIO::Storage::DBI::MSSQL'->can('sql_limit_dialect'),
   'Correct method picked'
 );
 

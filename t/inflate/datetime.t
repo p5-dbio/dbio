@@ -12,8 +12,8 @@ delete $ENV{DBIC_DT_SEARCH_OK};
 
 my $schema = DBICTest->init_schema();
 
-plan skip_all => 'DT inflation tests need ' . DBIx::Class::Optional::Dependencies->req_missing_for ('test_dt_sqlite')
-  unless DBIx::Class::Optional::Dependencies->req_ok_for ('test_dt_sqlite');
+plan skip_all => 'DT inflation tests need ' . DBIO::Optional::Dependencies->req_missing_for ('test_dt_sqlite')
+  unless DBIO::Optional::Dependencies->req_ok_for ('test_dt_sqlite');
 
 # inflation test
 my $event = $schema->resultset("Event")->find(1);
@@ -44,7 +44,7 @@ warnings_exist {
 
 {
   local $TODO = "This stuff won't work without a -dt operator of some sort"
-    unless eval { require DBIx::Class::SQLMaker::DateOps };
+    unless eval { require DBIO::SQLMaker::DateOps };
 
   is(eval { $row->id }, 1, 'DT in search');
 

@@ -14,7 +14,7 @@ DBICTest::Schema::Artist->filter_column(charfield => {
   filter_from_storage => sub { $from_storage_ran++; defined $_[1] ? $_[1] * 2 : undef },
   filter_to_storage   => sub { $to_storage_ran++; defined $_[1] ? $_[1] / 2 : undef },
 });
-Class::C3->reinitialize() if DBIx::Class::_ENV_::OLD_MRO;
+Class::C3->reinitialize() if DBIO::_ENV_::OLD_MRO;
 
 my $artist = $schema->resultset('Artist')->create( { charfield => 20 } );
 
@@ -280,7 +280,7 @@ IC_DIE: {
 DBICTest::Schema::Artist->filter_column(charfield => {
   filter_to_storage => sub { $to_storage_ran++; $_[1] },
 });
-Class::C3->reinitialize() if DBIx::Class::_ENV_::OLD_MRO;
+Class::C3->reinitialize() if DBIO::_ENV_::OLD_MRO;
 
 ASYMMETRIC_TO_TEST: {
   # initialise value
@@ -306,7 +306,7 @@ ASYMMETRIC_TO_TEST: {
 DBICTest::Schema::Artist->filter_column(charfield => {
   filter_from_storage => sub { $from_storage_ran++; $_[1] },
 });
-Class::C3->reinitialize() if DBIx::Class::_ENV_::OLD_MRO;
+Class::C3->reinitialize() if DBIO::_ENV_::OLD_MRO;
 
 ASYMMETRIC_FROM_TEST: {
   # initialise value

@@ -64,10 +64,10 @@ my $schema = DBICTest->init_schema();
 {
   my $rs = $schema->resultset('Artist')->search(
     { 'cds.title' => 'Spoonful of bees' },
-    { prefetch => 'cds', result_class => 'DBIx::Class::ResultClass::HashRefInflator' },
+    { prefetch => 'cds', result_class => 'DBIO::ResultClass::HashRefInflator' },
   );
 
-  is ($rs->result_class, 'DBIx::Class::ResultClass::HashRefInflator', 'starting with correct resultclass');
+  is ($rs->result_class, 'DBIO::ResultClass::HashRefInflator', 'starting with correct resultclass');
 
   $rs->result_class('DBICTest::Artist');
   is ($rs->result_class, 'DBICTest::Artist', 'resultclass changed');

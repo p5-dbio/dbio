@@ -4,7 +4,7 @@ package # hide from PAUSE
 use warnings;
 use strict;
 
-use base 'DBIx::Class::Core';
+use base 'DBIO::Core';
 __PACKAGE__->table('test');
 
 1;

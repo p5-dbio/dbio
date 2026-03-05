@@ -9,7 +9,7 @@ use DBI;
 use lib 't/lib';
 use DBICTest;
 
-use base qw(DBIx::Class::CDBICompat);
+use base qw(DBIO::CDBICompat);
 
 our $dbh;
 
@@ -17,8 +17,8 @@ my $err;
 if (! $ENV{DBICTEST_MYSQL_DSN} ) {
   $err = 'Set $ENV{DBICTEST_MYSQL_DSN}, _USER and _PASS to run this test';
 }
-elsif ( ! DBIx::Class::Optional::Dependencies->req_ok_for ('test_rdbms_mysql') ) {
-  $err = 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('test_rdbms_mysql')
+elsif ( ! DBIO::Optional::Dependencies->req_ok_for ('test_rdbms_mysql') ) {
+  $err = 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('test_rdbms_mysql')
 }
 
 if ($err) {

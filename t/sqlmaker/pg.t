@@ -9,7 +9,7 @@ use DBICTest ':DiffSQL';
 my $schema = DBICTest->init_schema(
   no_deploy => 1,
   quote_names => 1,
-  storage_type => 'DBIx::Class::Storage::DBI::Pg'
+  storage_type => 'DBIO::Storage::DBI::Pg'
 );
 
 my $rs = $schema->resultset('Artist')->search_related('cds_unordered',
@@ -67,7 +67,7 @@ my $rs = $schema->resultset('Artist')->search_related('cds_unordered',
     )},
     [
       [ { sqlt_datatype => 'integer', dbic_colname => 'me.rank' } => 13 ],
-      [ DBIx::Class::SQLMaker::ClassicExtensions->__rows_bindtype => 1 ],
+      [ DBIO::SQLMaker::ClassicExtensions->__rows_bindtype => 1 ],
       [ { sqlt_datatype => 'integer', dbic_colname => 'me.rank' } => 13 ],
     ],
     'correct SQL with aggregate boolean order on Pg',

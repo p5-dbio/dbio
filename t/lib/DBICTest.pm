@@ -7,7 +7,7 @@ use warnings;
 use DBICTest::Util qw( local_umask await_flock dbg DEBUG_TEST_CONCURRENCY_LOCKS );
 use DBICTest::Schema;
 use DBICTest::Util::LeakTracer qw/populate_weakregistry assert_empty_weakregistry/;
-use DBIx::Class::_Util 'detected_reinvoked_destructor';
+use DBIO::_Util 'detected_reinvoked_destructor';
 use Carp;
 use Path::Class::File ();
 use File::Spec;
@@ -17,7 +17,7 @@ use Scope::Guard ();
 
 =head1 NAME
 
-DBICTest - Library to be used by DBIx::Class test scripts
+DBICTest - Library to be used by DBIO test scripts
 
 =head1 SYNOPSIS
 
@@ -30,7 +30,7 @@ DBICTest - Library to be used by DBIx::Class test scripts
 =head1 DESCRIPTION
 
 This module provides the basic utilities to write tests against
-DBIx::Class.
+DBIO.
 
 =head1 EXPORTS
 
@@ -61,7 +61,7 @@ C<:GlobalLock> will ask for an exclusive one and block until they can get it.
     no_populate=>1,
     storage_type=>'::DBI::Replicated',
     storage_type_args=>{
-      balancer_type=>'DBIx::Class::Storage::DBI::Replicated::Balancer::Random'
+      balancer_type=>'DBIO::Storage::DBI::Replicated::Balancer::Random'
     },
   );
 
@@ -102,7 +102,7 @@ sub import {
             $global_exclusive_lock = 1;
         }
         elsif ($exp eq ':DiffSQL') {
-            require DBIx::Class::SQLMaker;
+            require DBIO::SQLMaker;
             require SQL::Abstract::Test;
             my $into = caller(0);
             for (qw(is_same_sql_bind is_same_sql is_same_bind)) {
@@ -255,7 +255,7 @@ sub __mk_disconnect_guard {
 
   return if (
     # this perl leaks handles, delaying DESTROY, can't work right
-    DBIx::Class::_ENV_::PEEPEENESS
+    DBIO::_ENV_::PEEPEENESS
       or
     ! -f $db_file
   );
@@ -268,7 +268,7 @@ sub __mk_disconnect_guard {
   my $i;
   while ( my ($pack, $file, $line) = caller(++$i) ) {
     next if $file eq __FILE__;
-    next if $pack =~ /^DBIx::Class|^Try::Tiny/;
+    next if $pack =~ /^DBIO|^Try::Tiny/;
     $clan_connect_caller = "$file line $line";
   }
 

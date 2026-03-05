@@ -15,7 +15,7 @@ use DBICTest::Schema;
   use warnings;
   use strict;
 
-  use base 'DBIx::Class::Storage::DBI';
+  use base 'DBIO::Storage::DBI';
 
   __PACKAGE__->sql_limit_dialect ('LimitOffset');
 

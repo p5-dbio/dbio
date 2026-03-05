@@ -1,4 +1,4 @@
-Revision history for DBIx::Class
+Revision history for DBIO
 
     * Fixes
         - Adjust tests to account for DBD::SQLite's column_info() no longer
@@ -30,11 +30,11 @@ Revision history for DBIx::Class
 
     * Misc
         - DBIC_TRACE_PROFILE=... now uses a ::Storage::Statistics subclass
-          DBIx::Class::Storage::Debug::PrettyTrace which properly ships as a
+          DBIO::Storage::Debug::PrettyTrace which properly ships as a
           part of this distrinbution
         - Switch out SQL::Abstract dependency with a slower moving dist
         - Remove Data::Page dependency by inlining its entirety into the core
-          DBIx::Class::ResultSet::Pager (RT#130686)
+          DBIO::ResultSet::Pager (RT#130686)
 
 0.082841 2018-01-29 08:10 (UTC)
     * Test-suite fixup changes only - no reason to upgrade, wait for 0.082850
@@ -142,7 +142,7 @@ Revision history for DBIx::Class
 0.082801 2014-10-05 23:55 (UTC)
     * Known Issues
         - Passing large amounts of objects with stringification overload
-          directly to DBIx::Class may result in strange action at a distance
+          directly to DBIO may result in strange action at a distance
           exceptions. More info (and a workaround description) can be found
           under "Note" at https://metacpan.org/pod/SQL::Abstract#is_plain_value
         - The relationship condition resolution fixes come with the side effect
@@ -233,7 +233,7 @@ Revision history for DBIx::Class
 
 0.08260 2014-01-28 18:52 (UTC)
     * New Features
-        - A new zero-to-DBIC style manual: DBIx::Class::Manual::QuickStart
+        - A new zero-to-DBIC style manual: DBIO::Manual::QuickStart
 
     * Notable Changes and Deprecations
         - Explicitly deprecate combination of distinct and selecting a
@@ -264,7 +264,7 @@ Revision history for DBIx::Class
           DBD::SQLite (now DBIC simply always binds SQLite ints as BIGINT)
         - Silence (harmless) warnings on recent DBD::SQLite versions, when
           inserting/updating large integers on 32bit ivsize systems (RT#76395)
-        - Back out self-cleaning from DBIx::Class::Carp for the time being
+        - Back out self-cleaning from DBIO::Carp for the time being
           (as a side effect fixes RT#86267)
         - Fix incorrect internal use of implicit list context in copy()
         - Fix 0.08250 regression in driver determination when DBI_DSN is used
@@ -410,7 +410,7 @@ Revision history for DBIx::Class
 0.08205 2013-01-22
     * New Features / Changes
         - The emulate_limit() arbitrary limit dialect emulation mechanism is
-          now deprecated, and will be removed when DBIx::Class migrates to
+          now deprecated, and will be removed when DBIO migrates to
           Data::Query
         - Support for the source_bind_attributes() storage method has been
           removed after a lengthy deprecation cycle
@@ -707,7 +707,7 @@ Revision history for DBIx::Class
 
     * Misc
         - Rewire all warnings to a new Carp-like implementation internal
-          to DBIx::Class, and remove the Carp::Clan dependency
+          to DBIO, and remove the Carp::Clan dependency
         - Only load Class::C3 and friends if necessary ($] < 5.010)
         - Greatly reduced loading of non-essential modules to aid startup
           time (mainly benefiting CGI users)
@@ -725,7 +725,7 @@ Revision history for DBIx::Class
     * New Features / Changes
         - Schema/resultsource instances are now crossreferenced via a new
           system guaranteeing leak-free mutually assured destruction
-        - DBIx::Class now warns when the user erroneously supplies
+        - DBIO now warns when the user erroneously supplies
           AutoCommit => 0 to connect()
         - A warning is also issued before forcing the RaiseError
           setting of externally supplied DBI handles
@@ -741,7 +741,7 @@ Revision history for DBIx::Class
         - A number of improvements/diagnostics of multiple active resultset
           handling on MSSQL over DBD::ODBC
         - Revert default selection to being lazy again (eagerness introduced
-          in 0.08125) - fixes DBIx::Class::Helper::ResultSet::RemoveColumns
+          in 0.08125) - fixes DBIO::Helper::ResultSet::RemoveColumns
         - Fix losing order of columns provided in select/as (regression from
           0.08125)
         - Unaliased "dark" selectors no longer throw off prefetch
@@ -795,7 +795,7 @@ Revision history for DBIx::Class
         - Add full INSERT...RETURNING support for Oracle
         - Deprecate use of -nest in search conditions (warn once per
           callsite)
-        - Deprecate the completely useless DBIx::Class::Serialize::Storable
+        - Deprecate the completely useless DBIO::Serialize::Storable
           result component
 
     * Fixes
@@ -841,16 +841,16 @@ Revision history for DBIx::Class
         - Switch all serialization to use Storable::nfreeze for portable
           architecture independent ice
         - Fix the bogus META.yml dependency injection issue for good
-        - Refactor DBIx::Class::Storage::Statistics::debugfh() to be lazy
+        - Refactor DBIO::Storage::Statistics::debugfh() to be lazy
 
 0.08124 2010-10-28 14:23 (UTC)
     * New Features / Changes
         - Add new -ident "function" indicating rhs is a column name
           { col => { -ident => 'othercol' } } vs { col => \'othercol' }
         - Extend 'proxy' relationship attribute
-        - Use DBIx::Class::Storage::Debug::PrettyPrint when the
+        - Use DBIO::Storage::Debug::PrettyPrint when the
           environment variable DBIC_TRACE_PROFILE is set, see
-          DBIx::Class::Storage for more information
+          DBIO::Storage for more information
         - Implemented add_unique_constraints() which delegates to
           add_unique_constraint() as appropriate
         - add_unique_constraint() now poparly throws if called with
@@ -867,7 +867,7 @@ Revision history for DBIx::Class
           total entries only when really needed, instead of doing it
           at instantiation time
         - New documentation map organized by features
-          (DBIx::Class::Manual::Features)
+          (DBIO::Manual::Features)
         - find( { ... }, { key => $constraint } ) now throws an exception
           when the supplied data does not fully specify $constraint
         - find( col1 => $val1, col2 => $val2, ... ) is no longer supported
@@ -959,7 +959,7 @@ Revision history for DBIx::Class
 
 0.08122 2010-06-03 17:41 (UTC)
     * New Features
-        - Add DBIx::Class::FilterColumn for non-ref filtering
+        - Add DBIO::FilterColumn for non-ref filtering
         - ::Storage::DBI now correctly preserves a parent $dbh from
           terminating children, even during interpreter-global
           out-of-order destruction
@@ -1020,11 +1020,11 @@ Revision history for DBIx::Class
 
     * Misc
         - Reformatted Changelog \o/
-        - DBIC goes git://git.shadowcat.co.uk/dbsrgits/DBIx-Class.git
+        - DBIC goes git://git.shadowcat.co.uk/dbsrgits/DBIO.git
         - Allow developers to skip optional dependency forcing when working
           from a checkout
         - Add a warning to load_namespaces if a class in ResultSet/ is not
-          a subclass of DBIx::Class::ResultSet
+          a subclass of DBIO::ResultSet
         - All DBIC exception-handling switched to Try::Tiny
         - All DBIC modules are now free of imports via namespace::clean
         - Depend on optimized SQL::Abstract (faster SQL generation)
@@ -1037,9 +1037,9 @@ Revision history for DBIx::Class
         - Add core support for INSERT RETURNING (for storages that
           supports this syntax, currently PostgreSQL and Firebird)
         - Fix spurious warnings on multiple UTF8Columns component loads
-        - DBIx::Class::UTF8Columns entered deprecated state
-        - DBIx::Class::InflateColumn::File entered deprecated state
-        - DBIx::Class::Optional::Dependencies left experimental state
+        - DBIO::UTF8Columns entered deprecated state
+        - DBIO::InflateColumn::File entered deprecated state
+        - DBIO::Optional::Dependencies left experimental state
         - Add req_group_list to Opt::Deps (RT#55211)
         - Add support for mysql-specific STRAIGHT_JOIN (RT#55579)
         - Cascading delete/update are now wrapped in a transaction
@@ -1111,7 +1111,7 @@ Revision history for DBIx::Class
         - Fixed regression in deploy() with a {sources} table limit applied
           (RT#52812)
         - Views without a view_definition will throw an exception when
-          parsed by SQL::Translator::Parser::DBIx::Class
+          parsed by SQL::Translator::Parser::DBIO
         - Stop the SQLT parser from auto-adding indexes identical to the
           Primary Key
         - InflateColumn::DateTime refactoring to allow fine grained method
@@ -1179,7 +1179,7 @@ Revision history for DBIx::Class
              connecting to an older Sybase and/or via FreeTDS
           - bulk API support for populate()
         - Transaction support for MSSQL via DBD::Sybase
-        - Add is_paged method to DBIx::Class::ResultSet so that we can
+        - Add is_paged method to DBIO::ResultSet so that we can
           check that if we want a pager
         - Skip versioning test on really old perls lacking Time::HiRes
           (RT #50209)
@@ -1201,9 +1201,9 @@ Revision history for DBIx::Class
         - POD improvements
 
 0.08112 2009-09-21 10:57:00 (UTC)
-        - Remove the recommends from Makefile.PL, DBIx::Class is not
+        - Remove the recommends from Makefile.PL, DBIO is not
           supposed to have optional dependencies. ever.
-        - Mangle the DBIx/Class.pm POD to be more clear about
+        - Mangle the DBIO.pm POD to be more clear about
           copyright and license
         - Put back PG's multiple autoinc per table support, accidentally
           dropped during the serial-autodetection rewrite
@@ -1220,7 +1220,7 @@ Revision history for DBIx::Class
         - Warn about attempting to $rs->get_column a non-unique column
           when has_many joins are added to resultset
         - Refactor of the exception handling system (now everything is a
-          DBIx::Class::Exception object)
+          DBIO::Exception object)
 
 0.08111 2009-09-06 21:58:00 (UTC)
         - The hashref to connection_info now accepts a 'dbh_maker'
@@ -1309,7 +1309,7 @@ Revision history for DBIx::Class
         - Fixed find_related on 'single' relationships - the former
           implementation would overspecify the WHERE condition, reporting
           no related objects when there in fact is one
-        - SQL::Translator::Parser::DBIx::Class now attaches tables to the
+        - SQL::Translator::Parser::DBIO now attaches tables to the
           central schema object in relationship dependency order
         - Fixed regression in set_column() preventing sourceless object
           manipulations
@@ -1378,9 +1378,9 @@ Revision history for DBIx::Class
         - Removed interpolation of bind vars for as_query - placeholders
           are preserved and nested query bind variables are properly
           merged in the correct order
-        - Refactor DBIx::Class::Storage::DBI::Sybase to automatically
+        - Refactor DBIO::Storage::DBI::Sybase to automatically
           load a subclass, namely Microsoft_SQL_Server.pm
-          (similar to DBIx::Class::Storage::DBI::ODBC)
+          (similar to DBIO::Storage::DBI::ODBC)
         - Refactor InflateColumn::DateTime to allow components to
           circumvent DateTime parsing
         - Support inflation of timestamp datatype
@@ -1412,7 +1412,7 @@ Revision history for DBIx::Class
 0.08101 2009-04-27 09:45:00 (UTC)
         - Fix +select, +as, +columns and include_columns being stripped
           by $rs->get_column
-        - move load_optional_class from DBIx::Class::Componentised to
+        - move load_optional_class from DBIO::Componentised to
           Class::C3::Componentised, bump dependency
         - register_extra_source() now *really* fixed wrt subclassing
         - Added missing POD descriptions (RT#45195)
@@ -1508,7 +1508,7 @@ Revision history for DBIx::Class
         - make ash's build_requires/META.yml fixes work better
         - is_deferable support on relations used by the SQL::Translator
           parser
-        - Refactored DBIx::Class::Schema::Versioned
+        - Refactored DBIO::Schema::Versioned
         - Syntax errors from resultset components are now reported correctly
         - sqltargs respected correctly in deploy et al.
         - Added support for savepoints, and using them automatically in
@@ -1537,8 +1537,8 @@ Revision history for DBIx::Class
           objects will get re-attached to the schema.
         - Moved dbicadmin to JSON::Any wrapped JSON.pm for a sane API
           (also fixes RT #32393)
-        - introduced DBIx::Class::set_inflated_columns
-        - DBIx::Class::Row::copy uses set_inflated_columns
+        - introduced DBIO::set_inflated_columns
+        - DBIO::Row::copy uses set_inflated_columns
 
 0.08008 2007-11-16 14:30:00
         - Fixed join merging bug (test from Zby)
@@ -1569,7 +1569,7 @@ Revision history for DBIx::Class
 
 0.08006 2007-08-12 15:12:00
         - Move to using Class::C3::Componentised
-        - Remove warn statement from DBIx::Class::Row
+        - Remove warn statement from DBIO::Row
 
 0.08005 2007-08-06
         - add timestamp fix re rt.cpan 26978 - no test yet but change
@@ -1594,7 +1594,7 @@ Revision history for DBIx::Class
           back to base Cursor->all
         - fix bug with create_multi not inserting non-storage objects
           (test and fix from davinchi)
-        - DBIx::Class::AccessorGroup made empty subclass of
+        - DBIO::AccessorGroup made empty subclass of
           Class::Accessor::Grouped
         - fixed an ugly bug regarding $dbh->{AutoCommit} and transactions
         - ensure_class_loaded handles non-classnames better.
@@ -1667,7 +1667,7 @@ Revision history for DBIx::Class
         - fixup to ensure join always LEFT after first LEFT join depthwise
         - converted the vendor tests to use schema objects intead of schema
           classes, made cleaned more reliable with END blocks
-        - versioning support via DBIx::Class::Schema::Versioned
+        - versioning support via DBIO::Schema::Versioned
         - find/next now return undef rather than () on fail from Bernhard Graf
         - rewritten collapse_result to fix prefetch
         - moved populate to resultset
@@ -1730,20 +1730,20 @@ Revision history for DBIx::Class
 0.07999_01 2006-10-05 21:00:00
         - add connect_info option "disable_statement_caching"
         - create insert_bulk using execute_array, populate uses it
-        - added DBIx::Class::Schema::load_namespaces, alternative to
+        - added DBIO::Schema::load_namespaces, alternative to
           load_classes
         - added source_info method for source-level metadata (kinda like
           column_info)
         - Some of ::Storage::DBI's code/docs moved to ::Storage
-        - DBIx::Class::Schema::txn_do code moved to ::Storage
+        - DBIO::Schema::txn_do code moved to ::Storage
         - Storage::DBI now uses exceptions instead of ->ping/->{Active} checks
         - Storage exceptions are thrown via the schema class's throw_exception
-        - DBIx::Class::Schema::throw_exception's behavior can be modified via
+        - DBIO::Schema::throw_exception's behavior can be modified via
           ->exception_action
         - columns_info_for is deprecated, and no longer runs automatically.
           You can make it work like before via
           __PACKAGE__->column_info_from_storage(1) for now
-        - Replaced DBIx::Class::AccessorGroup and Class::Data::Accessor with
+        - Replaced DBIO::AccessorGroup and Class::Data::Accessor with
           Class::Accessor::Grouped. Only user noticible change is to
           table_class on ResultSourceProxy::Table (i.e. table objects in
           schemas) and, resultset_class and result_class in ResultSource.
@@ -1848,7 +1848,7 @@ Revision history for DBIx::Class
         - bugfix for join-types in nested joins using the from attribute
         - obscure prefetch problem fixed
         - tightened up deep search_related
-        - Fixed 'DBIx/Class/DB.pm did not return a true value' error
+        - Fixed 'DBIO/DB.pm did not return a true value' error
         - Revert change to test for deprecated find usage and swallow warnings
         - Slight wording change to new_related() POD
         - new specific test for connect_info coderefs
@@ -2001,7 +2001,7 @@ Revision history for DBIx::Class
         - hack PK::Auto::Pg for "table" names referencing a schema
         - find() with attributes works
         - added experimental Serialize and ResultSetManager components
-        - added code attribute recording to DBIx::Class
+        - added code attribute recording to DBIO
         - fix to find() for complex resultsets
         - added of $storage->debugcb(sub { ... })
         - added $source->resultset_attributes accessor
@@ -2023,7 +2023,7 @@ Revision history for DBIx::Class
         - added accessor => option to column_info to specify accessor name
         - added $schema->populate to load test data (similar to AR fixtures)
         - removed cdbi-t dependencies, only run tests if installed
-        - Removed DBIx::Class::Exception
+        - Removed DBIO::Exception
         - unified throw_exception stuff, using Carp::Clan
         - report query when sth generation fails.
         - multi-step prefetch!
@@ -2034,7 +2034,7 @@ Revision history for DBIx::Class
         - more documentation improvements
         - add columns_info_for for vendor-specific column info (Zbigniew
         Lukasiak)
-        - add SQL::Translator::Producer for DBIx::Class table classes (Jess
+        - add SQL::Translator::Producer for DBIO table classes (Jess
         Robinson)
         - add unique constraint declaration (Daniel Westermann-Clark)
         - add new update_or_create method (Daniel Westermann-Clark)
@@ -2044,7 +2044,7 @@ Revision history for DBIx::Class
         - add debugfh method and ENV magic for tracing SQL (Nigel Metheringham)
 
 0.04999_03 2006-01-20 06:05:27
-        - imported Jess Robinson's SQL::Translator::Parser::DBIx::Class
+        - imported Jess Robinson's SQL::Translator::Parser::DBIO
         - lots of internals cleanup to eliminate result_source_instance
         requirement
         - added register_column and register_relationship class APIs
@@ -2072,9 +2072,9 @@ Revision history for DBIx::Class
 0.04999_01 2005-12-27 03:33:42
         - search and related methods moved to ResultSet
         - select and as added to ResultSet attrs
-        - added DBIx::Class::Table and TableInstance for table-per-class
-        - added DBIx::Class::ResultSetInstance which handles proxying
-          search etc. as a superclass of DBIx::Class::DB
+        - added DBIO::Table and TableInstance for table-per-class
+        - added DBIO::ResultSetInstance which handles proxying
+          search etc. as a superclass of DBIO::DB
         - assorted test and code cleanup work
 
 0.04001 2005-12-13 22:00:00

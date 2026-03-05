@@ -9,7 +9,7 @@ use DBICTest ':DiffSQL';
 # globalize for entirety of the test
 $SQL::Abstract::Test::parenthesis_significant = 1;
 
-my $schema = DBICTest->init_schema (storage_type => 'DBIx::Class::Storage::DBI::ACCESS', no_deploy => 1, quote_names => 1);
+my $schema = DBICTest->init_schema (storage_type => 'DBIO::Storage::DBI::ACCESS', no_deploy => 1, quote_names => 1);
 
 is_same_sql_bind(
   $schema->resultset('Artist')->search(

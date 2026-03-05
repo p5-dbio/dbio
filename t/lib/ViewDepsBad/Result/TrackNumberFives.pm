@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use base 'ViewDepsBad::Result::Track';
 
-__PACKAGE__->table_class('DBIx::Class::ResultSource::View');
+__PACKAGE__->table_class('DBIO::ResultSource::View');
 __PACKAGE__->table('track_number_fives');
 __PACKAGE__->result_source_instance->view_definition(
     "SELECT id,title,cd,track_number FROM track WHERE track_number = '5'");

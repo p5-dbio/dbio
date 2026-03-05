@@ -3,7 +3,7 @@ package DBICTest::DynamicForeignCols::TestComputer;
 use warnings;
 use strict;
 
-use base 'DBIx::Class::Core';
+use base 'DBIO::Core';
 
 __PACKAGE__->table('TestComputer');
 __PACKAGE__->add_columns(qw( test_id ));

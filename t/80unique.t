@@ -240,7 +240,7 @@ is($row->baz, 3, 'baz is correct');
       package # hide from PAUSE
         DBICTest::Schema::UniqueConstraintWarningTest;
 
-      use base qw/DBIx::Class::Core/;
+      use base qw/DBIO::Core/;
 
       __PACKAGE__->table('dummy');
 

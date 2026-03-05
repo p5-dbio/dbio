@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use lib qw(t/lib);
 use DBICTest;
-use DBIx::Class::_Util 'sigwarn_silencer';
+use DBIO::_Util 'sigwarn_silencer';
 
 my $schema = DBICTest->init_schema();
 

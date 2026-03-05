@@ -9,7 +9,7 @@ use DBICTest;
 
 throws_ok {
   package Foo;
-  use base 'DBIx::Class::Core';
+  use base 'DBIO::Core';
   __PACKAGE__->table('foo');
   __PACKAGE__->set_primary_key('bar')
 } qr/No such column 'bar' on source 'foo' /,
@@ -17,7 +17,7 @@ throws_ok {
 
 warnings_exist {
   package Foo2;
-  use base 'DBIx::Class::Core';
+  use base 'DBIO::Core';
   __PACKAGE__->table('foo');
   __PACKAGE__->add_columns(
     foo => {},

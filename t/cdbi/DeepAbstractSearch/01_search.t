@@ -19,7 +19,7 @@ $ENV{DBIC_UNSAFE_AUTOCOMMIT_OK} = 1;
 my @DSN = ("dbi:SQLite:dbname=$DB", '', '', { AutoCommit => 0 });
 
 package Music::DBI;
-use base qw(DBIx::Class::CDBICompat);
+use base qw(DBIO::CDBICompat);
 use Class::DBI::Plugin::DeepAbstractSearch;
 __PACKAGE__->connection(@DSN);
 

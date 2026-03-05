@@ -7,45 +7,45 @@ use lib qw(t/lib);
 use DBICTest;
 
 my %expected = (
-  'DBIx::Class::Storage::DBI'                    =>
+  'DBIO::Storage::DBI'                    =>
       # no default quote_char
     {                             name_sep => '.' },
 
-  'DBIx::Class::Storage::DBI::MSSQL'             =>
+  'DBIO::Storage::DBI::MSSQL'             =>
     { quote_char => [ '[', ']' ], name_sep => '.' },
 
-  'DBIx::Class::Storage::DBI::DB2'               =>
+  'DBIO::Storage::DBI::DB2'               =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIx::Class::Storage::DBI::Informix'          =>
+  'DBIO::Storage::DBI::Informix'          =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIx::Class::Storage::DBI::InterBase'         =>
+  'DBIO::Storage::DBI::InterBase'         =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIx::Class::Storage::DBI::mysql'             =>
+  'DBIO::Storage::DBI::mysql'             =>
     { quote_char => '`',          name_sep => '.' },
 
-  'DBIx::Class::Storage::DBI::Pg'             =>
+  'DBIO::Storage::DBI::Pg'             =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIx::Class::Storage::DBI::ODBC::ACCESS'      =>
+  'DBIO::Storage::DBI::ODBC::ACCESS'      =>
     { quote_char => [ '[', ']' ], name_sep => '.' },
 
 # Not testing this one, it's a pain.
-#  'DBIx::Class::Storage::DBI::ODBC::DB2_400_SQL' =>
+#  'DBIO::Storage::DBI::ODBC::DB2_400_SQL' =>
 #    { quote_char => '"',          name_sep => qr/must be connected/ },
 
-  'DBIx::Class::Storage::DBI::Oracle::Generic'   =>
+  'DBIO::Storage::DBI::Oracle::Generic'   =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIx::Class::Storage::DBI::SQLAnywhere'       =>
+  'DBIO::Storage::DBI::SQLAnywhere'       =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIx::Class::Storage::DBI::SQLite'            =>
+  'DBIO::Storage::DBI::SQLite'            =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIx::Class::Storage::DBI::Sybase::ASE'       =>
+  'DBIO::Storage::DBI::Sybase::ASE'       =>
     { quote_char => [ '[', ']' ], name_sep => '.' },
 );
 
@@ -74,18 +74,18 @@ for my $class (keys %expected) { SKIP: {
 # the SQLITE is a fake memory dsn
 local $ENV{DBICTEST_SQLITE_DSN} = 'dbi:SQLite::memory:';
 my %dbs = (
-  SQLITE           => 'DBIx::Class::Storage::DBI::SQLite',
-  ORA              => 'DBIx::Class::Storage::DBI::Oracle::Generic',
-  PG               => 'DBIx::Class::Storage::DBI::Pg',
-  MYSQL            => 'DBIx::Class::Storage::DBI::mysql',
-  DB2              => 'DBIx::Class::Storage::DBI::DB2',
-  SYBASE           => 'DBIx::Class::Storage::DBI::Sybase::ASE',
-  SQLANYWHERE      => 'DBIx::Class::Storage::DBI::SQLAnywhere',
-  SQLANYWHERE_ODBC => 'DBIx::Class::Storage::DBI::SQLAnywhere',
-  FIREBIRD         => 'DBIx::Class::Storage::DBI::InterBase',
-  FIREBIRD_ODBC    => 'DBIx::Class::Storage::DBI::InterBase',
-  INFORMIX         => 'DBIx::Class::Storage::DBI::Informix',
-  MSSQL_ODBC       => 'DBIx::Class::Storage::DBI::MSSQL',
+  SQLITE           => 'DBIO::Storage::DBI::SQLite',
+  ORA              => 'DBIO::Storage::DBI::Oracle::Generic',
+  PG               => 'DBIO::Storage::DBI::Pg',
+  MYSQL            => 'DBIO::Storage::DBI::mysql',
+  DB2              => 'DBIO::Storage::DBI::DB2',
+  SYBASE           => 'DBIO::Storage::DBI::Sybase::ASE',
+  SQLANYWHERE      => 'DBIO::Storage::DBI::SQLAnywhere',
+  SQLANYWHERE_ODBC => 'DBIO::Storage::DBI::SQLAnywhere',
+  FIREBIRD         => 'DBIO::Storage::DBI::InterBase',
+  FIREBIRD_ODBC    => 'DBIO::Storage::DBI::InterBase',
+  INFORMIX         => 'DBIO::Storage::DBI::Informix',
+  MSSQL_ODBC       => 'DBIO::Storage::DBI::MSSQL',
 );
 
 # lie that we already locked stuff - the tests below do not touch anything

@@ -6,7 +6,7 @@ use strict;
 
 use base qw/DBICTest::Schema::CD/;
 
-__PACKAGE__->table_class('DBIx::Class::ResultSource::View');
+__PACKAGE__->table_class('DBIO::ResultSource::View');
 __PACKAGE__->table('year2000cds');
 
 # need to operate on the instance for things to work

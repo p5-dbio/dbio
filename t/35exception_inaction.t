@@ -11,8 +11,8 @@ BEGIN {
 }
 
 use File::Temp ();
-use DBIx::Class::_Util 'scope_guard';
-use DBIx::Class::Schema;
+use DBIO::_Util 'scope_guard';
+use DBIO::Schema;
 
 # Do not use T::B - the test is hard enough not to segfault as it is
 my $test_count = 0;
@@ -39,7 +39,7 @@ sub ok {
 }
 
 # yes, make it even dirtier
-my $schema = 'DBIx::Class::Schema';
+my $schema = 'DBIO::Schema';
 
 $schema->connection('dbi:SQLite::memory:');
 
@@ -89,7 +89,7 @@ ESCAPE:
 ok(1, "Post-escape reached");
 
 ok(
-  !!( $output =~ /DBIx::Class INTERNAL PANIC.+FIX YOUR ERROR HANDLING/s ),
+  !!( $output =~ /DBIO INTERNAL PANIC.+FIX YOUR ERROR HANDLING/s ),
   'Proper warning emitted on STDERR'
 ) or print STDERR "Instead found:\n\n$output\n";
 

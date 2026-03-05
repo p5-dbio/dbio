@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use DBIx::Class::Optional::Dependencies ();
+use DBIO::Optional::Dependencies ();
 use lib qw(t/lib);
 use DBICTest;
 use Scope::Guard ();
@@ -21,8 +21,8 @@ plan skip_all => join (' ',
   "WARNING: This test drops and creates a table called 'event'",
 ) unless grep { $ENV{"${_}_DSN"} } keys %$env2optdep;
 
-plan skip_all => ( 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for('test_dt') )
-  unless DBIx::Class::Optional::Dependencies->req_ok_for ('test_dt');
+plan skip_all => ( 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for('test_dt') )
+  unless DBIO::Optional::Dependencies->req_ok_for ('test_dt');
 
 my $schema;
 
@@ -40,8 +40,8 @@ for my $prefix (keys %$env2optdep) { SKIP: {
   skip( "ODBC Firebird driver doesn't yet work with ASAN: https://github.com/google/sanitizers/issues/934", 1 );
 
 
-  skip ("Testing with ${prefix}_DSN needs " . DBIx::Class::Optional::Dependencies->req_missing_for( $env2optdep->{$prefix} ), 1)
-    unless  DBIx::Class::Optional::Dependencies->req_ok_for($env2optdep->{$prefix});
+  skip ("Testing with ${prefix}_DSN needs " . DBIO::Optional::Dependencies->req_missing_for( $env2optdep->{$prefix} ), 1)
+    unless  DBIO::Optional::Dependencies->req_ok_for($env2optdep->{$prefix});
 
   note "Testing with ${prefix}_DSN";
 

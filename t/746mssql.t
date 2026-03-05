@@ -5,9 +5,9 @@ use Test::More;
 use Test::Exception;
 use Try::Tiny;
 
-use DBIx::Class::Optional::Dependencies ();
-plan skip_all => 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('test_rdbms_mssql_odbc')
-  unless DBIx::Class::Optional::Dependencies->req_ok_for ('test_rdbms_mssql_odbc');
+use DBIO::Optional::Dependencies ();
+plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('test_rdbms_mssql_odbc')
+  unless DBIO::Optional::Dependencies->req_ok_for ('test_rdbms_mssql_odbc');
 
 use lib qw(t/lib);
 use DBICTest;
@@ -36,7 +36,7 @@ my $schema = DBICTest::Schema->connect($dsn, $user, $pass);
   is( $connect_count, 1, 'only one connection made');
 }
 
-isa_ok( $schema->storage, 'DBIx::Class::Storage::DBI::ODBC::Microsoft_SQL_Server' );
+isa_ok( $schema->storage, 'DBIO::Storage::DBI::ODBC::Microsoft_SQL_Server' );
 
 {
   my $schema2 = $schema->connect (@{$schema->storage->connect_info});

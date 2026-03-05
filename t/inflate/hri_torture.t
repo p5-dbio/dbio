@@ -51,18 +51,18 @@ for (1,2) {
 
 {
   package DBICTest::HRI::Subclass;
-  use base 'DBIx::Class::ResultClass::HashRefInflator';
+  use base 'DBIO::ResultClass::HashRefInflator';
 }
 
 {
   package DBICTest::HRI::Around;
-  use base 'DBIx::Class::ResultClass::HashRefInflator';
+  use base 'DBIO::ResultClass::HashRefInflator';
 
   sub inflate_result { shift->next::method(@_) }
 }
 
 for my $rs (
-  $schema->resultset('CD')->search_rs({}, { result_class => 'DBIx::Class::ResultClass::HashRefInflator' }),
+  $schema->resultset('CD')->search_rs({}, { result_class => 'DBIO::ResultClass::HashRefInflator' }),
   $schema->resultset('CD')->search_rs({}, { result_class => 'DBICTest::HRI::Subclass' }),
   $schema->resultset('CD')->search_rs({}, { result_class => 'DBICTest::HRI::Around' }),
 ) {

@@ -12,7 +12,7 @@ use DBICTest;
   package DBICTest::Thing;
   use warnings;
   use strict;
-  use base qw/DBIx::Class::Core/;
+  use base qw/DBIO::Core/;
   __PACKAGE__->table('thing');
   __PACKAGE__->add_columns(qw/id ancestor_id/);
   __PACKAGE__->set_primary_key('id');
@@ -26,7 +26,7 @@ use DBICTest;
   package DBICTest::SubThing;
   use warnings;
   use strict;
-  use base qw/DBIx::Class::Core/;
+  use base qw/DBIO::Core/;
   __PACKAGE__->table('subthing');
   __PACKAGE__->add_columns(qw/thing_id/);
   __PACKAGE__->belongs_to(thing => 'DBICTest::Thing', 'thing_id');
@@ -89,7 +89,7 @@ for my $without_schema (1,0) {
 }
 
 sub _instance {
-  $_[0]->isa('DBIx::Class::ResultSource')
+  $_[0]->isa('DBIO::ResultSource')
     ? $_[0]
     : $_[0]->result_source_instance
 }

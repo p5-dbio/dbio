@@ -5,7 +5,7 @@ use Test::More;
 use Test::Exception;
 use Scope::Guard ();
 use Try::Tiny;
-use DBIx::Class::Optional::Dependencies ();
+use DBIO::Optional::Dependencies ();
 use lib qw(t/lib);
 use DBICTest;
 
@@ -14,12 +14,12 @@ my ($dsn2, $user2, $pass2) = @ENV{map { "DBICTEST_MSACCESS_ADO_${_}" }  qw/DSN U
 
 plan skip_all => 'Test needs ' .
   (join ' or ', map { $_ ? $_ : () }
-    DBIx::Class::Optional::Dependencies->req_missing_for('test_rdbms_msaccess_odbc'),
-    DBIx::Class::Optional::Dependencies->req_missing_for('test_rdbms_msaccess_ado'))
+    DBIO::Optional::Dependencies->req_missing_for('test_rdbms_msaccess_odbc'),
+    DBIO::Optional::Dependencies->req_missing_for('test_rdbms_msaccess_ado'))
   unless
-    $dsn && DBIx::Class::Optional::Dependencies->req_ok_for('test_rdbms_msaccess_odbc')
+    $dsn && DBIO::Optional::Dependencies->req_ok_for('test_rdbms_msaccess_odbc')
     or
-    $dsn2 && DBIx::Class::Optional::Dependencies->req_ok_for('test_rdbms_msaccess_ado')
+    $dsn2 && DBIO::Optional::Dependencies->req_ok_for('test_rdbms_msaccess_ado')
     or
     (not $dsn || $dsn2);
 

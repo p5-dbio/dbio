@@ -68,7 +68,7 @@ $schema->is_executed_querycount( sub {
   $rs->reset();
 
   # make sure artist contains a related resultset for cds
-  isa_ok( $artist->{related_resultsets}{cds}, 'DBIx::Class::ResultSet', 'artist has a related_resultset for cds' );
+  isa_ok( $artist->{related_resultsets}{cds}, 'DBIO::ResultSet', 'artist has a related_resultset for cds' );
 
   # check if $artist->cds->get_cache is populated
   is( scalar @{$artist->cds->get_cache}, 3, 'cache for artist->cds contains correct number of records');

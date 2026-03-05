@@ -5,9 +5,9 @@ use Test::More;
 
 use lib qw(t/lib);
 use DBICTest ':DiffSQL';
-use DBIx::Class::_Util 'sigwarn_silencer';
+use DBIO::_Util 'sigwarn_silencer';
 
-my $ROWS = DBIx::Class::SQLMaker::ClassicExtensions->__rows_bindtype;
+my $ROWS = DBIO::SQLMaker::ClassicExtensions->__rows_bindtype;
 
 my $schema = DBICTest->init_schema();
 my $art_rs = $schema->resultset('Artist');

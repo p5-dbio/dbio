@@ -28,7 +28,7 @@ my $schema = DBICTest->init_schema;
 my %stores = (
     dclone_method           => sub { return $schema->dclone($_[0]) },
     dclone_func             => sub {
-      local $DBIx::Class::ResultSourceHandle::thaw_schema = $schema;
+      local $DBIO::ResultSourceHandle::thaw_schema = $schema;
       return dclone($_[0])
     },
     "freeze/thaw_method"    => sub {
@@ -37,7 +37,7 @@ my %stores = (
     },
     "nfreeze/thaw_func"      => sub {
       my $ice = freeze($_[0]);
-      local $DBIx::Class::ResultSourceHandle::thaw_schema = $schema;
+      local $DBIO::ResultSourceHandle::thaw_schema = $schema;
       return thaw($ice);
     },
 
@@ -59,7 +59,7 @@ my %stores = (
 );
 
 if ($ENV{DBICTEST_MEMCACHED}) {
-  if (DBIx::Class::Optional::Dependencies->req_ok_for ('test_memcached')) {
+  if (DBIO::Optional::Dependencies->req_ok_for ('test_memcached')) {
     my $memcached = Cache::Memcached->new(
       { servers => [ $ENV{DBICTEST_MEMCACHED} ] }
     );
@@ -69,13 +69,13 @@ if ($ENV{DBICTEST_MEMCACHED}) {
     $stores{memcached} = sub {
       $memcached->set( $key, $_[0], 60 )
         or die "Unable to insert into $ENV{DBICTEST_MEMCACHED} - is server running?";
-      local $DBIx::Class::ResultSourceHandle::thaw_schema = $schema;
+      local $DBIO::ResultSourceHandle::thaw_schema = $schema;
       return $memcached->get($key);
     };
   }
   else {
     SKIP: {
-      skip 'Memcached tests need ' . DBIx::Class::Optional::Dependencies->req_missing_for ('test_memcached'), 1;
+      skip 'Memcached tests need ' . DBIO::Optional::Dependencies->req_missing_for ('test_memcached'), 1;
     }
   }
 }

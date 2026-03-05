@@ -4,18 +4,18 @@ use strict;
 use warnings;
 
 BEGIN {
-  use DBIx::Class;
+  use DBIO;
   die (  'The following modules are required for the dbicadmin utility: '
-       . DBIx::Class::Optional::Dependencies->req_missing_for ('admin_script')
+       . DBIO::Optional::Dependencies->req_missing_for ('admin_script')
        . "\n"
-  ) unless DBIx::Class::Optional::Dependencies->req_ok_for ('admin_script');
+  ) unless DBIO::Optional::Dependencies->req_ok_for ('admin_script');
 }
 
-use DBIx::Class::Admin::Descriptive;
+use DBIO::Admin::Descriptive;
 #use Getopt::Long::Descriptive;
-use DBIx::Class::Admin;
+use DBIO::Admin;
 
-my $short_description = "utility for administrating DBIx::Class schemata";
+my $short_description = "utility for administrating DBIO schemata";
 my $synopsis_text =q|
   deploy a schema to a database
   %c --schema=MyApp::Schema \
@@ -62,7 +62,7 @@ my ($opts, $usage) = describe_options(
     ['attrs:s' => 'JSON string to be used for the second argument for search'],
     ['where:s' => 'JSON string to be used for the where clause of search'],
     ['force' => 'Be forceful with some operations'],
-    ['trace' => 'Turn on DBIx::Class trace output'],
+    ['trace' => 'Turn on DBIO trace output'],
     ['quiet' => 'Be less verbose'],
     ['I:s@' => 'Same as perl\'s -I, prepended to current @INC'],
   )
@@ -106,7 +106,7 @@ if($opts->{connect}) {
   $opts->{connect_info} = delete $opts->{connect};
 }
 
-my $admin = DBIx::Class::Admin->new( %$opts );
+my $admin = DBIO::Admin->new( %$opts );
 
 my $action = $opts->{action};
 

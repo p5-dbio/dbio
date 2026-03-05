@@ -10,8 +10,8 @@ use Data::Dumper;
 
 my $schema = DBICTest->init_schema( sqlite_use_file => 1 );
 
-is( ref($schema->storage), 'DBIx::Class::Storage::DBI::SQLite',
-    'Storage reblessed correctly into DBIx::Class::Storage::DBI::SQLite' );
+is( ref($schema->storage), 'DBIO::Storage::DBI::SQLite',
+    'Storage reblessed correctly into DBIO::Storage::DBI::SQLite' );
 
 my $storage = $schema->storage;
 $storage->ensure_connected;
@@ -198,13 +198,13 @@ SKIP: for my $env_dsn (undef, (DBICTest->_database)[0] ) {
   ok (! $s->storage->connected, 'Storage does not appear connected after SQLMaker instance is taken');
 
   if ($env_dsn) {
-    isa_ok($sm, 'DBIx::Class::SQLMaker');
+    isa_ok($sm, 'DBIO::SQLMaker');
 
     ok ( $s->storage->_driver_determined, 'Driver determined (with DBI_DSN)');
-    isa_ok ( $s->storage, 'DBIx::Class::Storage::DBI::SQLite' );
+    isa_ok ( $s->storage, 'DBIO::Storage::DBI::SQLite' );
   }
   else {
-    isa_ok($sm, 'DBIx::Class::SQLMaker');
+    isa_ok($sm, 'DBIO::SQLMaker');
 
     ok (! $s->storage->_driver_determined, 'Driver undetermined');
 

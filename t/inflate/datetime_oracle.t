@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
-use DBIx::Class::Optional::Dependencies ();
+use DBIO::Optional::Dependencies ();
 use lib qw(t/lib);
 use DBICTest;
 
@@ -14,8 +14,8 @@ if (not ($dsn && $user && $pass)) {
          'Warning: This test drops and creates a table called \'event\'';
 }
 
-plan skip_all => 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('test_rdbms_oracle')
-  unless DBIx::Class::Optional::Dependencies->req_ok_for ('test_rdbms_oracle');
+plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('test_rdbms_oracle')
+  unless DBIO::Optional::Dependencies->req_ok_for ('test_rdbms_oracle');
 
 
 # DateTime::Format::Oracle needs this set

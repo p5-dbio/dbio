@@ -23,8 +23,8 @@ unlink $lfn or die $!
   if -e $lfn;
 
 # make sure we are testing the vanilla debugger and not ::PrettyTrace
-require DBIx::Class::Storage::Statistics;
-$schema->storage->debugobj(DBIx::Class::Storage::Statistics->new);
+require DBIO::Storage::Statistics;
+$schema->storage->debugobj(DBIO::Storage::Statistics->new);
 
 ok ( $schema->storage->debug(1), 'debug' );
 $schema->storage->debugfh($lfn->openw);
@@ -124,7 +124,7 @@ is_deeply(\@warnings, [], 'No warnings with unicode on STDERR');
 
   {
     package DBICTest::DebugObj;
-    our @ISA = 'DBIx::Class::Storage::Statistics';
+    our @ISA = 'DBIO::Storage::Statistics';
 
     sub query_start {
       my $self = shift;
@@ -141,7 +141,7 @@ is_deeply(\@warnings, [], 'No warnings with unicode on STDERR');
   is_deeply ( $do->{_traced_bind}, \@bind_trace );
 }
 
-# recreate test as seen in DBIx::Class::QueryLog
+# recreate test as seen in DBIO::QueryLog
 # the rationale is that if someone uses a non-IO::Handle object
 # on CPAN, many are *bound* to use one on darkpan. Thus this
 # test to ensure there is no future silent breakage

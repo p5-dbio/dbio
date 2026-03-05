@@ -22,7 +22,7 @@ for my $arg (
 
     my $rs = $cds->search({}, {
       %{$arg->[1]},
-      $hri ? ( result_class => 'DBIx::Class::ResultClass::HashRefInflator' ) : (),
+      $hri ? ( result_class => 'DBIO::ResultClass::HashRefInflator' ) : (),
     });
 
     is

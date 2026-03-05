@@ -4,12 +4,12 @@ use warnings;
 use strict;
 
 use CPANDB;
-use DBIx::Class::Schema::Loader 0.05;
+use DBIO::Schema::Loader 0.05;
 use Data::Dumper::Concise;
 
 {
   package CPANDB::Schema;
-  use base qw/DBIx::Class::Schema::Loader/;
+  use base qw/DBIO::Schema::Loader/;
 
   __PACKAGE__->loader_options (
     naming => 'v5',
@@ -45,7 +45,7 @@ $distrsrc->add_relationship (
 # a proof of concept how to find out who uses us *AND* SQLT
 my $us_and_sqlt = $s->resultset('Distribution')->search (
   {
-    'deps.dependency' => 'DBIx-Class',
+    'deps.dependency' => 'DBIO',
     'deps_2.dependency' => 'SQL-Translator',
   },
   {
@@ -53,7 +53,7 @@ my $us_and_sqlt = $s->resultset('Distribution')->search (
     order_by => 'me.author',
     select => [ 'me.distribution', 'me.author', map { "$_.phase" } (qw/deps deps_2/)],
     as => [qw/dist_name dist_author req_dbic_at req_sqlt_at/],
-    result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+    result_class => 'DBIO::ResultClass::HashRefInflator',
   },
 );
 

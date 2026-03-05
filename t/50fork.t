@@ -5,12 +5,12 @@ use Test::Exception;
 
 use lib qw(t/lib);
 use DBICTest;
-use DBIx::Class::Optional::Dependencies ();
+use DBIO::Optional::Dependencies ();
 
 my $main_pid = $$;
 
-plan skip_all => 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('rdbms_pg')
-  unless DBIx::Class::Optional::Dependencies->req_ok_for ('rdbms_pg');
+plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('rdbms_pg')
+  unless DBIO::Optional::Dependencies->req_ok_for ('rdbms_pg');
 
 my ($dsn, $user, $pass) = @ENV{map { "DBICTEST_PG_${_}" } qw/DSN USER PASS/};
 

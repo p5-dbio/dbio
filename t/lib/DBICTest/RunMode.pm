@@ -5,13 +5,13 @@ use strict;
 use warnings;
 
 BEGIN {
-  if ($INC{'DBIx/Class.pm'}) {
+  if ($INC{'DBIO.pm'}) {
     my ($fr, @frame) = 1;
     while (@frame = caller($fr++)) {
       last if $frame[1] !~ m|^t/lib/DBICTest|;
     }
 
-    die __PACKAGE__ . " must be loaded before DBIx::Class (or modules using DBIx::Class) at $frame[1] line $frame[2]\n";
+    die __PACKAGE__ . " must be loaded before DBIO (or modules using DBIO) at $frame[1] line $frame[2]\n";
   }
 
   if ( $ENV{DBICTEST_VERSION_WARNS_INDISCRIMINATELY} ) {
@@ -124,7 +124,7 @@ sub _check_author_makefile {
   my $root = _find_co_root()
     or return;
 
-  my $optdeps = file('lib/DBIx/Class/Optional/Dependencies.pm');
+  my $optdeps = file('lib/DBIO/Optional/Dependencies.pm');
 
   # not using file->stat as it invokes File::stat which in turn breaks stat(_)
   my ($mf_pl_mtime, $mf_mtime, $optdeps_mtime) = ( map
@@ -177,7 +177,7 @@ attempting a regular installation be it through CPAN or manually),
 please report the situation to either the mailing list or to the
 irc channel as described in
 
-http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class.pm#GETTING_HELP/SUPPORT
+http://search.cpan.org/dist/DBIO/lib/DBIO.pm#GETTING_HELP/SUPPORT
 
 The DBIC team
 
@@ -213,7 +213,7 @@ sub is_author {
 
 sub is_smoker {
   return
-    ( ($ENV{TRAVIS}||'') eq 'true' and ($ENV{TRAVIS_REPO_SLUG}||'') eq 'Perl5/DBIx-Class' )
+    ( ($ENV{TRAVIS}||'') eq 'true' and ($ENV{TRAVIS_REPO_SLUG}||'') eq 'Perl5/DBIO' )
       ||
     ( $ENV{AUTOMATED_TESTING} && ! $ENV{PERL5_CPANM_IS_RUNNING} && ! $ENV{RELEASE_TESTING} )
   ;
@@ -223,7 +223,7 @@ sub is_ci {
   return (
     ($ENV{TRAVIS}||'') eq 'true'
       and
-    ($ENV{TRAVIS_REPO_SLUG}||'') =~ m|\w+/DBIx-Class$|
+    ($ENV{TRAVIS_REPO_SLUG}||'') =~ m|\w+/DBIO$|
   )
 }
 

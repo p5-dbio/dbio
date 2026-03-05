@@ -3,11 +3,11 @@ package # hide from PAUSE
 
 =head1 NAME
 
-DBIx::Class::Test::SQLite - Base class for running Class::DBI tests against DBIx::Class compat layer, shamelessly ripped from Class::DBI::Test::SQLite
+DBIO::Test::SQLite - Base class for running Class::DBI tests against DBIO compat layer, shamelessly ripped from Class::DBI::Test::SQLite
 
 =head1 SYNOPSIS
 
-  use base 'DBIx::Class::Test::SQLite';
+  use base 'DBIO::Test::SQLite';
 
   __PACKAGE__->set_table('test');
   __PACKAGE__->columns(All => qw/id name film salary/);
@@ -23,7 +23,7 @@ DBIx::Class::Test::SQLite - Base class for running Class::DBI tests against DBIx
 
 =head1 DESCRIPTION
 
-This provides a simple base class for DBIx::Class::CDBICompat tests using
+This provides a simple base class for DBIO::CDBICompat tests using
 SQLite.  Each class for the test should inherit from this, provide a
 create_sql() method which returns a string representing the SQL used to
 create the table for the class, and then call set_table() to create the
@@ -45,11 +45,11 @@ use lib 't/lib';
 use DBICTest;
 
 BEGIN {
-  eval { require DBIx::Class::CDBICompat }
+  eval { require DBIO::CDBICompat }
     or plan skip_all => 'Class::DBI required for this test';
 }
 
-use base qw/DBIx::Class/;
+use base qw/DBIO/;
 
 __PACKAGE__->load_components(qw/CDBICompat Core DB/);
 
@@ -67,7 +67,7 @@ __PACKAGE__->storage->dbh->do("PRAGMA synchronous = OFF");
 
     __PACKAGE__->set_table('test');
 
-This combines creating the table with the normal DBIx::Class table()
+This combines creating the table with the normal DBIO table()
 call.
 
 =cut

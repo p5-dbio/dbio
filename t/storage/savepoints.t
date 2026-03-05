@@ -3,8 +3,8 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
-use DBIx::Class::Optional::Dependencies;
-use DBIx::Class::_Util qw(sigwarn_silencer scope_guard);
+use DBIO::Optional::Dependencies;
+use DBIO::_Util qw(sigwarn_silencer scope_guard);
 use Scalar::Util 'weaken';
 
 use lib qw(t/lib);
@@ -14,7 +14,7 @@ use DBICTest;
   package # moar hide
     DBICTest::SVPTracerObj;
 
-  use base 'DBIx::Class::Storage::Statistics';
+  use base 'DBIO::Storage::Statistics';
 
   sub query_start { 'do notning'}
   sub callback { 'dummy '}
@@ -42,18 +42,18 @@ for ('', keys %$env2optdep) { SKIP: {
     skip ("Skipping tests with $prefix: set \$ENV{${prefix}_DSN} _USER and _PASS", 1)
       unless $dsn;
 
-    skip ("Testing with ${prefix}_DSN needs " . DBIx::Class::Optional::Dependencies->req_missing_for( $env2optdep->{$prefix} ), 1)
-      unless  DBIx::Class::Optional::Dependencies->req_ok_for($env2optdep->{$prefix});
+    skip ("Testing with ${prefix}_DSN needs " . DBIO::Optional::Dependencies->req_missing_for( $env2optdep->{$prefix} ), 1)
+      unless  DBIO::Optional::Dependencies->req_ok_for($env2optdep->{$prefix});
 
     $schema = DBICTest::Schema->connect ($dsn,$user,$pass,{ auto_savepoint => 1 });
 
     my $create_sql;
     $schema->storage->ensure_connected;
-    if ($schema->storage->isa('DBIx::Class::Storage::DBI::Pg')) {
+    if ($schema->storage->isa('DBIO::Storage::DBI::Pg')) {
       $create_sql = "CREATE TABLE artist (artistid serial PRIMARY KEY, name VARCHAR(100), rank INTEGER NOT NULL DEFAULT '13', charfield CHAR(10))";
       $schema->storage->dbh->do('SET client_min_messages=WARNING');
     }
-    elsif ($schema->storage->isa('DBIx::Class::Storage::DBI::mysql')) {
+    elsif ($schema->storage->isa('DBIO::Storage::DBI::mysql')) {
       $create_sql = "CREATE TABLE artist (artistid INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), rank INTEGER NOT NULL DEFAULT '13', charfield CHAR(10)) ENGINE=InnoDB";
     }
     else {

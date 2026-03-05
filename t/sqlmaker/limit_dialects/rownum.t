@@ -7,9 +7,9 @@ use lib qw(t/lib);
 use DBICTest ':DiffSQL';
 
 my ($TOTAL, $OFFSET, $ROWS) = (
-   DBIx::Class::SQLMaker::ClassicExtensions->__total_bindtype,
-   DBIx::Class::SQLMaker::ClassicExtensions->__offset_bindtype,
-   DBIx::Class::SQLMaker::ClassicExtensions->__rows_bindtype,
+   DBIO::SQLMaker::ClassicExtensions->__total_bindtype,
+   DBIO::SQLMaker::ClassicExtensions->__offset_bindtype,
+   DBIO::SQLMaker::ClassicExtensions->__rows_bindtype,
 );
 
 my $s = DBICTest->init_schema (no_deploy => 1, );

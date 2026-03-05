@@ -9,8 +9,8 @@ use lib qw(t/lib);
 use DBICTest ':DiffSQL';
 
 my ($ROWS, $OFFSET) = (
-   DBIx::Class::SQLMaker::ClassicExtensions->__rows_bindtype,
-   DBIx::Class::SQLMaker::ClassicExtensions->__offset_bindtype,
+   DBIO::SQLMaker::ClassicExtensions->__rows_bindtype,
+   DBIO::SQLMaker::ClassicExtensions->__offset_bindtype,
 );
 
 my $schema = DBICTest->init_schema();
@@ -62,7 +62,7 @@ for (1,2) {
 }
 
 # see if we get anything back at all
-isa_ok ($complex_rs->next, 'DBIx::Class::Row');
+isa_ok ($complex_rs->next, 'DBIO::Row');
 
 # Make sure that the bind shorthand syntax translation is accurate (and doesn't error)
 shorthand_check(

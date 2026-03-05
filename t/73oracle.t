@@ -5,7 +5,7 @@ use Test::Exception;
 use Test::More;
 use Sub::Name;
 use Try::Tiny;
-use DBIx::Class::Optional::Dependencies ();
+use DBIO::Optional::Dependencies ();
 
 use lib qw(t/lib);
 use DBICTest;
@@ -18,8 +18,8 @@ my ($dsn2, $user2, $pass2) = @ENV{map { "DBICTEST_ORA_EXTRAUSER_${_}" } qw/DSN U
 plan skip_all => 'Set $ENV{DBICTEST_ORA_DSN}, _USER and _PASS to run this test.'
   unless ($dsn && $user && $pass);
 
-plan skip_all => 'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('test_rdbms_oracle')
-  unless DBIx::Class::Optional::Dependencies->req_ok_for ('test_rdbms_oracle');
+plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('test_rdbms_oracle')
+  unless DBIO::Optional::Dependencies->req_ok_for ('test_rdbms_oracle');
 
 $ENV{NLS_SORT} = "BINARY";
 $ENV{NLS_COMP} = "BINARY";
@@ -29,7 +29,7 @@ $ENV{NLS_LANG} = "AMERICAN";
   package    # hide from PAUSE
     DBICTest::Schema::ArtistFQN;
 
-  use base 'DBIx::Class::Core';
+  use base 'DBIO::Core';
 
   __PACKAGE__->table(
     $ENV{DBICTEST_ORA_USER}
@@ -90,7 +90,7 @@ is (
   'insert returning capability guessed correctly'
 );
 
-isa_ok (DBICTest::Schema->connect($dsn, $user, $pass)->storage->sql_maker, 'DBIx::Class::SQLMaker::Oracle');
+isa_ok (DBICTest::Schema->connect($dsn, $user, $pass)->storage->sql_maker, 'DBIO::SQLMaker::Oracle');
 
 # see if determining a driver with bad credentials throws propely
 throws_ok {
@@ -119,7 +119,7 @@ for my $use_insert_returning ($test_server_supports_insert_returning ? (1,0) : (
     local *DBICTest::Schema::connection = subname 'DBICTest::Schema::connection' => sub {
       my $s = shift->$old_connection (@_);
       $s->storage->_use_insert_returning ($use_insert_returning);
-      $s->storage->sql_maker_class('DBIx::Class::SQLMaker::OracleJoins') if $force_ora_joins;
+      $s->storage->sql_maker_class('DBIO::SQLMaker::OracleJoins') if $force_ora_joins;
       $s;
     };
 
@@ -557,7 +557,7 @@ sub _run_tests {
     ($ENV{DBI_DSN}, my @user_pass_args) = @{ $schema->storage->connect_info };
     my $s2 = DBICTest::Schema->connect( undef, @user_pass_args );
     ok (! $s2->storage->connected, 'Not connected' );
-    is (ref $s2->storage, 'DBIx::Class::Storage::DBI', 'Undetermined driver' );
+    is (ref $s2->storage, 'DBIO::Storage::DBI', 'Undetermined driver' );
 
     ok (
       $s2->resultset('Artist')->search({ 'me.name' => { like => '%' } }, { prefetch => 'cds' })->count,

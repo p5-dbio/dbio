@@ -7,7 +7,7 @@ use strict;
 
 use base qw/DBICTest::BaseResult/;
 
-__PACKAGE__->table_class('DBIx::Class::ResultSource::View');
+__PACKAGE__->table_class('DBIO::ResultSource::View');
 
 __PACKAGE__->table('year1999cds');
 __PACKAGE__->result_source_instance->is_virtual(1);

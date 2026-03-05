@@ -6,7 +6,7 @@ use Test::More;
 use lib qw(t/lib);
 use DBICTest ':DiffSQL';
 
-my $ROWS = DBIx::Class::SQLMaker::ClassicExtensions->__rows_bindtype;
+my $ROWS = DBIO::SQLMaker::ClassicExtensions->__rows_bindtype;
 
 my $schema = DBICTest->init_schema();
 

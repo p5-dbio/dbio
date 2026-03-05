@@ -3,12 +3,12 @@ use warnings;
 
 use Test::More;
 
-use DBIx::Class::Storage::Debug::PrettyTrace;
+use DBIO::Storage::Debug::PrettyTrace;
 
 my $cap;
 open my $fh, '>', \$cap;
 
-my $pp = DBIx::Class::Storage::Debug::PrettyTrace->new({
+my $pp = DBIO::Storage::Debug::PrettyTrace->new({
    profile => 'none',
    squash_repeats => 1,
    fill_in_placeholders => 1,

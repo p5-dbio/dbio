@@ -10,7 +10,7 @@ package My::Schema::Result::User;
 
 use strict;
 use warnings;
-use base qw/DBIx::Class::Core/;
+use base qw/DBIO::Core/;
 
 ### Define what our admin class is, for ensure_class_loaded()
 my $admin_class = __PACKAGE__ . '::Admin';
@@ -57,7 +57,7 @@ sub do_admin_stuff {
 
 package My::Schema;
 
-use base qw/DBIx::Class::Schema/;
+use base qw/DBIO::Schema/;
 
 My::Schema->register_class( Admin => 'My::Schema::Result::User::Admin' );
 My::Schema->register_class( User  => 'My::Schema::Result::User' );

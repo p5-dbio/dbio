@@ -23,7 +23,7 @@ for my $conn_args (
 
     my $storage = $s->storage;
     $storage = $storage->master
-      if $storage->isa('DBIx::Class::Storage::DBI::Replicated');
+      if $storage->isa('DBIO::Storage::DBI::Replicated');
 
     ok( ! $storage->connected, 'Starting unconnected' );
 
@@ -49,7 +49,7 @@ for my $conn_args (
 
   my $storage = $s->storage;
   $storage = $storage->master
-    if $storage->isa('DBIx::Class::Storage::DBI::Replicated');
+    if $storage->isa('DBIO::Storage::DBI::Replicated');
 
   my $desc = "broken on_disconnect action @{[ explain $conn_args ]}";
 
@@ -95,7 +95,7 @@ throws_ok (
 # exception fallback:
 
 SKIP: {
-  if ( !!DBIx::Class::_ENV_::PEEPEENESS ) {
+  if ( !!DBIO::_ENV_::PEEPEENESS ) {
     skip "Your perl version $] appears to leak like a sieve - skipping garbage collected \$schema test", 1;
   }
 

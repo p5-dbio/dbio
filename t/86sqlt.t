@@ -9,10 +9,10 @@ use DBICTest;
 use Scalar::Util 'blessed';
 
 BEGIN {
-  require DBIx::Class;
+  require DBIO;
   plan skip_all =>
-      'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('deploy')
-    unless DBIx::Class::Optional::Dependencies->req_ok_for ('deploy')
+      'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('deploy')
+    unless DBIO::Optional::Dependencies->req_ok_for ('deploy')
 }
 
 my $custom_deployment_statements_called = 0;
@@ -128,7 +128,7 @@ warnings_exist {
     my $relinfo = $schema->source('Artist')->relationship_info ('cds');
     local $relinfo->{attrs}{on_delete} = 'restrict';
 
-    $translator->parser('SQL::Translator::Parser::DBIx::Class');
+    $translator->parser('SQL::Translator::Parser::DBIO');
     $translator->producer('SQLite');
 
     my $output = $translator->translate();

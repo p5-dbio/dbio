@@ -44,9 +44,9 @@ is_deeply (
 
 SKIP: {
   skip (
-    "+select/get_inflated_columns tests need " . DBIx::Class::Optional::Dependencies->req_missing_for ('test_dt'),
+    "+select/get_inflated_columns tests need " . DBIO::Optional::Dependencies->req_missing_for ('test_dt'),
     1
-  ) unless DBIx::Class::Optional::Dependencies->req_ok_for ('test_dt');
+  ) unless DBIO::Optional::Dependencies->req_ok_for ('test_dt');
 
   $schema->class('CD')->inflate_column( 'year',
     { inflate => sub { DateTime->new( year => shift ) },

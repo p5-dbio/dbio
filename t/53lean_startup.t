@@ -39,7 +39,7 @@ BEGIN {
     push @{$require_sites->{$req}}, "$caller[1] line $caller[2]"
       if @caller;
 
-    return $res if $req =~ /^DBIx::Class|^DBICTest::/;
+    return $res if $req =~ /^DBIO|^DBICTest::/;
 
     # exclude everything where the current namespace does not match the called function
     # (this works around very weird XS-induced require callstack corruption)
@@ -50,7 +50,7 @@ BEGIN {
         and
       @caller
         and
-      $caller[0] =~ /^DBIx::Class/
+      $caller[0] =~ /^DBIO/
         and
       (caller($up))[3] =~ /\Q$caller[0]/
     ) {

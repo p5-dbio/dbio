@@ -8,16 +8,16 @@ use FindBin;
 use lib "$FindBin::Bin/../../t/lib";
 use lib "$FindBin::Bin/../../lib";
 use DBICTest::Schema;
-use DBIx::Class::ResultClass::HashRefInflator;  # older dbic didn't load it
+use DBIO::ResultClass::HashRefInflator;  # older dbic didn't load it
 
-printf "Benchmarking DBIC version %s\n", DBIx::Class->VERSION;
+printf "Benchmarking DBIC version %s\n", DBIO->VERSION;
 
 my $schema = DBICTest::Schema->connect ('dbi:SQLite::memory:');
 $schema->deploy;
 
 my $rs = $schema->resultset ('Artist');
 
-my $hri_rs = $rs->search ({}, { result_class => 'DBIx::Class::ResultClass::HashRefInflator' } );
+my $hri_rs = $rs->search ({}, { result_class => 'DBIO::ResultClass::HashRefInflator' } );
 
 #DB::enable_profile();
 #my @foo = $hri_rs->all;

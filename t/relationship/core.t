@@ -41,10 +41,10 @@ $schema->is_executed_querycount( sub {
 }, 1, 'SELECT made for belongs_to if key IS NULL when undef_on_null_fk disabled');
 
 my( $rs_from_list ) = $artist->search_related_rs('cds');
-isa_ok( $rs_from_list, 'DBIx::Class::ResultSet', 'search_related_rs in list context returns rs' );
+isa_ok( $rs_from_list, 'DBIO::ResultSet', 'search_related_rs in list context returns rs' );
 
 ( $rs_from_list ) = $artist->cds_rs();
-isa_ok( $rs_from_list, 'DBIx::Class::ResultSet', 'relation_rs in list context returns rs' );
+isa_ok( $rs_from_list, 'DBIO::ResultSet', 'relation_rs in list context returns rs' );
 
 # count_related
 is( $artist->count_related('cds'), 4, 'count_related ok' );

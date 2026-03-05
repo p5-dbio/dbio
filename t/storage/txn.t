@@ -252,7 +252,7 @@ sub _test_forking_action {
   # otherwise a deadlock may occur between the transactions running in the
   # children and the query of the parent
   for my $pid (@pids) {
-    isa_ok ($schema->resultset ('Artist')->find ({ name => "forking action $pid" }), 'DBIx::Class::Row');
+    isa_ok ($schema->resultset ('Artist')->find ({ name => "forking action $pid" }), 'DBIO::Row');
   }
 }
 
@@ -300,10 +300,10 @@ my $fail_code = sub {
 
     # this should logically work just fine - but it does not,
     # only direct override of the existing method dtrt
-    #local *DBIx::Class::Storage::DBI::SQLite::txn_rollback = sub { die 'FAILED' };
+    #local *DBIO::Storage::DBI::SQLite::txn_rollback = sub { die 'FAILED' };
 
-    local *DBIx::Class::Storage::DBI::txn_rollback = sub { die 'FAILED' };
-    Class::C3->reinitialize() if DBIx::Class::_ENV_::OLD_MRO;
+    local *DBIO::Storage::DBI::txn_rollback = sub { die 'FAILED' };
+    Class::C3->reinitialize() if DBIO::_ENV_::OLD_MRO;
 
     throws_ok (
       sub {
@@ -371,7 +371,7 @@ my $fail_code = sub {
     $schema->txn_begin();
   }, 'Pre-connection nested transactions.');
 
-  throws_ok( sub { $schema->txn_rollback }, 'DBIx::Class::Storage::NESTED_ROLLBACK_EXCEPTION', 'got proper nested rollback exception' );
+  throws_ok( sub { $schema->txn_rollback }, 'DBIO::Storage::NESTED_ROLLBACK_EXCEPTION', 'got proper nested rollback exception' );
 }
 
 # make sure AutoCommit => 0 on external handles behaves correctly with scope_guard

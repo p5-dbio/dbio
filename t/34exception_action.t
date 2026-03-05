@@ -25,7 +25,7 @@ my $e = $@;
 # Re-throw the exception with rethrow()
 throws_ok { $e->rethrow }
   $ex_regex;
-isa_ok( $@, 'DBIx::Class::Exception' );
+isa_ok( $@, 'DBIO::Exception' );
 
 # Now lets rethrow via exception_action
 $schema->exception_action(sub { die @_ });

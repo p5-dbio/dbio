@@ -11,7 +11,7 @@ use Time::HiRes qw/time sleep/;
 
 use lib qw(t/lib);
 use DBICTest;
-use DBIx::Class::_Util 'sigwarn_silencer';
+use DBIO::_Util 'sigwarn_silencer';
 
 my ($dsn, $user, $pass);
 
@@ -21,14 +21,14 @@ BEGIN {
   plan skip_all => 'Set $ENV{DBICTEST_MYSQL_DSN}, _USER and _PASS to run this test'
     unless ($dsn);
 
-  require DBIx::Class;
+  require DBIO;
   plan skip_all =>
-      'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('deploy')
-    unless DBIx::Class::Optional::Dependencies->req_ok_for ('deploy');
+      'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('deploy')
+    unless DBIO::Optional::Dependencies->req_ok_for ('deploy');
 
   plan skip_all =>
-      'Test needs ' . DBIx::Class::Optional::Dependencies->req_missing_for ('test_rdbms_mysql')
-    unless DBIx::Class::Optional::Dependencies->req_ok_for ('test_rdbms_mysql');
+      'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('test_rdbms_mysql')
+    unless DBIO::Optional::Dependencies->req_ok_for ('test_rdbms_mysql');
 }
 
 # this is just to grab a lock
@@ -268,7 +268,7 @@ my $schema_v3 = DBICVersion::Schema->connect($dsn, $user, $pass, { ignore_versio
   my $get_db_version_run = 0;
 
   no warnings qw/once redefine/;
-  local *DBIx::Class::Schema::Versioned::get_db_version = sub {
+  local *DBIO::Schema::Versioned::get_db_version = sub {
     $get_db_version_run = 1;
     return $_[0]->schema_version;
   };

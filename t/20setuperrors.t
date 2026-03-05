@@ -10,7 +10,7 @@ use DBICTest;
 throws_ok (
   sub {
     package BuggyTable;
-    use base 'DBIx::Class::Core';
+    use base 'DBIO::Core';
 
     __PACKAGE__->table('buggy_table');
     __PACKAGE__->columns( qw/this doesnt work as expected/ );

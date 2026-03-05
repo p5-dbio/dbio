@@ -3,5 +3,5 @@ package DBICNSTest::RSet::C;
 use warnings;
 use strict;
 
-use base qw/DBIx::Class::ResultSet/;
+use base qw/DBIO::ResultSet/;
 1;

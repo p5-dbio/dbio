@@ -346,7 +346,7 @@ lives_ok ( sub {
 
   my $tracks = $cd_result->tracks;
 
-  isa_ok( $tracks, 'DBIx::Class::ResultSet', 'Got Expected Tracks ResultSet');
+  isa_ok( $tracks, 'DBIO::ResultSet', 'Got Expected Tracks ResultSet');
 
   foreach my $track ($tracks->all)
   {
@@ -376,7 +376,7 @@ lives_ok ( sub {
 
   my $tracks = $cd_result->tracks;
 
-  isa_ok( $tracks, 'DBIx::Class::ResultSet', "Got Expected Tracks ResultSet");
+  isa_ok( $tracks, 'DBIO::ResultSet', "Got Expected Tracks ResultSet");
 
   foreach my $track ($tracks->all)
   {

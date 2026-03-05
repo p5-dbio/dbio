@@ -4,7 +4,7 @@ package #hide from pause
 use strict;
 use warnings;
 
-# must load before any DBIx::Class* namespaces
+# must load before any DBIO* namespaces
 use DBICTest::RunMode;
 
 sub _skip_namespace_frames { '^DBICTest' }

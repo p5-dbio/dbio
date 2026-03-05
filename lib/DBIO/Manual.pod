@@ -1,0 +1,67 @@
+=head1 NAME
+
+DBIO::Manual - Index of the Manual
+
+=head1 DESCRIPTION
+
+This is the L<DBIO> users manual. DBIO is a SQL->OOP mapper.
+This means that it can represent your SQL tables as perl classes, and give
+you convenient accessors and methods for retrieving and updating information
+from your SQL database.
+
+=head1 SECTIONS
+
+=head2 L<DBIO::Manual::FAQ>
+
+Short answers and doc pointers to questions.
+
+=head2 L<DBIO::Manual::Glossary>
+
+Explanations of terms used in this documentation.
+
+=head2 L<DBIO::Manual::Intro>
+
+Beginner guide to using DBIO.
+
+=head2 L<DBIO::Manual::Example>
+
+An example of slightly more complex usage.
+
+=head2 L<DBIO::Manual::Joining>
+
+How to translate known SQL JOINs into DBIO-ish.
+
+=head2 L<DBIO::Manual::Cookbook>
+
+Convenient recipes for DBIC usage.
+
+=head2 L<DBIO::Manual::Reading>
+
+How to read (and write) the reference documentation.
+
+=head2 L<DBIO::Manual::DocMap>
+
+Lists of modules by task to help you find the correct document.
+
+=head2 L<DBIO::Manual::Troubleshooting>
+
+Got trouble? Let us shoot it for you.
+
+If you're using the CDBI Compat layer, we suggest reading the L<Class::DBI>
+documentation. It should behave the same way.
+
+=head2 L<DBIO::Manual::Component>
+
+Existing components, and documentation and example on how to
+develop new ones.
+
+=head1 FURTHER QUESTIONS?
+
+Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.
+
+=head1 COPYRIGHT AND LICENSE
+
+This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
+by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+redistribute it and/or modify it under the same terms as the
+L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.

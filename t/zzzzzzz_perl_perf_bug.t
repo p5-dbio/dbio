@@ -19,7 +19,7 @@ use DBICTest ':GlobalLock';
 use Benchmark;
 
 # This is a rather unusual test.
-# It does not test any aspect of DBIx::Class, but instead tests the
+# It does not test any aspect of DBIO, but instead tests the
 # perl installation this is being run under to see if it is:-
 #  1. Potentially affected by a RH perl build bug
 #  2. If so we do a performance test for the effect of
@@ -30,7 +30,7 @@ use Benchmark;
 #
 # If these tests fail then please read the section titled
 # Perl Performance Issues on Red Hat Systems in
-# L<DBIx::Class::Manual::Troubleshooting>
+# L<DBIO::Manual::Troubleshooting>
 
 # we do a benchmark test filling an array with blessed/overloaded references,
 # against an array filled with array refs.
@@ -68,7 +68,7 @@ cmp_ok( $ratio, '<', $fail_ratio, 'Overload/bless performance acceptable' )
     "\n",
     "This perl has a substantial slow down when handling large numbers\n",
     "of blessed/overloaded objects.  This can severely adversely affect\n",
-    "the performance of DBIx::Class programs.  Please read the section\n",
+    "the performance of DBIO programs.  Please read the section\n",
     "in the Troubleshooting POD documentation entitled\n",
     "'Perl Performance Issues on Red Hat Systems'\n",
     "As this is an extremely serious condition, the only way to skip\n",
@@ -106,9 +106,9 @@ SKIP: {
     # perl with the performance bug
     # if this test fails, look at the section titled
     # "Perl Performance Issues on Red Hat Systems" in
-    # L<DBIx::Class::Manual::Troubleshooting>
+    # L<DBIO::Manual::Troubleshooting>
     # Basically you may suffer severe performance issues when running
-    # DBIx::Class (and many other) modules.  Look at getting a fixed
+    # DBIO (and many other) modules.  Look at getting a fixed
     # version of the perl interpreter for your system.
     #
     ok( !_possibly_has_bad_overload_performance(),

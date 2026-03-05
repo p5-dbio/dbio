@@ -5,7 +5,7 @@ use Test::More;
 use lib 't/cdbi/testlib';
 use Film;
 
-my $it_class = "DBIx::Class::ResultSet";
+my $it_class = "DBIO::ResultSet";
 
 my @film  = (
   Film->create({ Title => 'Film 1' }),
