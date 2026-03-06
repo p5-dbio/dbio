@@ -5,17 +5,28 @@ use strict;
 use warnings;
 
 my $hook_installed;
+my $isa_patched;
 
 sub import {
+  _install_hook();
+  _install_isa_patch();
+  _setup_existing_modules();
+}
+
+sub _install_hook {
   return if $hook_installed;
   $hook_installed = 1;
-
   unshift @INC, \&_dbic_inc_hook;
+}
 
-  # Patch DBIO::isa so that ->isa('DBIx::Class::Foo') also checks
-  # ->isa('DBIO::Foo'), without needing parent stash aliasing
-  require DBIO;
-  my $orig_isa = DBIO->can('isa');
+sub _install_isa_patch {
+  return if $isa_patched;
+
+  # If DBIO isn't loaded yet, patch will be applied later
+  # when _setup_existing_modules detects it
+  my $orig_isa = DBIO->can('isa') or return;
+  $isa_patched = 1;
+
   no warnings 'redefine';
   *DBIO::isa = sub {
     return 1 if $orig_isa->(@_);
@@ -26,11 +37,52 @@ sub import {
   };
 }
 
+# For a given DBIO package, set up the DBIx::Class equivalent
+sub _setup_dbix_package {
+  my ($dbix_pkg, $dbic_pkg) = @_;
+
+  no strict 'refs';
+  unless (@{"${dbix_pkg}::ISA"}) {
+    @{"${dbix_pkg}::ISA"} = ($dbic_pkg);
+  }
+  require mro;
+  mro::set_mro($dbix_pkg, mro::get_mro($dbic_pkg));
+}
+
+# Scan %INC for all loaded DBIO modules and ensure their
+# DBIx::Class aliases exist. Called at import time and
+# every time the hook intercepts a DBIx::Class require.
+sub _setup_existing_modules {
+  for my $file (keys %INC) {
+    next unless $file =~ m{^DBIO(/|\.pm$)};
+    (my $dbix_file = $file) =~ s{^DBIO(?=/|\.pm$)}{DBIx/Class};
+    next if exists $INC{$dbix_file};
+
+    (my $dbic_pkg = $file) =~ s{/}{::}g;
+    $dbic_pkg =~ s{\.pm$}{};
+    (my $dbix_pkg = $dbix_file) =~ s{/}{::}g;
+    $dbix_pkg =~ s{\.pm$}{};
+
+    _setup_dbix_package($dbix_pkg, $dbic_pkg);
+    $INC{$dbix_file} = $INC{$file};
+  }
+
+  _install_isa_patch();
+}
+
 sub _dbic_inc_hook {
   my (undef, $file) = @_;
 
   # Only intercept DBIx/Class requests
   return unless $file =~ /^DBIx\/Class(?:\/|\.pm$)/;
+
+  # Every time any DBIx::Class module is requested, ensure all
+  # already-loaded DBIO modules have their DBIx::Class aliases.
+  # This handles the case where ResultDDL's table() references
+  # DBIx::Class::Core->can('table') but nobody ever did
+  # require DBIx::Class::Core (because the class was set up
+  # through DBIO::Core directly).
+  _setup_existing_modules();
 
   # Map DBIx/Class.pm -> DBIO.pm, DBIx/Class/Foo.pm -> DBIO/Foo.pm
   (my $dbic_file = $file) =~ s{^DBIx/Class(?=/|\.pm$)}{DBIO};
@@ -42,18 +94,29 @@ sub _dbic_inc_hook {
   (my $dbic_pkg = $dbic_file) =~ s{/}{::}g;
   $dbic_pkg =~ s{\.pm$}{};
 
-  # Check that the DBIO equivalent actually exists
+  # If _setup_existing_modules already set this up, return a stub
+  # to prevent Perl from finding a real DBIx::Class file on disk
+  if (exists $INC{$file}) {
+    open my $fh, '<', \"1;\n";
+    return $fh;
+  }
+
+  # Check that the DBIO equivalent actually exists on disk
   for my $inc (@INC) {
     next if ref $inc;
     next unless -f "$inc/$dbic_file";
 
-    # Generate a stub that loads the DBIO module and aliases only
-    # this specific package stash (not parent namespaces)
-    my $code = "require $dbic_pkg;\n"
-      . "no strict 'refs';\n"
-      . "*${dbix_pkg}:: = *${dbic_pkg}::;\n"
-      . "1;\n";
-    open my $fh, '<', \$code;
+    # Load the DBIO module and set up the alias
+    local $@;
+    eval "require ${dbic_pkg}; 1" or do {
+      warn "DBIO::Compat::DBIxClass: Failed to load ${dbic_pkg}: $@";
+      return;
+    };
+    _setup_dbix_package($dbix_pkg, $dbic_pkg);
+    $INC{$file} = $INC{$dbic_file};
+
+    # Return minimal stub to satisfy the require
+    open my $fh, '<', \"1;\n";
     return $fh;
   }
 
@@ -71,16 +134,19 @@ sub _dbic_inc_hook {
 
 This module installs an C<@INC> hook that intercepts any attempt to load
 a C<DBIx::Class::*> module and transparently redirects it to the
-corresponding C<DBIO::*> module. The C<DBIx::Class::*> package is then
-stash-aliased to the C<DBIO::*> package, so method calls and C<can()>
+corresponding C<DBIO::*> module. The C<DBIx::Class::*> package inherits
+from the C<DBIO::*> package via C<@ISA>, so method calls and C<can()>
 work correctly.
 
-Additionally, C<isa()> on all DBIO classes is patched so that
+Additionally, any time a C<DBIx::Class::*> module is requested, all
+already-loaded C<DBIO::*> modules are automatically aliased to their
+C<DBIx::Class::*> counterparts. This ensures that code referencing
+C<DBIx::Class::Core> works even when the class was set up directly
+through C<DBIO::Core>.
+
+C<isa()> on all DBIO classes is patched so that
 C<< $obj->isa('DBIx::Class::Foo') >> returns true when the object
 C<isa('DBIO::Foo')>.
-
-This allows existing CPAN modules written for C<DBIx::Class> to work
-with DBIO without any modifications.
 
 No files are created on disk — the compatibility stubs are generated
 purely at runtime and will not be indexed by PAUSE.

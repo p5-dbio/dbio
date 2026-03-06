@@ -31,7 +31,7 @@ BEGIN {
 
     # During 5.13 dev cycle HELEMs started to leak on copy
     # add an escape for these perls ON SMOKERS - a user will still get death
-    PEEPEENESS => ( eval { DBICTest::RunMode->is_smoker } && ($] >= 5.013005 and $] <= 5.013006) ),
+    PEEPEENESS => ( $INC{"DBICTest/RunMode.pm"} && eval { DBICTest::RunMode->is_smoker } && ($] >= 5.013005 and $] <= 5.013006) ),
 
     SHUFFLE_UNORDERED_RESULTSETS => $ENV{DBIC_SHUFFLE_UNORDERED_RESULTSETS} ? 1 : 0,
 
