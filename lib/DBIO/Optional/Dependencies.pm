@@ -78,7 +78,11 @@ my $rdbms_msaccess_ado = {
   'DBD::ADO'                      => '0',
 };
 my $rdbms_mysql = {
-  'DBD::mysql'                    => '0',
+  # Accept either DBD::mysql or DBD::MariaDB (the actively maintained fork)
+  ( eval { require DBD::MariaDB; 1 }
+    ? ( 'DBD::MariaDB' => '0' )
+    : ( 'DBD::mysql'   => '0' )
+  ),
 };
 my $rdbms_oracle = {
   'DBD::Oracle'                   => '0',

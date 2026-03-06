@@ -108,7 +108,10 @@ my %DB_SPECS = (
             { name => 'MYSQL_DATABASE',      value => 'dbic_test' },
         ],
         readiness_cmd => [qw(mysqladmin ping -h localhost)],
-        dsn_template  => 'dbi:mysql:database=dbic_test;host=%s;port=%s',
+        dsn_template  => ( eval { require DBD::MariaDB; 1 }
+            ? 'dbi:MariaDB:database=dbic_test;host=%s;port=%s'
+            : 'dbi:mysql:database=dbic_test;host=%s;port=%s'
+        ),
         user          => 'root',
         pass          => 'dbictest',
         env_prefix    => 'DBICTEST_MYSQL',

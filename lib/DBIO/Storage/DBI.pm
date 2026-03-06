@@ -1303,7 +1303,9 @@ sub _determine_driver {
       }
 
       if ($driver) {
-        my $storage_class = "DBIO::Storage::DBI::${driver}";
+        # DBD::MariaDB is a drop-in replacement for DBD::mysql
+        my $mapped_driver = $driver eq 'MariaDB' ? 'mysql' : $driver;
+        my $storage_class = "DBIO::Storage::DBI::${mapped_driver}";
         if ($self->load_optional_class($storage_class)) {
           mro::set_mro($storage_class, 'c3');
           bless $self, $storage_class;

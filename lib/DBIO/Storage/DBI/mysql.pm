@@ -29,7 +29,8 @@ sub connect_call_set_strict_mode {
 
 sub _dbh_last_insert_id {
   my ($self, $dbh, $source, $col) = @_;
-  $dbh->{mysql_insertid};
+  # DBD::MariaDB uses mariadb_insertid, DBD::mysql uses mysql_insertid
+  $dbh->{mariadb_insertid} // $dbh->{mysql_insertid};
 }
 
 sub _prep_for_execute {
@@ -93,13 +94,16 @@ sub _prep_for_execute {
 sub _run_connection_actions {
   my $self = shift;
 
-  # default mysql_auto_reconnect to off unless explicitly set
+  # default auto_reconnect to off unless explicitly set
+  # DBD::MariaDB uses mariadb_auto_reconnect, DBD::mysql uses mysql_auto_reconnect
+  my $ar_attr = exists $self->_dbh->{mariadb_auto_reconnect}
+    ? 'mariadb_auto_reconnect' : 'mysql_auto_reconnect';
   if (
-    $self->_dbh->{mysql_auto_reconnect}
+    $self->_dbh->{$ar_attr}
       and
-    ! exists $self->_dbic_connect_attributes->{mysql_auto_reconnect}
+    ! exists $self->_dbic_connect_attributes->{$ar_attr}
   ) {
-    $self->_dbh->{mysql_auto_reconnect} = 0;
+    $self->_dbh->{$ar_attr} = 0;
   }
 
   $self->next::method(@_);

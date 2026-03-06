@@ -26,11 +26,11 @@ my $dbh = $schema->storage->dbh;
 
 $dbh->do("DROP TABLE IF EXISTS artist;");
 
-$dbh->do("CREATE TABLE artist (artistid INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), rank INTEGER NOT NULL DEFAULT '13', charfield CHAR(10));");
+$dbh->do("CREATE TABLE artist (artistid INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), `rank` INTEGER NOT NULL DEFAULT '13', charfield CHAR(10));");
 
 $dbh->do("DROP TABLE IF EXISTS cd;");
 
-$dbh->do("CREATE TABLE cd (cdid INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, artist INTEGER, title TEXT, year DATE, genreid INTEGER, single_track INTEGER);");
+$dbh->do("CREATE TABLE cd (cdid INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, artist INTEGER, title TEXT, year VARCHAR(20), genreid INTEGER, single_track INTEGER);");
 
 $dbh->do("DROP TABLE IF EXISTS producer;");
 
@@ -176,6 +176,12 @@ SKIP: {
 
     if ($norm_version < 5.000003_01) {
         $test_type_info->{charfield}->{data_type} = 'VARCHAR';
+    }
+
+    # MySQL 8.0+ removed integer display width, so size is undef for INT
+    if ($norm_version >= 8.000000_00) {
+        $test_type_info->{artistid}{size} = undef;
+        $test_type_info->{rank}{size} = undef;
     }
 
     my $type_info = $schema->storage->columns_info_for('artist');
@@ -368,21 +374,24 @@ ZEROINSEARCH: {
   isa_ok($schema->storage->sql_maker, 'DBIO::SQLMaker::MySQL');
 }
 
-# make sure the mysql_auto_reconnect buggery is avoided
+# make sure the auto_reconnect buggery is avoided
+# DBD::MariaDB uses mariadb_auto_reconnect, DBD::mysql uses mysql_auto_reconnect
 {
   local $ENV{MOD_PERL} = 'boogiewoogie';
   my $schema = DBICTest::Schema->connect($dsn, $user, $pass);
-  ok (! $schema->storage->_get_dbh->{mysql_auto_reconnect}, 'mysql_auto_reconnect unset regardless of ENV' );
+  my $ar_attr = $schema->storage->_get_dbh->{Driver}{Name} eq 'MariaDB'
+    ? 'mariadb_auto_reconnect' : 'mysql_auto_reconnect';
+  ok (! $schema->storage->_get_dbh->{$ar_attr}, 'auto_reconnect unset regardless of ENV' );
 
-  # Make sure hardcore forking action still works even if mysql_auto_reconnect
+  # Make sure hardcore forking action still works even if auto_reconnect
   # is true (test inspired by ether)
 
-  my $schema_autorecon = DBICTest::Schema->connect($dsn, $user, $pass, { mysql_auto_reconnect => 1 });
+  my $schema_autorecon = DBICTest::Schema->connect($dsn, $user, $pass, { $ar_attr => 1 });
   my $orig_dbh = $schema_autorecon->storage->_get_dbh;
   weaken $orig_dbh;
 
   ok ($orig_dbh, 'Got weak $dbh ref');
-  ok ($orig_dbh->{mysql_auto_reconnect}, 'mysql_auto_reconnect is properly set if explicitly requested' );
+  ok ($orig_dbh->{$ar_attr}, 'auto_reconnect is properly set if explicitly requested' );
 
   my $rs = $schema_autorecon->resultset('Artist');
 
