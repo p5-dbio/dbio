@@ -374,6 +374,46 @@ my $fail_code = sub {
   throws_ok( sub { $schema->txn_rollback }, 'DBIO::Storage::NESTED_ROLLBACK_EXCEPTION', 'got proper nested rollback exception' );
 }
 
+# Nested rollback should never result in a commit (deferred rollback)
+{
+  use Try::Tiny;
+  my $schema = DBICTest->init_schema();
+
+  is( $schema->storage->transaction_depth, 0, 'txn depth starts at 0');
+
+  my $artist = $schema->resultset('Artist')->find(3);
+
+  # This simulates a situation that might happen if a routine tries performing
+  # database work, but it fails, and then the code that called it wants
+  # to perform additional database work (like logging the exception to the DB).
+  my $code_with_error_handling = sub {
+    my $artist = shift;
+    try {
+      $schema->txn_do($fail_code, $artist);
+    } catch {
+      $code->($artist, 'catch code inserts records');
+    };
+  };
+
+  # This simulates code that wraps the previous with a transaction,
+  # causing the inner rollback to be "nested". Without deferred_rollback
+  # protection, the outer commit would succeed, silently committing
+  # data that should have been rolled back.
+  warnings_like( sub { $schema->txn_do($code_with_error_handling, $artist); },
+    qr/rollback/i, 'get warning about nested rollback' );
+
+  my $fail_record = $artist->cds({
+    title => 'this should not exist',
+    year => 2005,
+  })->first;
+  my $followup_record = $artist->cds({
+    title => 'catch code inserts records',
+    year => 2006,
+  })->first;
+  ok( !defined $fail_record, 'record from failcode not committed' );
+  ok( !defined $followup_record, 'record from exception handler not committed' );
+}
+
 # make sure AutoCommit => 0 on external handles behaves correctly with scope_guard
 warnings_are {
   my $factory = DBICTest->init_schema;

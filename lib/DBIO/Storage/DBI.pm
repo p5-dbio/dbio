@@ -883,6 +883,7 @@ sub disconnect {
     %{ $dbh->{CachedKids} } = ();
     $dbh->disconnect;
     $_[0]->_dbh(undef);
+    $_[0]->deferred_rollback(undef);
   }
 }
 
@@ -1053,6 +1054,7 @@ sub _populate_dbh {
   # Always set the transaction depth on connect, since
   #  there is no transaction in progress by definition
   $_[0]->{transaction_depth} = $_[0]->_dbh_autocommit ? 0 : 1;
+  $_[0]->deferred_rollback(undef);
 
   $_[0]->_run_connection_actions unless $_[0]->{_in_determine_driver};
 

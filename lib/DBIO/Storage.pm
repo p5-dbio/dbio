@@ -19,7 +19,7 @@ use DBIO::Storage::TxnScopeGuard;
 use Try::Tiny;
 use namespace::clean;
 
-__PACKAGE__->mk_group_accessors(simple => qw/debug schema transaction_depth auto_savepoint savepoints/);
+__PACKAGE__->mk_group_accessors(simple => qw/debug schema transaction_depth deferred_rollback auto_savepoint savepoints/);
 __PACKAGE__->mk_group_accessors(component_class => 'cursor_class');
 
 __PACKAGE__->cursor_class('DBIO::Cursor');
@@ -175,6 +175,7 @@ transaction failure.
 
 sub txn_do {
   my $self = shift;
+  $self->_throw_deferred_rollback if $self->deferred_rollback;
 
   DBIO::Storage::BlockRunner->new(
     storage => $self,
@@ -198,6 +199,7 @@ an entire code block to be executed transactionally.
 
 sub txn_begin {
   my $self = shift;
+  $self->_throw_deferred_rollback if $self->deferred_rollback;
 
   if($self->transaction_depth == 0) {
     $self->debugobj->txn_begin()
@@ -222,6 +224,7 @@ transaction currently in effect (i.e. you called L</txn_begin>).
 
 sub txn_commit {
   my $self = shift;
+  $self->_throw_deferred_rollback if $self->deferred_rollback;
 
   if ($self->transaction_depth == 1) {
     $self->debugobj->txn_commit() if $self->debug;
@@ -240,9 +243,16 @@ sub txn_commit {
 
 =head2 txn_rollback
 
-Issues a rollback of the current transaction. A nested rollback will
-throw a L<DBIO::Storage::NESTED_ROLLBACK_EXCEPTION> exception,
-which allows the rollback to propagate to the outermost transaction.
+Issues a rollback of the current transaction (or savepoint, if
+auto_savepoint is enabled, and you are in a nested transaction).
+
+If you are in a nested transaction without auto_savepoint, rollback will
+put the storage into a "deferred rollback" state and throw a
+L<DBIO::Storage::NESTED_ROLLBACK_EXCEPTION> exception
+to help you unwind to the outer-most transaction's scope.
+Until the "deferred rollback" condition is resolved,
+the storage engine will throw exceptions on any attempt to begin, commit,
+or rollback a transaction.
 
 =cut
 
@@ -254,6 +264,7 @@ sub txn_rollback {
     $self->_exec_txn_rollback;
     $self->{transaction_depth}--;
     $self->savepoints([]);
+    $self->deferred_rollback(undef);
   }
   elsif ($self->transaction_depth > 1) {
     $self->{transaction_depth}--;
@@ -263,6 +274,7 @@ sub txn_rollback {
       $self->svp_release;
     }
     else {
+      $self->deferred_rollback(1);
       DBIO::Storage::NESTED_ROLLBACK_EXCEPTION->throw(
         "A txn_rollback in nested transaction is ineffective! (depth $self->{transaction_depth})"
       );
@@ -271,6 +283,13 @@ sub txn_rollback {
   else {
     $self->throw_exception( 'Refusing to roll back without a started transaction' );
   }
+}
+
+sub _throw_deferred_rollback {
+  DBIO::Storage::NESTED_ROLLBACK_EXCEPTION->throw(
+    "You are in the middle of a deferred rollback from a nested transaction."
+    ." No further statements can be executed until the rollback is complete."
+  );
 }
 
 =head2 svp_begin
@@ -290,6 +309,9 @@ sub svp_begin {
 
   my $exec = $self->can('_exec_svp_begin')
     or $self->throw_exception ("Your Storage implementation doesn't support savepoints");
+
+  # This could happen if savepoints were not enabled at the time rollback was called
+  $self->_throw_deferred_rollback if $self->deferred_rollback;
 
   $name = $self->_svp_generate_name
     unless defined $name;
@@ -325,6 +347,9 @@ sub svp_release {
 
   my $exec = $self->can('_exec_svp_release')
     or $self->throw_exception ("Your Storage implementation doesn't support savepoints");
+
+  # This could happen if savepoints were not enabled at the time rollback was called
+  $self->_throw_deferred_rollback if $self->deferred_rollback;
 
   if (defined $name) {
     my @stack = @{ $self->savepoints };
@@ -368,6 +393,9 @@ sub svp_rollback {
 
   my $exec = $self->can('_exec_svp_rollback')
     or $self->throw_exception ("Your Storage implementation doesn't support savepoints");
+
+  # This could happen if savepoints were not enabled at the time rollback was called
+  $self->_throw_deferred_rollback if $self->deferred_rollback;
 
   if (defined $name) {
     my @stack = @{ $self->savepoints };
