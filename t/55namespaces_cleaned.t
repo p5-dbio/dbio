@@ -93,7 +93,6 @@ my @modules = grep {
 # have an exception table for old and/or weird code we are not sure
 # we *want* to clean in the first place
 my $skip_idx = { map { $_ => 1 } (
-  (grep { /^DBIO::CDBICompat/ } @modules), # too crufty to touch
   'SQL::Translator::Producer::DBIO::File', # ditto
 
   # not sure how to handle type libraries

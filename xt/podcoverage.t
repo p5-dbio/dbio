@@ -150,9 +150,7 @@ my $exceptions = {
 
 # deprecated / backcompat stuff
     'DBIO::Serialize::Storable'              => { skip => 1 },
-    'DBIO::CDBICompat*'                      => { skip => 1 },
     'DBIO::ResultSetManager'                 => { skip => 1 },
-    'DBIO::DB'                               => { skip => 1 },
 
 # skipped because the synopsis covers it clearly
     'DBIO::InflateColumn::File'              => { skip => 1 },

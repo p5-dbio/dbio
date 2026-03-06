@@ -254,15 +254,6 @@ my $reqs = {
     },
   },
 
-  test_cdbicompat => {
-    req => {
-      'Class::DBI::Plugin::DeepAbstractSearch' => '0',
-      %$datetime_basic,
-      'Time::Piece::MySQL'        => '0',
-      'Date::Simple'              => '3.03',
-    },
-  },
-
   # this is just for completeness as SQLite
   # is a core dep of DBIC for testing
   rdbms_sqlite => {

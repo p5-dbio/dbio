@@ -80,8 +80,6 @@ being called try printing out the current linearized MRO.
 These components provide extra functionality beyond
 basic functionality that you can't live without.
 
-L<DBIO::CDBICompat> - Class::DBI Compatibility layer.
-
 L<DBIO::FormTools> - Build forms with multiple interconnected objects.
 
 L<DBIO::HTMLWidget> - Like FromForm but with DBIO and HTML::Widget.
@@ -115,8 +113,6 @@ DBIO' functionality.
 L<DBIO::Core> - Loads various components that "most people" would want.
 
 L<DBIO::AccessorGroup> - Lets you build groups of accessors.
-
-L<DBIO::DB> - Non-recommended classdata schema component.
 
 L<DBIO::InflateColumn> - Automatically create objects from column data.
 

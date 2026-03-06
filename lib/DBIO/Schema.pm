@@ -58,9 +58,8 @@ Creates database classes based on a schema. This is the recommended way to
 use L<DBIO> and allows you to use more than one concurrent connection
 with your classes.
 
-NB: If you're used to L<Class::DBI> it's worth reading the L</SYNOPSIS>
-carefully, as DBIO does things a little differently. Note in
-particular which module inherits off which.
+NB: It's worth reading the L</SYNOPSIS> carefully. Note in particular which
+module inherits off which.
 
 =head1 SETUP METHODS
 
@@ -985,8 +984,6 @@ sub compose_namespace {
 
 sub setup_connection_class {
   my ($class, $target, @info) = @_;
-  $class->inject_base($target => 'DBIO::DB');
-  #$target->load_components('DB');
   $target->connection(@info);
 }
 
@@ -1526,83 +1523,6 @@ sub _unregister_source {
     }
 }
 
-
-=head2 compose_connection (DEPRECATED)
-
-=over 4
-
-=item Arguments: $target_namespace, @db_info
-
-=item Return Value: $new_schema
-
-=back
-
-DEPRECATED. You probably wanted compose_namespace.
-
-Actually, you probably just wanted to call connect.
-
-=begin hidden
-
-(hidden due to deprecation)
-
-Calls L<DBIO::Schema/"compose_namespace"> to the target namespace,
-calls L<DBIO::Schema/connection> with @db_info on the new schema,
-then injects the L<DBix::Class::ResultSetProxy> component and a
-resultset_instance classdata entry on all the new classes, in order to support
-$target_namespaces::$class->search(...) method calls.
-
-This is primarily useful when you have a specific need for class method access
-to a connection. In normal usage it is preferred to call
-L<DBIO::Schema/connect> and use the resulting schema object to operate
-on L<DBIO::ResultSet> objects with L<DBIO::Schema/resultset> for
-more information.
-
-=end hidden
-
-=cut
-
-sub compose_connection {
-  my ($self, $target, @info) = @_;
-
-  carp_once "compose_connection deprecated as of 0.08000"
-    unless $INC{"DBIO/CDBICompat.pm"};
-
-  my $base = 'DBIO::ResultSetProxy';
-  try {
-    eval "require ${base};"
-  }
-  catch {
-    $self->throw_exception
-      ("No arguments to load_classes and couldn't load ${base} ($_)")
-  };
-
-  if ($self eq $target) {
-    # Pathological case, largely caused by the docs on early C::M::DBIC::Plain
-    foreach my $source_name ($self->sources) {
-      my $source = $self->source($source_name);
-      my $class = $source->result_class;
-      $self->inject_base($class, $base);
-      $class->mk_classdata(resultset_instance => $source->resultset);
-      $class->mk_classdata(class_resolver => $self);
-    }
-    $self->connection(@info);
-    return $self;
-  }
-
-  my $schema = $self->compose_namespace($target, $base);
-  quote_sub "${target}::schema", '$s', { '$s' => \$schema };
-
-  $schema->connection(@info);
-  foreach my $source_name ($schema->sources) {
-    my $source = $schema->source($source_name);
-    my $class = $source->result_class;
-    #warn "$source_name $class $source ".$source->storage;
-    $class->mk_classdata(result_source_instance => $source);
-    $class->mk_classdata(resultset_instance => $source->resultset);
-    $class->mk_classdata(class_resolver => $schema);
-  }
-  return $schema;
-}
 
 =head1 FURTHER QUESTIONS?
 

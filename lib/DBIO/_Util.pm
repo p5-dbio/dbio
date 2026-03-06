@@ -350,10 +350,6 @@ sub modver_gt_or_eq_and_lt ($$$) {
 
         |
 
-      # these are explicitly prefixed, since we only recognize them as valid
-      # escapes when they come from the guts of CDBICompat
-      CDBICompat .*? :: (?: search_where | retrieve_from_sql | retrieve_all )
-
     ) $/x ) {
       $cf++;
     }
@@ -400,7 +396,7 @@ sub fail_on_internal_call {
       and
     $fr->[0] =~ /^(?:DBIO|DBICx::)/
       and
-    $fr->[1] !~ /\b(?:CDBICompat|ResultSetProxy)\b/  # no point touching there
+    $fr->[1] !~ /\bResultSetProxy\b/  # no point touching there
   ) {
     DBIO::Exception->throw( sprintf (
       "Illegal internal call of indirect proxy-method %s() with argument %s: examine the last lines of the proxy method deparse below to determine what to call directly instead at %s on line %d\n\n%s\n\n    Stacktrace starts",

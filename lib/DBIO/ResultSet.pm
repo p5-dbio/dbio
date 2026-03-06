@@ -27,8 +27,6 @@ use overload
         'bool'   => "_bool",
         fallback => 1;
 
-# this is real - CDBICompat overrides it with insanity
-# yes, prototype won't matter, but that's for now ;)
 sub _bool () { 1 }
 
 __PACKAGE__->mk_group_accessors('simple' => qw/_result_class result_source/);
@@ -450,8 +448,7 @@ sub search_rs {
   }
   # legacy search
   elsif (@_) {
-    carp_unique 'search( %condition ) is deprecated, use search( \%condition ) instead'
-      unless $rsrc->result_class->isa('DBIO::CDBICompat');
+    carp_unique 'search( %condition ) is deprecated, use search( \%condition ) instead';
 
     for my $i (0 .. $#_) {
       next if $i % 2;
@@ -670,10 +667,9 @@ sub _stack_cond {
 
 =head2 search_literal
 
-B<CAVEAT>: C<search_literal> is provided for Class::DBI compatibility and
-should only be used in that context. C<search_literal> is a convenience
-method. It is equivalent to calling C<< $schema->search(\[]) >>, but if you
-want to ensure columns are bound correctly, use L</search>.
+B<CAVEAT>: C<search_literal> is a legacy convenience method. It is equivalent
+to calling C<< $schema->search(\[]) >>, but if you want to ensure columns are
+bound correctly, use L</search>.
 
 See L<DBIO::Manual::Cookbook/SEARCHING> and
 L<DBIO::Manual::FAQ/Searching> for searching techniques that do not
@@ -1142,7 +1138,7 @@ sub get_column {
   $cd_rs = $rs->search_like({ title => '%blue%'});
 
 Performs a search, but uses C<LIKE> instead of C<=> as the condition. Note
-that this is simply a convenience method retained for ex Class::DBI users.
+that this is simply a legacy convenience method.
 You most likely want to use L</search> with specific operators.
 
 For more information, see L<DBIO::Manual::Cookbook>.
@@ -1772,8 +1768,8 @@ sub _count_subq_rs {
 
 =head2 count_literal
 
-B<CAVEAT>: C<count_literal> is provided for Class::DBI compatibility and
-should only be used in that context. See L</search_literal> for further info.
+B<CAVEAT>: C<count_literal> is a legacy convenience method.
+See L</search_literal> for further info.
 
 =over 4
 
