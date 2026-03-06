@@ -163,6 +163,8 @@ sub _exec_svp_rollback {
 
 sub sqlt_type { 'SQLServer' }
 
+sub _random_function { 'NEWID()' }
+
 sub sql_limit_dialect {
   my $self = shift;
 

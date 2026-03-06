@@ -71,4 +71,16 @@ my $schema = DBIOTest->init_schema();
   }
 }
 
+# --- clean_rs ---
+{
+  my $cd = $schema->resultset('CD')->first;
+  my $clean = $cd->clean_rs;
+  isa_ok($clean, 'DBIO::ResultSet', 'clean_rs returns ResultSet');
+  ok($clean->count > 1, 'clean_rs returns unfiltered RS');
+
+  # Compare with self_rs (which is filtered)
+  is($cd->self_rs->count, 1, 'self_rs has 1 row');
+  ok($cd->clean_rs->count > $cd->self_rs->count, 'clean_rs > self_rs');
+}
+
 done_testing;

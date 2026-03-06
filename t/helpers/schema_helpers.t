@@ -50,4 +50,22 @@ my $schema = DBIOTest->init_schema();
   ok($mapped, 'source() accepts full class name');
 }
 
+# --- datetime convenience methods ---
+{
+  my $parser = $schema->datetime_parser;
+  ok($parser, 'datetime_parser returns parser');
+  like(ref($parser) || $parser, qr/DateTime::Format/,
+    'datetime_parser returns DateTime::Format class');
+
+  # format_datetime
+  eval { require DateTime };
+  SKIP: {
+    skip 'DateTime not available', 2 if $@;
+    my $dt = DateTime->now;
+    my $formatted = $schema->format_datetime($dt);
+    ok(defined $formatted, 'format_datetime returns value');
+    like($formatted, qr/\d{4}-\d{2}-\d{2}/, 'format_datetime looks like a date');
+  }
+}
+
 done_testing;

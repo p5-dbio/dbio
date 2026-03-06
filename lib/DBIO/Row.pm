@@ -1650,6 +1650,9 @@ sub self_rs {
   return $rs->search_rs($self->ident_condition($rs->current_source_alias));
 }
 
+# --- clean_rs: get unfiltered ResultSet for this row's source ---
+sub clean_rs { shift->result_source->resultset }
+
 =head2 id
 
   my @pk = $result->id;

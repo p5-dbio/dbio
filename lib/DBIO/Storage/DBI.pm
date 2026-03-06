@@ -2915,6 +2915,12 @@ sub _native_data_type {
   return undef
 }
 
+# Override in DB-specific subclasses for the correct RANDOM() function
+sub _random_function { 'RANDOM()' }
+
+# Override in DB-specific subclasses for the correct EXPLAIN syntax
+sub _explain_sql { "EXPLAIN $_[1]" }
+
 # Check if placeholders are supported at all
 sub _determine_supports_placeholders {
   my $self = shift;

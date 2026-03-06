@@ -126,6 +126,10 @@ sub sqlt_type {
   return 'MySQL';
 }
 
+sub _random_function { 'RAND()' }
+
+sub _explain_sql { "EXPLAIN $_[1]" }
+
 sub deployment_statements {
   my $self = shift;
   my ($schema, $type, $version, $dir, $sqltargs, @rest) = @_;

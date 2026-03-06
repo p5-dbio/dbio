@@ -646,6 +646,14 @@ sub _simple_distance {
 
 sub _min { my $m = shift; $m = $_ < $m ? $_ : $m for @_; $m }
 
+# --- DateTime convenience methods ---
+
+sub datetime_parser { shift->storage->datetime_parser }
+
+sub parse_datetime { shift->datetime_parser->parse_datetime(@_) }
+
+sub format_datetime { shift->datetime_parser->format_datetime(@_) }
+
 =head2 class
 
 =over 4

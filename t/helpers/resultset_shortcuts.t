@@ -215,4 +215,59 @@ my $schema = DBIOTest->init_schema();
   ok(exists $rows[0]->{year}, 'chained shortcuts: has year');
 }
 
+# --- one_row ---
+{
+  my $cd = $schema->resultset('CD')->one_row;
+  ok($cd, 'one_row returns a row');
+  isa_ok($cd, 'DBIO::Row', 'one_row returns Row object');
+
+  my $cd2 = $schema->resultset('CD')->one_row({ title => { -like => '%Spoon%' } });
+  ok($cd2, 'one_row with condition returns a row');
+
+  my $cd3 = $schema->resultset('CD')->one_row({ cdid => -1 });
+  ok(!defined $cd3, 'one_row returns undef for no match');
+}
+
+# --- no_columns ---
+{
+  my $rs = $schema->resultset('CD')->no_columns->search(undef, {
+    '+columns' => ['title'],
+  });
+  my $row = $rs->hri->first;
+  ok(exists $row->{title}, 'no_columns + add title: has title');
+  ok(!exists $row->{year}, 'no_columns + add title: no year');
+}
+
+# --- bare ---
+{
+  my $searched = $schema->resultset('CD')->search({ cdid => 1 });
+  is($searched->count, 1, 'searched RS has 1 row');
+  my $bare = $searched->bare;
+  isa_ok($bare, 'DBIO::ResultSet', 'bare returns RS');
+  ok($bare->count > 1, 'bare RS has all rows');
+}
+
+# --- rand ---
+{
+  my $rs = $schema->resultset('CD')->rand(2);
+  isa_ok($rs, 'DBIO::ResultSet', 'rand returns RS');
+  my @rows = $rs->all;
+  is(scalar @rows, 2, 'rand(2) returns 2 rows');
+
+  # Error cases
+  throws_ok {
+    $schema->resultset('CD')->rand(0)
+  } qr/positive amount/, 'rand(0) throws';
+  throws_ok {
+    $schema->resultset('CD')->rand(1.5)
+  } qr/integer amount/, 'rand(1.5) throws';
+}
+
+# --- explain ---
+{
+  my $plan = $schema->resultset('CD')->explain;
+  is(ref $plan, 'ARRAY', 'explain returns arrayref');
+  ok(@$plan > 0, 'explain returns query plan rows');
+}
+
 done_testing;

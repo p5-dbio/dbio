@@ -4480,6 +4480,42 @@ sub _set_operation {
   });
 }
 
+# --- one_row: safe alternative to first() that exhausts cursor ---
+sub one_row {
+  my $self = shift;
+  $self->search(shift, { rows => 1 })->next;
+}
+
+# --- no_columns: clear column selection for custom projections ---
+sub no_columns { $_[0]->search(undef, { columns => [] }) }
+
+# --- bare: get unsearched ResultSet from a searched one ---
+sub bare { shift->result_source->resultset }
+
+# --- rand: get random rows ---
+sub rand {
+  my $self   = shift;
+  my $amount = @_ ? shift : 1;
+  $self->throw_exception('rand can only return a positive amount of rows')
+    unless $amount > 0;
+  $self->throw_exception('rand can only return an integer amount of rows')
+    unless $amount == int $amount;
+  my $rand_func = $self->result_source->storage->_random_function;
+  $self->search(undef, { rows => $amount, order_by => \$rand_func });
+}
+
+# --- explain: get query plan for debugging ---
+sub explain {
+  my $self = shift;
+  my $storage = $self->result_source->storage;
+  $storage->ensure_connected;
+  my $dbh = $storage->dbh;
+  my ($sql, @bind) = @{${$self->as_query}};
+  $sql =~ s/^\s*\((.*)\)\s*$/$1/s;
+  my $explain_sql = $storage->_explain_sql($sql);
+  $dbh->selectall_arrayref($explain_sql, undef, @bind);
+}
+
 1;
 
 __END__

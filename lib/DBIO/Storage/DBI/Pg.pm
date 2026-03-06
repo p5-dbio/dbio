@@ -162,6 +162,8 @@ sub sqlt_type {
   return 'PostgreSQL';
 }
 
+sub _explain_sql { "EXPLAIN ANALYZE $_[1]" }
+
 # Pg is not able to MAX(boolean_column), sigh...
 #
 # Generally it would make more sense to have this in the SQLMaker hierarchy,
