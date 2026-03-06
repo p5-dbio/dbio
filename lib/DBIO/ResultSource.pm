@@ -1935,7 +1935,21 @@ sub _resolve_relationship_condition {
       . "perhaps you've made a mistake invoking the condition resolver?"
       ) unless $args->{foreign_values}->isa($rel_rsrc->result_class);
 
-      $args->{foreign_values} = { $args->{foreign_values}->get_columns };
+      my $fvals = { $args->{foreign_values}->get_columns };
+
+      # The very low level resolve_relationship_condition() deliberately contains
+      # extra logic to ensure that it isn't passed garbage. Unfortunately we can
+      # get into a situation where an object *has* extra columns on it, which
+      # the interface of ->get_columns is obligated to return. In order not to
+      # compromise the sanity checks within r_r_c, simply do a cleanup pass here.
+      #
+      # FIXME - perhaps this should warn, but that's a battle for another day
+      #
+      $args->{foreign_values} = { map {
+        exists $fvals->{$_}
+          ? ( $_ => $fvals->{$_} )
+          : ()
+      } $rel_rsrc->columns };
     }
     elsif (! defined $args->{foreign_values} or ref $args->{foreign_values} eq 'HASH') {
       my $ri = { map { $_ => 1 } $rel_rsrc->relationships };
