@@ -3,7 +3,7 @@ package DBICTest::SQLMRebase;
 use warnings;
 use strict;
 
-our @ISA = qw( DBIO::SQLMaker::ClassicExtensions SQL::Abstract::Classic );
+our @ISA = qw( DBIO::SQLMaker::ClassicExtensions SQL::Abstract );
 
 __PACKAGE__->mk_group_accessors( simple => '__select_counter' );
 

@@ -457,7 +457,9 @@ my @tests = (
 
 # these die as of SQLAC 1.80 - make sure we do not transform them
 # into something usable instead
-for my $lhs (undef, '', { -ident => 'foo' }, { -value => 'foo' } ) {
+# Note: { -ident => 'foo' } and { -value => 'foo' } are valid value
+# expressions in SQL::Abstract v2, so they no longer throw
+for my $lhs (undef, '') {
   no warnings 'uninitialized';
 
   for my $w (

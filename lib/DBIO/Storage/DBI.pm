@@ -1090,13 +1090,13 @@ sub _run_connection_actions {
   ) {
 
     require DBIO::SQLMaker::ClassicExtensions;
-    require SQL::Abstract::Classic;
+    require SQL::Abstract;
 
     Class::C3::Componentised->inject_base(
       'DBICDevRel::SQLAC::SwapOut',
       'DBIO::SQLMaker::ClassicExtensions',
       $sqlac_like,
-      'SQL::Abstract::Classic',
+      'SQL::Abstract',
     );
 
     $_[0]->_do_connection_actions(connect_call_ => [[ rebase_sqlmaker => 'DBICDevRel::SQLAC::SwapOut' ]]);
@@ -1516,7 +1516,7 @@ sub _do_query {
 This on-connect call takes as a single argument the name of a class to "rebase"
 the SQLMaker inheritance hierarchy upon. For this to work properly the target
 class B<MUST> inherit from L<DBIO::SQLMaker::ClassicExtensions> and
-L<SQL::Abstract::Classic> as shown below.
+either L<SQL::Abstract> or L<SQL::Abstract::Classic> as shown below.
 
 This infrastructure is provided to aid recent activity around experimental new
 aproaches to SQL generation within DBIO. You can (and are encouraged to)
@@ -1528,7 +1528,7 @@ mix and match old and new within the same codebase as follows:
   use base qw(
     DBIO::SQLMaker::ClassicExtensions
     << OPTIONAL::AWESOME::Class::Implementing::ExtraRainbowSauce >>
-    SQL::Abstract::Classic
+    SQL::Abstract
   );
   << your new code goes here >>
 
@@ -1575,15 +1575,14 @@ sub connect_call_rebase_sqlmaker {
 
       $self->ensure_class_loaded( $requested_base_class );
 
-      for my $base (qw(
-        DBIO::SQLMaker::ClassicExtensions
-        SQL::Abstract::Classic
-      )) {
+      $self->throw_exception(
+        "The 'rebase_sqlmaker' target class '$requested_base_class' is not inheriting from 'DBIO::SQLMaker::ClassicExtensions', this can not work"
+      ) unless $requested_base_class->isa( 'DBIO::SQLMaker::ClassicExtensions' );
 
-        $self->throw_exception(
-          "The 'rebase_sqlmaker' target class '$requested_base_class' is not inheriting from '$base', this can not work"
-        ) unless $requested_base_class->isa( $base );
-      }
+      $self->throw_exception(
+        "The 'rebase_sqlmaker' target class '$requested_base_class' must inherit from SQL::Abstract or SQL::Abstract::Classic"
+      ) unless $requested_base_class->isa( 'SQL::Abstract' )
+            or $requested_base_class->isa( 'SQL::Abstract::Classic' );
 
       $self->inject_base( $synthetic_class, $old_class, $requested_base_class );
 

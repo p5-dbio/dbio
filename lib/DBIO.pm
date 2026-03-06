@@ -198,7 +198,7 @@ Then you can use these classes in your application's code:
   # Create a result set to search for artists.
   # This does not query the DB.
   my $johns_rs = $schema->resultset('Artist')->search(
-    # Build your WHERE using an SQL::Abstract::Classic-compatible structure:
+    # Build your WHERE using an SQL::Abstract-compatible structure:
     { name => { like => 'John%' } }
   );
 

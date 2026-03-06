@@ -95,10 +95,9 @@ my $sql_maker = $schema->storage->sql_maker;
 }
 
 
-# Make sure the carp/croak override in SQLAC works (via SQLMaker)
-my $file = quotemeta (__FILE__);
+# Make sure invalid order_by throws an exception
 throws_ok (sub {
   $schema->resultset ('Artist')->search ({}, { order_by => { -asc => 'stuff', -desc => 'staff' } } )->as_query;
-}, qr/$file/, 'Exception correctly croak()ed');
+}, qr/order/i, 'Exception correctly thrown on invalid order_by');
 
 done_testing;

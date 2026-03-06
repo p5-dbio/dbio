@@ -246,9 +246,9 @@ to resort to literal SQL:
 
 =item .. find more help on constructing searches?
 
-Behind the scenes, DBIO uses L<SQL::Abstract::Classic> to help construct
+Behind the scenes, DBIO uses L<SQL::Abstract> to help construct
 its SQL searches. So if you fail to find help in the
-L<DBIO::Manual::Cookbook>, try looking in the L<SQL::Abstract::Classic>
+L<DBIO::Manual::Cookbook>, try looking in the L<SQL::Abstract>
 documentation.
 
 =item .. make searches in Oracle (10gR2 and newer) case-insensitive?

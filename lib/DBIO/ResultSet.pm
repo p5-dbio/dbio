@@ -369,7 +369,7 @@ For a list of attributes that can be passed to C<search>, see
 L</ATTRIBUTES>. For more examples of using this function, see
 L<Searching|DBIO::Manual::Cookbook/SEARCHING>. For a complete
 documentation for the first argument, see
-L<SQL::Abstract::Classic/"WHERE CLAUSES"> and its extension
+L<SQL::Abstract/"WHERE CLAUSES"> and its extension
 L<DBIO::SQLMaker>.
 
 For more help on using joins with search, see L<DBIO::Manual::Joining>.
@@ -377,7 +377,7 @@ For more help on using joins with search, see L<DBIO::Manual::Joining>.
 =head3 CAVEAT
 
 Note that L</search> does not process/deflate any of the values passed in the
-L<SQL::Abstract::Classic>-compatible search condition structure. This is unlike
+L<SQL::Abstract>-compatible search condition structure. This is unlike
 other condition-bound methods L</new_result>, L</create> and L</find>. The user
 must ensure manually that any value passed to this method will stringify to
 something the RDBMS knows how to deal with. A notable example is the handling
@@ -4543,7 +4543,7 @@ These are in no particular order:
 Which column(s) to order the results by.
 
 [The full list of suitable values is documented in
-L<SQL::Abstract::Classic/"ORDER BY CLAUSES">; the following is a summary of
+L<SQL::Abstract/"ORDER BY CLAUSES">; the following is a summary of
 common options.]
 
 If a single column name, or an arrayref of names is supplied, the
@@ -4604,7 +4604,7 @@ chain such that it matches existing relationships:
 Like elsewhere, literal SQL or literal values can be included by using a
 scalar reference or a literal bind value, and these values will be available
 in the result with C<get_column> (see also
-L<SQL::Abstract::Classic>/Literal SQL and value type operators>):
+L<SQL::Abstract>/Literal SQL and value type operators>):
 
     # equivalent SQL: SELECT 1, 'a string', IF(my_column,?,?) ...
     # bind values: $true_value, $false_value
@@ -5064,7 +5064,7 @@ A arrayref of columns to group by. Can include columns of joined tables.
 The HAVING operator specifies a B<secondary> condition applied to the set
 after the grouping calculations have been done. In other words it is a
 constraint just like L</where> (and accepting the same
-L<SQL::Abstract::Classic syntax|SQL::Abstract::Classic/WHERE CLAUSES>) applied
+L<SQL::Abstract syntax|SQL::Abstract/WHERE CLAUSES>) applied
 to the data as it exists after GROUP BY has taken place. Specifying L</having>
 without L</group_by> is a logical mistake, and a fatal error on most RDBMS
 engines.
@@ -5109,7 +5109,7 @@ Adds to the WHERE clause.
 Can be overridden by passing C<< { where => undef } >> as an attribute
 to a resultset.
 
-For more complicated where clauses see L<SQL::Abstract::Classic/WHERE CLAUSES>.
+For more complicated where clauses see L<SQL::Abstract/WHERE CLAUSES>.
 
 =back
 

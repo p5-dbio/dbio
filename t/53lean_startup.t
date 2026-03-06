@@ -162,7 +162,7 @@ BEGIN {
 {
   register_lazy_loadable_requires(qw(
     DBI
-    SQL::Abstract::Classic
+    SQL::Abstract
   ));
 
   my $s = DBICTest::Schema->connect('dbi:SQLite::memory:');

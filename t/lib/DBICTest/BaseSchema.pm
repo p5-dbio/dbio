@@ -148,13 +148,13 @@ sub connection {
     Class::C3::Componentised->ensure_class_loaded( $sqlac_like );
 
     require DBIO::SQLMaker::ClassicExtensions;
-    require SQL::Abstract::Classic;
+    require SQL::Abstract;
 
     Class::C3::Componentised->inject_base(
       'DBICTest::SQLAC::SwapOut',
       'DBIO::SQLMaker::ClassicExtensions',
       $sqlac_like,
-      'SQL::Abstract::Classic',
+      'SQL::Abstract',
     );
 
     # perl can be pretty disgusting...

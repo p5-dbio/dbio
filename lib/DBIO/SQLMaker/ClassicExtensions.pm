@@ -5,7 +5,7 @@ use warnings;
 
 =head1 NAME
 
-DBIO::SQLMaker::ClassicExtensions - Class containing generic enhancements to SQL::Abstract::Classic
+DBIO::SQLMaker::ClassicExtensions - Class containing generic enhancements to SQL::Abstract
 
 =head1 DESCRIPTION
 
@@ -14,7 +14,7 @@ a quasi-role, that one would "mix in" via classic C<@ISA> inheritance into
 a DBIO::SQLMaker-like provider. See
 L<DBIO::Storage::DBI/connect_call_rebase_sqlmaker> for more info.
 
-Currently the enhancements over L<SQL::Abstract::Classic> are:
+Currently the enhancements over L<SQL::Abstract> are:
 
 =over
 
@@ -466,7 +466,7 @@ sub _join_condition {
   ) {
     carp_unique(
       "ResultSet {from} structures with conditions not conforming to the "
-    . "SQL::Abstract::Classic syntax are deprecated: you either need to stop "
+    . "SQL::Abstract syntax are deprecated: you either need to stop "
     . "abusing {from} altogether, or express the condition properly using the "
     . "{ -ident => ... } operator"
     );
