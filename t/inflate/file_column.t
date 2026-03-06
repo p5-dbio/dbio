@@ -77,7 +77,7 @@ ok ( compare($storage, $source_file) == 0, 'file contents matches' );
 
 # update
 my $new_fname = 'File.pm';
-my $new_source_file = file(qw/lib DBIx Class InflateColumn File.pm/);
+my $new_source_file = file(qw/lib DBIO InflateColumn File.pm/);
 my $new_storage = file(
     $fc->column_info('file')->{file_column_path},
     $fc->id,

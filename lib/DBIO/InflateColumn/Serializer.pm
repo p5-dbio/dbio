@@ -1,0 +1,105 @@
+package DBIO::InflateColumn::Serializer;
+# ABSTRACT: Inflators to serialize data structures for DBIO
+
+use strict;
+use warnings;
+use namespace::clean;
+
+sub register_column {
+    my $self = shift;
+    my ($column, $info, $args) = @_;
+    $self->next::method(@_);
+
+    return unless defined $info->{'serializer_class'};
+
+    my $class = "DBIO::InflateColumn::Serializer::$info->{'serializer_class'}";
+    eval "require ${class};";
+    $self->throw_exception("Failed to use serializer_class '${class}': $@") if $@;
+
+    defined( my $freezer = eval{ $class->get_freezer($column, $info, $args) }) ||
+      $self->throw_exception("Failed to create freezer with class '$class': $@");
+    defined( my $unfreezer = eval{ $class->get_unfreezer($column, $info, $args) }) ||
+      $self->throw_exception("Failed to create unfreezer with class '$class': $@");
+
+    $self->inflate_column(
+        $column => {
+            inflate => $unfreezer,
+            deflate => $freezer,
+        }
+    );
+};
+
+=head1 SYNOPSIS
+
+  package MySchema::Table;
+  use base 'DBIO::Core';
+
+  __PACKAGE__->load_components('InflateColumn::Serializer');
+  __PACKAGE__->add_columns(
+    'data_column' => {
+      'data_type' => 'VARCHAR',
+      'size'      => 255,
+      'serializer_class'   => 'JSON'
+    }
+  );
+
+Then in your code...
+
+  my $struct = { 'I' => { 'am' => 'a struct' } };
+  $obj->data_column($struct);
+  $obj->update;
+
+And you can recover your data structure with:
+
+  my $obj = ...->find(...);
+  my $struct = $obj->data_column;
+
+The data structures you assign to "data_column" will be saved in the database in JSON format.
+
+=head1 DESCRIPTION
+
+These modules help you store and access serialized data structures in the columns of your DB from your DBIO classes. They provide inflators and deflators that serialize and deserialize data structures, with added protection:
+
+=over 4
+
+=item * throw an exception if the serialization doesn't fit in the field
+
+=item * throw an exception if the deserialization results in an error
+
+=back
+
+The following serializer backends are included:
+
+=over 4
+
+=item * L<JSON|DBIO::InflateColumn::Serializer::JSON> (requires L<JSON::MaybeXS>)
+
+=item * L<YAML|DBIO::InflateColumn::Serializer::YAML> (requires L<YAML>)
+
+=item * L<MessagePack|DBIO::InflateColumn::Serializer::MessagePack> (requires L<Data::MessagePack>)
+
+=back
+
+The backend modules are loaded on demand. You must install the required
+serialization module separately — they are not hard dependencies of DBIO.
+
+=head1 USAGE
+
+1. Install the serialization module you want to use (e.g. L<JSON::MaybeXS> or L<YAML>)
+
+2. Add 'InflateColumn::Serializer' into the load_components of your table class
+
+3. add 'serializer_class' => SERIALIZER to the properties of the column that you want to (de/i)nflate
+   with the SERIALIZER class.
+
+=head1 NOTES
+
+As stated in the DBIO FAQ: "Be careful not to overuse this capability, however. If you find yourself depending more and more on some data within the inflated column, then it may be time to factor that data out."
+
+=head1 SEE ALSO
+
+L<DBIO>, L<DBIO::InflateColumn::Serializer::JSON>, L<DBIO::InflateColumn::Serializer::YAML>, L<DBIO::InflateColumn::Serializer::MessagePack>
+
+=cut
+
+1;

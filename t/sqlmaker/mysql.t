@@ -121,7 +121,7 @@ bless ( $schema->storage, 'DBIO::Storage::DBI::mysql' );
 
 # Test support for inner joins on mysql v3
 for (
-  [ 3 => 'INNER JOIN' ],
+  [ 3 => 'JOIN' ],
   [ 4 => 'JOIN' ],
 ) {
   my ($ver, $join_op) = @$_;

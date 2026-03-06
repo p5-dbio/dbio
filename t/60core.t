@@ -626,7 +626,7 @@ SKIP: {
 #------------------------------
 #
 SKIP: {
-    skip "Something needs to be done before 0.09", 2 if $DBIO::VERSION < 0.09;
+    skip "Something needs to be done before 1.000", 2 if $DBIO::VERSION < 1.000;
 
     my $row = $schema->resultset ('Artist')->next;
 
