@@ -8,8 +8,22 @@ my $hook_installed;
 
 sub import {
   return if $hook_installed;
-  unshift @INC, \&_dbic_inc_hook;
   $hook_installed = 1;
+
+  unshift @INC, \&_dbic_inc_hook;
+
+  # Patch DBIO::isa so that ->isa('DBIx::Class::Foo') also checks
+  # ->isa('DBIO::Foo'), without needing parent stash aliasing
+  require DBIO;
+  my $orig_isa = DBIO->can('isa');
+  no warnings 'redefine';
+  *DBIO::isa = sub {
+    return 1 if $orig_isa->(@_);
+    if (defined $_[1] && (my $mapped = $_[1]) =~ s/^DBIx::Class(?=::|$)/DBIO/) {
+      return $orig_isa->($_[0], $mapped);
+    }
+    return '';
+  };
 }
 
 sub _dbic_inc_hook {
@@ -33,8 +47,12 @@ sub _dbic_inc_hook {
     next if ref $inc;
     next unless -f "$inc/$dbic_file";
 
-    # Generate a stub that loads the DBIO module and aliases the stash
-    my $code = "require $dbic_pkg; *${dbix_pkg}:: = *${dbic_pkg}::; 1;\n";
+    # Generate a stub that loads the DBIO module and aliases only
+    # this specific package stash (not parent namespaces)
+    my $code = "require $dbic_pkg;\n"
+      . "no strict 'refs';\n"
+      . "*${dbix_pkg}:: = *${dbic_pkg}::;\n"
+      . "1;\n";
     open my $fh, '<', \$code;
     return $fh;
   }
@@ -53,9 +71,13 @@ sub _dbic_inc_hook {
 
 This module installs an C<@INC> hook that intercepts any attempt to load
 a C<DBIx::Class::*> module and transparently redirects it to the
-corresponding C<DBIO::*> module. The C<DBIx::Class::*> namespace is then
-aliased to the C<DBIO::*> stash, so method calls, C<can()>, and C<isa()>
-all work correctly.
+corresponding C<DBIO::*> module. The C<DBIx::Class::*> package is then
+stash-aliased to the C<DBIO::*> package, so method calls and C<can()>
+work correctly.
+
+Additionally, C<isa()> on all DBIO classes is patched so that
+C<< $obj->isa('DBIx::Class::Foo') >> returns true when the object
+C<isa('DBIO::Foo')>.
 
 This allows existing CPAN modules written for C<DBIx::Class> to work
 with DBIO without any modifications.
