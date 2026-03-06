@@ -6,7 +6,7 @@ use strict;
 
 use base qw/DBICTest::BaseResult/;
 
-# Test VARCHAR(MAX) type for MSSQL (used in ADO tests)
+# Test VARCHAR(MAX) type for MSSQL
 
 __PACKAGE__->table('varying_max_test');
 

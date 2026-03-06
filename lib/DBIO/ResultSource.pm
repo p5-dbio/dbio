@@ -274,9 +274,8 @@ issues related to db-side default values.
    { sequence => 'my_table_seq' }
 
 Set this on a primary key column to the name of the sequence used to
-generate a new key value. If not specified, L<DBIO::PK::Auto>
-will attempt to retrieve the name of the sequence from the database
-automatically.
+generate a new key value. If not specified, DBIO will attempt to
+retrieve the name of the sequence from the database automatically.
 
 =item retrieve_on_insert
 

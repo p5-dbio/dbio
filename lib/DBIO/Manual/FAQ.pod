@@ -385,7 +385,7 @@ the access of your primary key column) on the object.
 =item .. insert a row with a primary key that uses a sequence?
 
 You need to create a trigger in your database that updates your
-primary key field from the sequence. To help PK::Auto find the next
+primary key field from the sequence. To help DBIO find the next
 key value, you can tell it the name of the sequence in the
 C<column_info> supplied with C<add_columns>.
 

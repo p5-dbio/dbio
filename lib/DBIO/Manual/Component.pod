@@ -6,9 +6,9 @@ DBIO::Manual::Component - Developing DBIO Components
 =head1 WHAT IS A COMPONENT
 
 A component is a module that can be added in to your DBIO
-classes to provide extra functionality. A good example is the PK::Auto
-component which automatically retrieves primary keys that the database
-itself creates, after the insert has happened.
+classes to provide extra functionality. A good example is
+L<DBIO::InflateColumn> which automatically inflates/deflates column
+values to and from Perl objects.
 
 =head1 USING
 
@@ -85,8 +85,6 @@ L<DBIO::FormTools> - Build forms with multiple interconnected objects.
 L<DBIO::HTMLWidget> - Like FromForm but with DBIO and HTML::Widget.
 
 L<DBIO::Ordered> - Modify the position of objects in an ordered list.
-
-L<DBIO::PK::Auto> - Retrieve automatically created primary keys upon insert.
 
 L<DBIO::QueriesTime> - Display the amount of time it takes to run queries.
 

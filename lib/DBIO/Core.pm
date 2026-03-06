@@ -8,7 +8,6 @@ use base qw/DBIO/;
 __PACKAGE__->load_components(qw/
   Relationship
   InflateColumn
-  PK::Auto
   PK
   Row
   ResultSourceProxy::Table
@@ -39,8 +38,6 @@ The core modules currently are:
 =item L<DBIO::InflateColumn>
 
 =item L<DBIO::Relationship> (See also L<DBIO::Relationship::Base>)
-
-=item L<DBIO::PK::Auto>
 
 =item L<DBIO::PK>
 

@@ -68,15 +68,6 @@ my $rdbms_mssql_odbc = {
 my $rdbms_mssql_sybase = {
   'DBD::Sybase'                   => '0',
 };
-my $rdbms_mssql_ado = {
-  'DBD::ADO'                      => '0',
-};
-my $rdbms_msaccess_odbc = {
-  'DBD::ODBC'                     => '0',
-};
-my $rdbms_msaccess_ado = {
-  'DBD::ADO'                      => '0',
-};
 my $rdbms_mysql = {
   # Accept either DBD::mysql or DBD::MariaDB (the actively maintained fork)
   ( eval { require DBD::MariaDB; 1 }
@@ -94,28 +85,6 @@ my $rdbms_ase = {
 my $rdbms_db2 = {
   'DBD::DB2'                      => '0',
 };
-my $rdbms_db2_400 = {
-  'DBD::ODBC'                     => '0',
-};
-my $rdbms_informix = {
-  'DBD::Informix'                 => '0',
-};
-my $rdbms_sqlanywhere = {
-  'DBD::SQLAnywhere'              => '0',
-};
-my $rdbms_sqlanywhere_odbc = {
-  'DBD::ODBC'                     => '0',
-};
-my $rdbms_firebird = {
-  'DBD::Firebird'                 => '0',
-};
-my $rdbms_firebird_interbase = {
-  'DBD::InterBase'                => '0',
-};
-my $rdbms_firebird_odbc = {
-  'DBD::ODBC'                     => '0',
-};
-
 my $reqs = {
   replicated => {
     req => $replicated,
@@ -301,36 +270,6 @@ my $reqs = {
     },
   },
 
-  rdbms_mssql_ado => {
-    req => {
-      %$rdbms_mssql_ado,
-    },
-    pod => {
-      title => 'MSSQL support via DBD::ADO (Windows only)',
-      desc => 'Modules required to connect to MSSQL via DBD::ADO. This particular DBD is available on Windows only',
-    },
-  },
-
-  rdbms_msaccess_odbc => {
-    req => {
-      %$rdbms_msaccess_odbc,
-    },
-    pod => {
-      title => 'MS Access support via DBD::ODBC',
-      desc => 'Modules required to connect to MS Access via DBD::ODBC',
-    },
-  },
-
-  rdbms_msaccess_ado => {
-    req => {
-      %$rdbms_msaccess_ado,
-    },
-    pod => {
-      title => 'MS Access support via DBD::ADO (Windows only)',
-      desc => 'Modules required to connect to MS Access via DBD::ADO. This particular DBD is available on Windows only',
-    },
-  },
-
   rdbms_mysql => {
     req => {
       %$rdbms_mysql,
@@ -371,76 +310,6 @@ my $reqs = {
     },
   },
 
-  rdbms_db2_400 => {
-    req => {
-      %$rdbms_db2_400,
-    },
-    pod => {
-      title => 'DB2 on AS/400 support',
-      desc => 'Modules required to connect to DB2 on AS/400',
-    },
-  },
-
-  rdbms_informix => {
-    req => {
-      %$rdbms_informix,
-    },
-    pod => {
-      title => 'Informix support',
-      desc => 'Modules required to connect to Informix',
-    },
-  },
-
-  rdbms_sqlanywhere => {
-    req => {
-      %$rdbms_sqlanywhere,
-    },
-    pod => {
-      title => 'SQLAnywhere support',
-      desc => 'Modules required to connect to SQLAnywhere',
-    },
-  },
-
-  rdbms_sqlanywhere_odbc => {
-    req => {
-      %$rdbms_sqlanywhere_odbc,
-    },
-    pod => {
-      title => 'SQLAnywhere support via DBD::ODBC',
-      desc => 'Modules required to connect to SQLAnywhere via DBD::ODBC',
-    },
-  },
-
-  rdbms_firebird => {
-    req => {
-      %$rdbms_firebird,
-    },
-    pod => {
-      title => 'Firebird support',
-      desc => 'Modules required to connect to Firebird',
-    },
-  },
-
-  rdbms_firebird_interbase => {
-    req => {
-      %$rdbms_firebird_interbase,
-    },
-    pod => {
-      title => 'Firebird support via DBD::InterBase',
-      desc => 'Modules required to connect to Firebird via DBD::InterBase',
-    },
-  },
-
-  rdbms_firebird_odbc => {
-    req => {
-      %$rdbms_firebird_odbc,
-    },
-    pod => {
-      title => 'Firebird support via DBD::ODBC',
-      desc => 'Modules required to connect to Firebird via DBD::ODBC',
-    },
-  },
-
 # the order does matter because the rdbms support group might require
 # a different version that the test group
   test_rdbms_pg => {
@@ -463,42 +332,11 @@ my $reqs = {
     },
   },
 
-  test_rdbms_mssql_ado => {
-    req => {
-      $ENV{DBICTEST_MSSQL_ADO_DSN}
-        ? (
-          %$rdbms_mssql_ado,
-        ) : ()
-    },
-  },
-
   test_rdbms_mssql_sybase => {
     req => {
       $ENV{DBICTEST_MSSQL_DSN}
         ? (
           %$rdbms_mssql_sybase,
-        ) : ()
-    },
-  },
-
-  test_rdbms_msaccess_odbc => {
-    req => {
-      $ENV{DBICTEST_MSACCESS_ODBC_DSN}
-        ? (
-          %$rdbms_msaccess_odbc,
-          %$datetime_basic,
-          'Data::GUID' => '0',
-        ) : ()
-    },
-  },
-
-  test_rdbms_msaccess_ado => {
-    req => {
-      $ENV{DBICTEST_MSACCESS_ADO_DSN}
-        ? (
-          %$rdbms_msaccess_ado,
-          %$datetime_basic,
-          'Data::GUID' => 0,
         ) : ()
     },
   },
@@ -537,69 +375,6 @@ my $reqs = {
       $ENV{DBICTEST_DB2_DSN}
         ? (
           %$rdbms_db2,
-        ) : ()
-    },
-  },
-
-  test_rdbms_db2_400 => {
-    req => {
-      $ENV{DBICTEST_DB2_400_DSN}
-        ? (
-          %$rdbms_db2_400,
-        ) : ()
-    },
-  },
-
-  test_rdbms_informix => {
-    req => {
-      $ENV{DBICTEST_INFORMIX_DSN}
-        ? (
-          %$rdbms_informix,
-        ) : ()
-    },
-  },
-
-  test_rdbms_sqlanywhere => {
-    req => {
-      $ENV{DBICTEST_SQLANYWHERE_DSN}
-        ? (
-          %$rdbms_sqlanywhere,
-        ) : ()
-    },
-  },
-
-  test_rdbms_sqlanywhere_odbc => {
-    req => {
-      $ENV{DBICTEST_SQLANYWHERE_ODBC_DSN}
-        ? (
-          %$rdbms_sqlanywhere_odbc,
-        ) : ()
-    },
-  },
-
-  test_rdbms_firebird => {
-    req => {
-      $ENV{DBICTEST_FIREBIRD_DSN}
-        ? (
-          %$rdbms_firebird,
-        ) : ()
-    },
-  },
-
-  test_rdbms_firebird_interbase => {
-    req => {
-      $ENV{DBICTEST_FIREBIRD_INTERBASE_DSN}
-        ? (
-          %$rdbms_firebird_interbase,
-        ) : ()
-    },
-  },
-
-  test_rdbms_firebird_odbc => {
-    req => {
-      $ENV{DBICTEST_FIREBIRD_ODBC_DSN}
-        ? (
-          %$rdbms_firebird_odbc,
         ) : ()
     },
   },

@@ -17,29 +17,13 @@ my %expected = (
   'DBIO::Storage::DBI::DB2'               =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIO::Storage::DBI::Informix'          =>
-    { quote_char => '"',          name_sep => '.' },
-
-  'DBIO::Storage::DBI::InterBase'         =>
-    { quote_char => '"',          name_sep => '.' },
-
   'DBIO::Storage::DBI::mysql'             =>
     { quote_char => '`',          name_sep => '.' },
 
   'DBIO::Storage::DBI::Pg'             =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIO::Storage::DBI::ODBC::ACCESS'      =>
-    { quote_char => [ '[', ']' ], name_sep => '.' },
-
-# Not testing this one, it's a pain.
-#  'DBIO::Storage::DBI::ODBC::DB2_400_SQL' =>
-#    { quote_char => '"',          name_sep => qr/must be connected/ },
-
   'DBIO::Storage::DBI::Oracle::Generic'   =>
-    { quote_char => '"',          name_sep => '.' },
-
-  'DBIO::Storage::DBI::SQLAnywhere'       =>
     { quote_char => '"',          name_sep => '.' },
 
   'DBIO::Storage::DBI::SQLite'            =>
@@ -80,11 +64,6 @@ my %dbs = (
   MYSQL            => 'DBIO::Storage::DBI::mysql',
   DB2              => 'DBIO::Storage::DBI::DB2',
   SYBASE           => 'DBIO::Storage::DBI::Sybase::ASE',
-  SQLANYWHERE      => 'DBIO::Storage::DBI::SQLAnywhere',
-  SQLANYWHERE_ODBC => 'DBIO::Storage::DBI::SQLAnywhere',
-  FIREBIRD         => 'DBIO::Storage::DBI::InterBase',
-  FIREBIRD_ODBC    => 'DBIO::Storage::DBI::InterBase',
-  INFORMIX         => 'DBIO::Storage::DBI::Informix',
   MSSQL_ODBC       => 'DBIO::Storage::DBI::MSSQL',
 );
 

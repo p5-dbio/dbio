@@ -470,7 +470,7 @@ C<Schema.pm>:
   __PACKAGE__->default_resultset_attributes({ software_limit => 1 });
 
 B<WARNING:> If you are dealing with large resultsets and your L<DBI> or
-ODBC/ADO driver does not have proper cursor support (i.e. it loads the whole
+ODBC driver does not have proper cursor support (i.e. it loads the whole
 resultset into memory) then this feature will be extremely slow and use huge
 amounts of memory at best, and may cause your process to run out of memory and
 cause instability on your server at worst, beware!
@@ -733,7 +733,7 @@ method.
 
 AKA getting last_insert_id
 
-Thanks to the core component PK::Auto, this is straightforward:
+This is straightforward:
 
   my $foo = $rs->create(\%blah);
   # do more stuff
@@ -1802,15 +1802,9 @@ retrieved from the database. It is better to avoid
 encoding/decoding data and to use your database's own unicode
 capabilities if at all possible.
 
-The L<DBIO::UTF8Columns> component handles storing selected
-unicode columns in a database that does not directly support
-unicode. If used with a database that does correctly handle unicode
-then strange and unexpected data corrupt B<will> occur.
-
-The Catalyst Wiki Unicode page at
-L<http://wiki.catalystframework.org/wiki/tutorialsandhowtos/using_unicode>
-has additional information on the use of Unicode with Catalyst and
-DBIO.
+Most modern databases handle Unicode natively. Ensure your database
+connection is configured for UTF-8 (e.g. C<pg_enable_utf8> for
+PostgreSQL, C<mysql_enable_utf8mb4> for MySQL).
 
 The following databases do correctly handle unicode data:-
 
