@@ -379,89 +379,81 @@ ZEROINSEARCH: {
 {
   local $ENV{MOD_PERL} = 'boogiewoogie';
   my $schema = DBICTest::Schema->connect($dsn, $user, $pass);
-  my $is_mariadb = $schema->storage->_get_dbh->{Driver}{Name} eq 'MariaDB';
-  my $ar_attr = $is_mariadb ? 'mariadb_auto_reconnect' : 'mysql_auto_reconnect';
+  my $ar_attr = $schema->storage->_get_dbh->{Driver}{Name} eq 'MariaDB'
+    ? 'mariadb_auto_reconnect' : 'mysql_auto_reconnect';
   ok (! $schema->storage->_get_dbh->{$ar_attr}, 'auto_reconnect unset regardless of ENV' );
 
   # Make sure hardcore forking action still works even if auto_reconnect
   # is true (test inspired by ether)
 
-  SKIP: {
-    # DBD::MariaDB handles fork+reconnect differently from DBD::mysql — the
-    # child process spins instead of cleanly reconnecting. Skip the fork
-    # portion of this test when using DBD::MariaDB.
-    skip 'DBD::MariaDB fork+auto_reconnect behaves differently', 6
-      if $is_mariadb;
+  my $schema_autorecon = DBICTest::Schema->connect($dsn, $user, $pass, { $ar_attr => 1 });
+  my $orig_dbh = $schema_autorecon->storage->_get_dbh;
+  weaken $orig_dbh;
 
-    my $schema_autorecon = DBICTest::Schema->connect($dsn, $user, $pass, { $ar_attr => 1 });
-    my $orig_dbh = $schema_autorecon->storage->_get_dbh;
-    weaken $orig_dbh;
+  ok ($orig_dbh, 'Got weak $dbh ref');
+  ok ($orig_dbh->{$ar_attr}, 'auto_reconnect is properly set if explicitly requested' );
 
-    ok ($orig_dbh, 'Got weak $dbh ref');
-    ok ($orig_dbh->{$ar_attr}, 'auto_reconnect is properly set if explicitly requested' );
+  my $rs = $schema_autorecon->resultset('Artist');
 
-    my $rs = $schema_autorecon->resultset('Artist');
-
-    my ($parent_in, $child_out);
-    pipe( $parent_in, $child_out ) or die "Pipe open failed: $!";
-    my $pid = fork();
-    if (! defined $pid ) {
-      die "fork() failed: $!"
-    }
-    elsif ($pid) {
-      close $child_out;
-
-      # sanity check
-      $schema_autorecon->storage->dbh_do(sub {
-        is ($_[1], $orig_dbh, 'Storage holds correct $dbh in parent');
-      });
-
-      # kill our $dbh
-      $schema_autorecon->storage->_dbh(undef);
-
-      {
-        local $TODO = "Perl $] is known to leak like a sieve"
-          if DBIO::_ENV_::PEEPEENESS;
-
-        ok (! defined $orig_dbh, 'Parent $dbh handle is gone');
-      }
-    }
-    else {
-      close $parent_in;
-
-      #simulate a  subtest to not confuse the parent TAP emission
-      my $tb = Test::More->builder;
-      $tb->reset;
-      for (qw/output failure_output todo_output/) {
-        close $tb->$_;
-        open ($tb->$_, '>&', $child_out);
-      }
-
-      # wait for parent to kill its $dbh
-      sleep 1;
-
-      # try to do something dbic-esque
-      $rs->create({ name => "Hardcore Forker $$" });
-
-      {
-        local $TODO = "Perl $] is known to leak like a sieve"
-          if DBIO::_ENV_::PEEPEENESS;
-
-        ok (! defined $orig_dbh, 'DBIO operation triggered reconnect - old $dbh is gone');
-      }
-
-      done_testing;
-      exit 0;
-    }
-
-    while (my $ln = <$parent_in>) {
-      print "   $ln";
-    }
-    wait;
-    ok(!$?, 'Child subtests passed');
-
-    ok ($rs->find({ name => "Hardcore Forker $pid" }), 'Expected row created');
+  my ($parent_in, $child_out);
+  pipe( $parent_in, $child_out ) or die "Pipe open failed: $!";
+  my $pid = fork();
+  if (! defined $pid ) {
+    die "fork() failed: $!"
   }
+  elsif ($pid) {
+    close $child_out;
+
+    # sanity check
+    $schema_autorecon->storage->dbh_do(sub {
+      is ($_[1], $orig_dbh, 'Storage holds correct $dbh in parent');
+    });
+
+    # kill our $dbh
+    $schema_autorecon->storage->_dbh(undef);
+
+    {
+      local $TODO = "Perl $] is known to leak like a sieve"
+        if DBIO::_ENV_::PEEPEENESS;
+
+      ok (! defined $orig_dbh, 'Parent $dbh handle is gone');
+    }
+  }
+  else {
+    close $parent_in;
+
+    #simulate a  subtest to not confuse the parent TAP emission
+    my $tb = Test::More->builder;
+    $tb->reset;
+    for (qw/output failure_output todo_output/) {
+      close $tb->$_;
+      open ($tb->$_, '>&', $child_out);
+    }
+
+    # wait for parent to kill its $dbh
+    sleep 1;
+
+    # try to do something dbic-esque
+    $rs->create({ name => "Hardcore Forker $$" });
+
+    {
+      local $TODO = "Perl $] is known to leak like a sieve"
+        if DBIO::_ENV_::PEEPEENESS;
+
+      ok (! defined $orig_dbh, 'DBIC operation triggered reconnect - old $dbh is gone');
+    }
+
+    done_testing;
+    exit 0;
+  }
+
+  while (my $ln = <$parent_in>) {
+    print "   $ln";
+  }
+  wait;
+  ok(!$?, 'Child subtests passed');
+
+  ok ($rs->find({ name => "Hardcore Forker $pid" }), 'Expected row created');
 }
 
 done_testing;
