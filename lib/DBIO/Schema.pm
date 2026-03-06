@@ -593,10 +593,58 @@ sub source {
 
   # if we got here, they probably passed a full class name
   my $mapped = $self->class_mappings->{$source_name};
-  $self->throw_exception("Can't find source for ${source_name}")
-    unless $mapped && exists $sreg->{$mapped};
-  return $sreg->{$mapped};
+  if ($mapped && exists $sreg->{$mapped}) {
+    return $sreg->{$mapped};
+  }
+
+  # Provide helpful "did you mean?" suggestions
+  my @sources = sort keys %$sreg;
+  my @suggestions;
+  for my $s (@sources) {
+    # Simple edit distance check — suggest if name is close
+    my $dist = _simple_distance(lc $source_name, lc $s);
+    push @suggestions, $s if $dist <= 3;
+  }
+
+  my $msg = "Can't find source for ${source_name}";
+  if (@suggestions) {
+    $msg .= ". Did you mean: " . join(', ', @suggestions) . "?";
+  }
+  elsif (@sources) {
+    $msg .= ". Available sources: " . join(', ', @sources[0..($#sources > 9 ? 9 : $#sources)]);
+    $msg .= ", ..." if @sources > 10;
+  }
+  $self->throw_exception($msg);
 }
+
+# Simple Levenshtein distance for "did you mean?" suggestions
+sub _simple_distance {
+  my ($s, $t) = @_;
+  my @s = split //, $s;
+  my @t = split //, $t;
+  my $n = scalar @s;
+  my $m = scalar @t;
+  return $m unless $n;
+  return $n unless $m;
+
+  my @d;
+  $d[$_][0] = $_ for 0 .. $n;
+  $d[0][$_] = $_ for 0 .. $m;
+
+  for my $i (1 .. $n) {
+    for my $j (1 .. $m) {
+      my $cost = ($s[$i-1] eq $t[$j-1]) ? 0 : 1;
+      $d[$i][$j] = _min(
+        $d[$i-1][$j] + 1,
+        $d[$i][$j-1] + 1,
+        $d[$i-1][$j-1] + $cost,
+      );
+    }
+  }
+  return $d[$n][$m];
+}
+
+sub _min { my $m = shift; $m = $_ < $m ? $_ : $m for @_; $m }
 
 =head2 class
 
