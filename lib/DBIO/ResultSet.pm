@@ -4176,8 +4176,9 @@ Shortcut for C<< ->search(undef, { rows => ... }) >>.
 {
   my $orig_rows = __PACKAGE__->can('rows');
   no warnings 'redefine';
+  require Sub::Name;
 
-  *rows = sub {
+  *rows = Sub::Name::subname rows => sub {
     if (@_ > 1) {
       return $_[0]->search(undef, { rows => $_[1] });
     }
