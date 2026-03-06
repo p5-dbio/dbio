@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Replicated::WithDSN;
+# ABSTRACT: A DBI Storage Role with DSN information in trace output
 
 use Moose::Role;
 use Scalar::Util 'reftype';
@@ -6,11 +7,6 @@ requires qw/_query_start/;
 
 use Try::Tiny;
 use namespace::clean -except => 'meta';
-
-=head1 NAME
-
-DBIO::Storage::DBI::Replicated::WithDSN - A DBI Storage Role with DSN
-information in trace output
 
 =head1 SYNOPSIS
 

@@ -62,10 +62,6 @@ __PACKAGE__->register_class('TableCompat', 'DBIO::Version::TableCompat');
 
 # ---------------------------------------------------------------------------
 
-=head1 NAME
-
-DBIO::Schema::Versioned - DBIO::Schema plugin for Schema upgrades
-
 =head1 SYNOPSIS
 
   package MyApp::Schema;
@@ -196,6 +192,7 @@ and then you're good to go.
 =cut
 
 package DBIO::Schema::Versioned;
+# ABSTRACT: DBIO::Schema plugin for Schema upgrades
 
 use strict;
 use warnings;

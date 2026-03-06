@@ -1,4 +1,5 @@
 package DBIO::Storage;
+# ABSTRACT: Generic Storage Handler
 
 use strict;
 use warnings;
@@ -25,10 +26,6 @@ __PACKAGE__->mk_group_accessors(component_class => 'cursor_class');
 __PACKAGE__->cursor_class('DBIO::Cursor');
 
 sub cursor { shift->cursor_class(@_); }
-
-=head1 NAME
-
-DBIO::Storage - Generic Storage Handler
 
 =head1 DESCRIPTION
 

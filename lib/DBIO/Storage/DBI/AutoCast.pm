@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::AutoCast;
+# ABSTRACT: Storage component for RDBMS requiring explicit placeholder typing
 
 use strict;
 use warnings;
@@ -7,10 +8,6 @@ use base qw/DBIO::Storage::DBI/;
 use mro 'c3';
 
 __PACKAGE__->mk_group_accessors('simple' => 'auto_cast' );
-
-=head1 NAME
-
-DBIO::Storage::DBI::AutoCast - Storage component for RDBMS requiring explicit placeholder typing
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,5 @@
-=head1 NAME
-
-DBIO::Manual::Example - Simple CD database example
-
+# PODNAME: DBIO::Manual::Example
+# ABSTRACT: Simple CD database example
 =head1 DESCRIPTION
 
 This tutorial will guide you through the process of setting up and

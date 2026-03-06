@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Cursor;
+# ABSTRACT: Object representing a query cursor on a resultset.
 
 use strict;
 use warnings;
@@ -13,11 +14,6 @@ use namespace::clean;
 __PACKAGE__->mk_group_accessors('simple' =>
     qw/storage args attrs/
 );
-
-=head1 NAME
-
-DBIO::Storage::DBI::Cursor - Object representing a query cursor on a
-resultset.
 
 =head1 SYNOPSIS
 

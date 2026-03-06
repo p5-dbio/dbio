@@ -1,4 +1,5 @@
 package DBIO::Core;
+# ABSTRACT: Core set of DBIO modules
 
 use strict;
 use warnings;
@@ -16,10 +17,6 @@ __PACKAGE__->load_components(qw/
 1;
 
 __END__
-
-=head1 NAME
-
-DBIO::Core - Core set of DBIO modules
 
 =head1 SYNOPSIS
 

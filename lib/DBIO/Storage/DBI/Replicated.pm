@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Replicated;
+# ABSTRACT: BETA Replicated database support
 
 BEGIN {
   use DBIO;
@@ -19,10 +20,6 @@ use Context::Preserve 'preserve_context';
 use Try::Tiny;
 
 use namespace::clean -except => 'meta';
-
-=head1 NAME
-
-DBIO::Storage::DBI::Replicated - BETA Replicated database support
 
 =head1 SYNOPSIS
 

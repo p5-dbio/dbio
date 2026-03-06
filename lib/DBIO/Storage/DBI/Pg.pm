@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Pg;
+# ABSTRACT: Automatic primary key class for PostgreSQL
 
 use strict;
 use warnings;
@@ -248,10 +249,6 @@ sub deployment_statements {
 1;
 
 __END__
-
-=head1 NAME
-
-DBIO::Storage::DBI::Pg - Automatic primary key class for PostgreSQL
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,5 @@
 package DBIO::ResultSourceHandle;
+# ABSTRACT: Serializable pointers to ResultSource instances
 
 use strict;
 use warnings;
@@ -16,10 +17,6 @@ __PACKAGE__->mk_group_accessors('simple' => qw/schema source_moniker _detached_s
 
 # Schema to use when thawing.
 our $thaw_schema;
-
-=head1 NAME
-
-DBIO::ResultSourceHandle - Serializable pointers to ResultSource instances
 
 =head1 DESCRIPTION
 

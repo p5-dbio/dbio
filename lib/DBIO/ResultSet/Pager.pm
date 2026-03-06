@@ -1,4 +1,5 @@
 package DBIO::ResultSet::Pager;
+# ABSTRACT: help when paging through sets of results
 
 use warnings;
 use strict;
@@ -167,10 +168,6 @@ sub change_entries_per_page {
 1;
 
 __END__
-
-=head1 NAME
-
-DBIO::ResultSet::Pager - help when paging through sets of results
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI;
+# ABSTRACT: DBI storage handler
 # -*- mode: cperl; cperl-indent-level: 2 -*-
 
 use strict;
@@ -153,10 +154,6 @@ for my $meth (keys %$storage_accessor_idx, qw(
     goto $orig;
 EOC
 }
-
-=head1 NAME
-
-DBIO::Storage::DBI - DBI storage handler
 
 =head1 SYNOPSIS
 

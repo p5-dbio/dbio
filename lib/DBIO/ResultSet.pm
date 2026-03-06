@@ -1,4 +1,5 @@
 package DBIO::ResultSet;
+# ABSTRACT: Represents a query used for fetching a set of results.
 
 use strict;
 use warnings;
@@ -30,10 +31,6 @@ use overload
 sub _bool () { 1 }
 
 __PACKAGE__->mk_group_accessors('simple' => qw/_result_class result_source/);
-
-=head1 NAME
-
-DBIO::ResultSet - Represents a query used for fetching a set of results.
 
 =head1 SYNOPSIS
 

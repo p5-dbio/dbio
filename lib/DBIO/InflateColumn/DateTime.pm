@@ -1,4 +1,5 @@
 package DBIO::InflateColumn::DateTime;
+# ABSTRACT: Auto-create DateTime objects from date and datetime columns.
 
 use strict;
 use warnings;
@@ -6,10 +7,6 @@ use base qw/DBIO/;
 use DBIO::Carp;
 use Try::Tiny;
 use namespace::clean;
-
-=head1 NAME
-
-DBIO::InflateColumn::DateTime - Auto-create DateTime objects from date and datetime columns.
 
 =head1 SYNOPSIS
 

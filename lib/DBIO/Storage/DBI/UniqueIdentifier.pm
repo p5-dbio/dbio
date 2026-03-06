@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::UniqueIdentifier;
+# ABSTRACT: Storage component for RDBMSes supporting GUID types
 
 use strict;
 use warnings;
@@ -6,11 +7,6 @@ use base 'DBIO::Storage::DBI';
 use mro 'c3';
 
 __PACKAGE__->mk_group_accessors(inherited => 'new_guid');
-
-=head1 NAME
-
-DBIO::Storage::DBI::UniqueIdentifier - Storage component for RDBMSes
-supporting GUID types
 
 =head1 DESCRIPTION
 

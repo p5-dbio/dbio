@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::SQLite;
+# ABSTRACT: Automatic primary key class for SQLite
 
 use strict;
 use warnings;
@@ -24,10 +25,6 @@ sub _determine_supports_multicolumn_in {
     : 1
 }
 
-
-=head1 NAME
-
-DBIO::Storage::DBI::SQLite - Automatic primary key class for SQLite
 
 =head1 SYNOPSIS
 

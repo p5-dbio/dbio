@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::ODBC::Microsoft_SQL_Server;
+# ABSTRACT: Support specific to Microsoft SQL Server over ODBC
 use strict;
 use warnings;
 
@@ -15,11 +16,6 @@ use namespace::clean;
 __PACKAGE__->mk_group_accessors(simple => qw/
   _using_dynamic_cursors
 /);
-
-=head1 NAME
-
-DBIO::Storage::DBI::ODBC::Microsoft_SQL_Server - Support specific
-to Microsoft SQL Server over ODBC
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,5 @@
 package DBIO::InflateColumn;
+# ABSTRACT: Automatically create references from column data
 
 use strict;
 use warnings;
@@ -6,10 +7,6 @@ use warnings;
 use base 'DBIO::Row';
 use SQL::Abstract::Util 'is_literal_value';
 use namespace::clean;
-
-=head1 NAME
-
-DBIO::InflateColumn - Automatically create references from column data
 
 =head1 SYNOPSIS
 

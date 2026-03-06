@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Sybase::Microsoft_SQL_Server::NoBindVars;
+# ABSTRACT: Support for Microsoft SQL Server via DBD::Sybase without placeholders
 
 use strict;
 use warnings;
@@ -17,11 +18,6 @@ sub _init {
 }
 
 1;
-
-=head1 NAME
-
-DBIO::Storage::DBI::Sybase::Microsoft_SQL_Server::NoBindVars - Support for Microsoft
-SQL Server via DBD::Sybase without placeholders
 
 =head1 SYNOPSIS
 

@@ -13,10 +13,6 @@ use Try::Tiny;
 use Moo;
 use namespace::clean;
 
-=head1 NAME
-
-DBIO::Storage::BlockRunner - Try running a block of code until success with a configurable retry logic
-
 =head1 DESCRIPTION
 
 =head1 METHODS

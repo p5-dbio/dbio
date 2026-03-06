@@ -129,10 +129,6 @@ sub unimport {
 
 __END__
 
-=head1 NAME
-
-DBIO::Carp - Provides advanced Carp::Clan-like warning functions for DBIO internals
-
 =head1 DESCRIPTION
 
 Documentation is lacking on purpose - this an experiment not yet fit for

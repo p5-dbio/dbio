@@ -1,7 +1,5 @@
-=head1 NAME
-
-DBIO::Manual::FAQ - Frequently Asked Questions (in theory)
-
+# PODNAME: DBIO::Manual::FAQ
+# ABSTRACT: Frequently Asked Questions (in theory)
 =head1 DESCRIPTION
 
 This document is intended as an anti-map of the documentation. If you

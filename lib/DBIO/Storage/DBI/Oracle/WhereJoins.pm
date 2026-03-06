@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Oracle::WhereJoins;
+# ABSTRACT: Oracle joins in WHERE syntax support (instead of ANSI).
 
 use strict;
 use warnings;
@@ -13,11 +14,6 @@ __PACKAGE__->sql_maker_class('DBIO::SQLMaker::OracleJoins');
 __END__
 
 =pod
-
-=head1 NAME
-
-DBIO::Storage::DBI::Oracle::WhereJoins - Oracle joins in WHERE syntax
-support (instead of ANSI).
 
 =head1 PURPOSE
 

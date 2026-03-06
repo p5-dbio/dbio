@@ -1,4 +1,5 @@
 package DBIO::Relationship::Base;
+# ABSTRACT: Inter-table relationships
 
 use strict;
 use warnings;
@@ -9,10 +10,6 @@ use Scalar::Util qw/weaken blessed/;
 use Try::Tiny;
 use DBIO::_Util 'UNRESOLVABLE_CONDITION';
 use namespace::clean;
-
-=head1 NAME
-
-DBIO::Relationship::Base - Inter-table relationships
 
 =head1 SYNOPSIS
 

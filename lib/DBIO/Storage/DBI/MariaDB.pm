@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::MariaDB;
+# ABSTRACT: Storage::DBI class implementing MariaDB specifics
 
 use strict;
 use warnings;
@@ -39,10 +40,6 @@ sub lag_behind_master {
 }
 
 1;
-
-=head1 NAME
-
-DBIO::Storage::DBI::MariaDB - Storage::DBI class implementing MariaDB specifics
 
 =head1 SYNOPSIS
 

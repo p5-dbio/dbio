@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::mysql;
+# ABSTRACT: Storage::DBI class implementing MySQL specifics
 
 use strict;
 use warnings;
@@ -175,10 +176,6 @@ sub lag_behind_master {
 }
 
 1;
-
-=head1 NAME
-
-DBIO::Storage::DBI::mysql - Storage::DBI class implementing MySQL specifics
 
 =head1 SYNOPSIS
 

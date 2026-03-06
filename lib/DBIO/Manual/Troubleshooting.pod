@@ -1,7 +1,5 @@
-=head1 NAME
-
-DBIO::Manual::Troubleshooting - Got a problem? Shoot it.
-
+# PODNAME: DBIO::Manual::Troubleshooting
+# ABSTRACT: Got a problem? Shoot it.
 =head2  "Can't locate storage blabla"
 
 You're trying to make a query on a non-connected schema. Make sure you got

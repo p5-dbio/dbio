@@ -1,4 +1,5 @@
 package DBIO::StartupCheck;
+# ABSTRACT: Run environment checks on startup
 
 use strict;
 use warnings;
@@ -6,10 +7,6 @@ use warnings;
 1;
 
 __END__
-
-=head1 NAME
-
-DBIO::StartupCheck - Run environment checks on startup
 
 =head1 SYNOPSIS
 

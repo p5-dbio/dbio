@@ -1,13 +1,10 @@
 package DBIO::Storage::DBI::Replicated::Balancer::Random;
+# ABSTRACT: A 'random' Balancer
 
 use Moose;
 with 'DBIO::Storage::DBI::Replicated::Balancer';
 use DBIO::Storage::DBI::Replicated::Types 'Weight';
 use namespace::clean -except => 'meta';
-
-=head1 NAME
-
-DBIO::Storage::DBI::Replicated::Balancer::Random - A 'random' Balancer
 
 =head1 SYNOPSIS
 

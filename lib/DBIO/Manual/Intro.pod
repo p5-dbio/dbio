@@ -1,7 +1,5 @@
-=head1 NAME
-
-DBIO::Manual::Intro - Introduction to DBIO
-
+# PODNAME: DBIO::Manual::Intro
+# ABSTRACT: Introduction to DBIO
 =head1 INTRODUCTION
 
 You're bored with SQL, and want a native Perl interface for your database?  Or

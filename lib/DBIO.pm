@@ -1,4 +1,5 @@
 package DBIO;
+# ABSTRACT: Extensible and flexible object <-> relational mapper.
 
 use strict;
 use warnings;
@@ -95,10 +96,6 @@ __END__
 # so all is well
 #
 =encoding UTF-8
-
-=head1 NAME
-
-DBIO - Extensible and flexible object <-> relational mapper.
 
 =head1 WHERE TO START READING
 

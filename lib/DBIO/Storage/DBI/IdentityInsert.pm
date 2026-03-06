@@ -1,14 +1,10 @@
 package DBIO::Storage::DBI::IdentityInsert;
+# ABSTRACT: Storage Component for Sybase ASE and MSSQL for Identity Inserts / Updates
 
 use strict;
 use warnings;
 use base 'DBIO::Storage::DBI';
 use mro 'c3';
-
-=head1 NAME
-
-DBIO::Storage::DBI::IdentityInsert - Storage Component for Sybase ASE and
-MSSQL for Identity Inserts / Updates
 
 =head1 DESCRIPTION
 

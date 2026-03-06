@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::DB2;
+# ABSTRACT: IBM DB2 support for DBIO
 
 use strict;
 use warnings;
@@ -57,10 +58,6 @@ sub _dbh_last_insert_id {
 
   return @res ? $res[0] : undef;
 }
-
-=head1 NAME
-
-DBIO::Storage::DBI::DB2 - IBM DB2 support for DBIO
 
 =head1 DESCRIPTION
 

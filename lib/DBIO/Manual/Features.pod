@@ -1,7 +1,5 @@
-=head1 NAME
-
-DBIO::Manual::Features - A boatload of DBIO features with links to respective documentation
-
+# PODNAME: DBIO::Manual::Features
+# ABSTRACT: A boatload of DBIO features with links to respective documentation
 =head1 META
 
 =head2 Large Community

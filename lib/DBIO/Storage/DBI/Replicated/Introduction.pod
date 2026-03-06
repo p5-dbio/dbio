@@ -1,7 +1,5 @@
-=head1 NAME
-
-DBIO::Storage::DBI::Replicated::Introduction - Minimum Need to Know
-
+# PODNAME: DBIO::Storage::DBI::Replicated::Introduction
+# ABSTRACT: Minimum Need to Know
 =head1 SYNOPSIS
 
 This is an introductory document for L<DBIO::Storage::DBI::Replicated>.

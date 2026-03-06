@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Oracle;
+# ABSTRACT: Base class for Oracle driver
 
 use strict;
 use warnings;
@@ -19,10 +20,6 @@ sub _rebless {
 }
 
 1;
-
-=head1 NAME
-
-DBIO::Storage::DBI::Oracle - Base class for Oracle driver
 
 =head1 DESCRIPTION
 

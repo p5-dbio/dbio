@@ -1,4 +1,5 @@
 package DBIO::InflateColumn::File;
+# ABSTRACT: DEPRECATED (superseded by DBIO::InflateColumn::FS)
 
 use strict;
 use warnings;
@@ -126,10 +127,6 @@ sub _save_file_column {
 
     return $value->{filename};
 }
-
-=head1 NAME
-
-DBIO::InflateColumn::File -  DEPRECATED (superseded by DBIO::InflateColumn::FS)
 
 =head2 Deprecation Notice
 

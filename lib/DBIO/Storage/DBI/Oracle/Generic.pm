@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Oracle::Generic;
+# ABSTRACT: Oracle Support for DBIO
 
 use strict;
 use warnings;
@@ -16,10 +17,6 @@ __PACKAGE__->sql_maker_class('DBIO::SQLMaker::Oracle');
 __PACKAGE__->datetime_parser_type('DateTime::Format::Oracle');
 
 sub __cache_queries_with_max_lob_parts { 2 }
-
-=head1 NAME
-
-DBIO::Storage::DBI::Oracle::Generic - Oracle Support for DBIO
 
 =head1 SYNOPSIS
 

@@ -1,11 +1,8 @@
 package DBIO::Ordered;
+# ABSTRACT: Modify the position of objects in an ordered list.
 use strict;
 use warnings;
 use base qw( DBIO );
-
-=head1 NAME
-
-DBIO::Ordered - Modify the position of objects in an ordered list.
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,5 @@
 package DBIO::Storage::TxnScopeGuard;
+# ABSTRACT: Scope-based transaction handling
 
 use strict;
 use warnings;
@@ -129,10 +130,6 @@ sub DESTROY {
 1;
 
 __END__
-
-=head1 NAME
-
-DBIO::Storage::TxnScopeGuard - Scope-based transaction handling
 
 =head1 SYNOPSIS
 

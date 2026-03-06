@@ -1,6 +1,7 @@
 # because of how loose dep specs are, we need to keep squatting
 # on the CPAN face - FOREVER.
 package DBIO::SQLMaker::LimitDialects;
+# ABSTRACT: SQL::Abstract::Limit-like functionality in DBIO::SQLMaker
 
 use warnings;
 use strict;
@@ -30,10 +31,6 @@ sub __total_bindtype { $sigh->() }
 1;
 
 __END__
-
-=head1 NAME
-
-DBIO::SQLMaker::LimitDialects - SQL::Abstract::Limit-like functionality in DBIO::SQLMaker
 
 =head1 DESCRIPTION
 

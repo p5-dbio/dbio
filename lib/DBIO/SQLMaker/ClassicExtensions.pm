@@ -1,11 +1,8 @@
 package DBIO::SQLMaker::ClassicExtensions;
+# ABSTRACT: Class containing generic enhancements to SQL::Abstract
 
 use strict;
 use warnings;
-
-=head1 NAME
-
-DBIO::SQLMaker::ClassicExtensions - Class containing generic enhancements to SQL::Abstract
 
 =head1 DESCRIPTION
 

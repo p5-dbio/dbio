@@ -1,4 +1,5 @@
 package DBIO::ResultSetColumn;
+# ABSTRACT: helpful methods for messing with a single column of the resultset
 
 use strict;
 use warnings;
@@ -7,11 +8,6 @@ use base 'DBIO';
 use DBIO::Carp;
 use DBIO::_Util 'fail_on_internal_wantarray';
 use namespace::clean;
-
-=head1 NAME
-
-  DBIO::ResultSetColumn - helpful methods for messing
-  with a single column of the resultset
 
 =head1 SYNOPSIS
 

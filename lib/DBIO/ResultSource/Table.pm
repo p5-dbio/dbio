@@ -1,4 +1,5 @@
 package DBIO::ResultSource::Table;
+# ABSTRACT: Table object
 
 use strict;
 use warnings;
@@ -7,10 +8,6 @@ use DBIO::ResultSet;
 
 use base qw/DBIO/;
 __PACKAGE__->load_components(qw/ResultSource/);
-
-=head1 NAME
-
-DBIO::ResultSource::Table - Table object
 
 =head1 SYNOPSIS
 

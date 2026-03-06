@@ -1,4 +1,5 @@
 package DBIO::Admin;
+# ABSTRACT: Administration object for schemas
 
 # check deps
 BEGIN {
@@ -16,10 +17,6 @@ use MooseX::Types::Path::Class qw(Dir File);
 use MooseX::Types::LoadableClass qw(LoadableClass);
 use Try::Tiny;
 use namespace::clean;
-
-=head1 NAME
-
-DBIO::Admin - Administration object for schemas
 
 =head1 SYNOPSIS
 

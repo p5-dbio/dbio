@@ -1,14 +1,10 @@
 package DBIO::Cursor;
+# ABSTRACT: Abstract object representing a query cursor on a resultset.
 
 use strict;
 use warnings;
 
 use base qw/DBIO/;
-
-=head1 NAME
-
-DBIO::Cursor - Abstract object representing a query cursor on a
-resultset.
 
 =head1 SYNOPSIS
 

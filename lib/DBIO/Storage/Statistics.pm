@@ -1,4 +1,5 @@
 package DBIO::Storage::Statistics;
+# ABSTRACT: SQL Statistics
 
 use strict;
 use warnings;
@@ -8,10 +9,6 @@ use IO::Handle ();
 use Moo;
 extends 'DBIO';
 use namespace::clean;
-
-=head1 NAME
-
-DBIO::Storage::Statistics - SQL Statistics
 
 =head1 SYNOPSIS
 

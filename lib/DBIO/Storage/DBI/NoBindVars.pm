@@ -1,14 +1,11 @@
 package DBIO::Storage::DBI::NoBindVars;
+# ABSTRACT: Sometime DBDs have poor to no support for bind variables
 
 use strict;
 use warnings;
 
 use base 'DBIO::Storage::DBI';
 use mro 'c3';
-
-=head1 NAME
-
-DBIO::Storage::DBI::NoBindVars - Sometime DBDs have poor to no support for bind variables
 
 =head1 DESCRIPTION
 

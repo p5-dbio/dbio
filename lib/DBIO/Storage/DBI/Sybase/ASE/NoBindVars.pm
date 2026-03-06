@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Sybase::ASE::NoBindVars;
+# ABSTRACT: Storage::DBI subclass for Sybase ASE without placeholder support
 
 use warnings;
 use strict;
@@ -63,11 +64,6 @@ sub _prep_interpolated_value {
 }
 
 1;
-
-=head1 NAME
-
-DBIO::Storage::DBI::Sybase::ASE::NoBindVars - Storage::DBI subclass for
-Sybase ASE without placeholder support
 
 =head1 DESCRIPTION
 

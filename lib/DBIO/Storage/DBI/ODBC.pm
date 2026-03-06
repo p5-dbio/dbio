@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::ODBC;
+# ABSTRACT: Base class for ODBC drivers
 use strict;
 use warnings;
 use base qw/DBIO::Storage::DBI/;
@@ -49,10 +50,6 @@ sub _disable_odbc_array_ops {
     $dbh->{$k} = $v;
   }
 }
-
-=head1 NAME
-
-DBIO::Storage::DBI::ODBC - Base class for ODBC drivers
 
 =head1 DESCRIPTION
 

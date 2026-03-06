@@ -1,4 +1,5 @@
 package DBIO::AccessorGroup;
+# ABSTRACT: See Class::Accessor::Grouped
 
 use strict;
 use warnings;
@@ -33,10 +34,6 @@ sub set_component_class {
 }
 
 1;
-
-=head1 NAME
-
-DBIO::AccessorGroup - See Class::Accessor::Grouped
 
 =head1 SYNOPSIS
 

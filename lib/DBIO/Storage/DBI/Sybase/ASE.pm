@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Sybase::ASE;
+# ABSTRACT: Sybase ASE SQL Server support for DBIO
 
 use strict;
 use warnings;
@@ -39,11 +40,6 @@ my @also_proxy_to_extra_storages = qw/
   disconnect _connect_info _sql_maker _sql_maker_opts disable_sth_caching
   auto_savepoint unsafe cursor_class debug debugobj schema
 /;
-
-=head1 NAME
-
-DBIO::Storage::DBI::Sybase::ASE - Sybase ASE SQL Server support for
-DBIO
 
 =head1 SYNOPSIS
 

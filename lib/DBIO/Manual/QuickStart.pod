@@ -1,7 +1,5 @@
-=head1 NAME
-
-DBIO::Manual::QuickStart - up and running with DBIC in 10 minutes
-
+# PODNAME: DBIO::Manual::QuickStart
+# ABSTRACT: up and running with DBIO in 10 minutes
 =head1 DESCRIPTION
 
 This document shows the minimum amount of code to make you a productive DBIC

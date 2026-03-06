@@ -1,4 +1,5 @@
 package DBIO::Storage::Debug::PrettyTrace;
+# ABSTRACT: Pretty Tracing DebugObj
 
 use strict;
 use warnings;
@@ -93,10 +94,6 @@ sub query_end {
 1;
 
 =pod
-
-=head1 NAME
-
-DBIO::Storage::Debug::PrettyTrace - Pretty Tracing DebugObj
 
 =head1 SYNOPSIS
 

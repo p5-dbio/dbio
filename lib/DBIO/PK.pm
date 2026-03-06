@@ -1,13 +1,10 @@
 package DBIO::PK;
+# ABSTRACT: Primary Key class
 
 use strict;
 use warnings;
 
 use base qw/DBIO::Row/;
-
-=head1 NAME
-
-DBIO::PK - Primary Key class
 
 =head1 SYNOPSIS
 

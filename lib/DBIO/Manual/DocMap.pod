@@ -1,7 +1,5 @@
-=head1 NAME
-
-DBIO::Manual::DocMap - What documentation do we have?
-
+# PODNAME: DBIO::Manual::DocMap
+# ABSTRACT: What documentation do we have?
 =head1 Manuals
 
 =over 4

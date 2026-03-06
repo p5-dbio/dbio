@@ -1,4 +1,5 @@
 package DBIO::ResultSource;
+# ABSTRACT: Result source object
 
 use strict;
 use warnings;
@@ -30,10 +31,6 @@ __PACKAGE__->mk_group_accessors(component_class => qw/
 /);
 
 __PACKAGE__->mk_classdata( sqlt_deploy_callback => 'default_sqlt_deploy_hook' );
-
-=head1 NAME
-
-DBIO::ResultSource - Result source object
 
 =head1 SYNOPSIS
 

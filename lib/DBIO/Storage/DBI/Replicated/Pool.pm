@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Replicated::Pool;
+# ABSTRACT: Manage a pool of replicants
 
 use Moose;
 use DBIO::Storage::DBI::Replicated::Replicant;
@@ -9,10 +10,6 @@ use DBIO::Storage::DBI::Replicated::Types 'DBICStorageDBI';
 use Try::Tiny;
 
 use namespace::clean -except => 'meta';
-
-=head1 NAME
-
-DBIO::Storage::DBI::Replicated::Pool - Manage a pool of replicants
 
 =head1 SYNOPSIS
 

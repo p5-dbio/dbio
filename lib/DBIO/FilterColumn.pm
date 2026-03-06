@@ -1,4 +1,5 @@
 package DBIO::FilterColumn;
+# ABSTRACT: Automatically convert column data
 use strict;
 use warnings;
 
@@ -196,10 +197,6 @@ sub new {
 1;
 
 __END__
-
-=head1 NAME
-
-DBIO::FilterColumn - Automatically convert column data
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::ODBC::Firebird;
+# ABSTRACT: Driver for using the Firebird RDBMS through ODBC
 
 use strict;
 use warnings;
@@ -9,11 +10,6 @@ use base qw/
 use mro 'c3';
 use Try::Tiny;
 use namespace::clean;
-
-=head1 NAME
-
-DBIO::Storage::DBI::ODBC::Firebird - Driver for using the Firebird RDBMS
-through ODBC
 
 =head1 DESCRIPTION
 

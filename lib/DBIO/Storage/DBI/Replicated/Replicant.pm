@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Replicated::Replicant;
+# ABSTRACT: A replicated DBI Storage Role
 
 use Moose::Role;
 requires qw/_query_start/;
@@ -7,10 +8,6 @@ use MooseX::Types::Moose qw/Bool Str/;
 use DBIO::Storage::DBI::Replicated::Types 'DBICStorageDBI';
 
 use namespace::clean -except => 'meta';
-
-=head1 NAME
-
-DBIO::Storage::DBI::Replicated::Replicant - A replicated DBI Storage Role
 
 =head1 SYNOPSIS
 

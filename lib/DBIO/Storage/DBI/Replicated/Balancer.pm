@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Replicated::Balancer;
+# ABSTRACT: A Software Load Balancer
 
 use Moose::Role;
 requires 'next_storage';
@@ -6,10 +7,6 @@ use MooseX::Types::Moose qw/Int/;
 use DBIO::Storage::DBI::Replicated::Pool;
 use DBIO::Storage::DBI::Replicated::Types qw/DBICStorageDBI/;
 use namespace::clean -except => 'meta';
-
-=head1 NAME
-
-DBIO::Storage::DBI::Replicated::Balancer - A Software Load Balancer
 
 =head1 SYNOPSIS
 

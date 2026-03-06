@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Sybase;
+# ABSTRACT: Base class for drivers using L<DBD::Sybase>
 
 use strict;
 use warnings;
@@ -6,11 +7,6 @@ use Try::Tiny;
 use namespace::clean;
 
 use base qw/DBIO::Storage::DBI/;
-
-=head1 NAME
-
-DBIO::Storage::DBI::Sybase - Base class for drivers using
-L<DBD::Sybase>
 
 =head1 DESCRIPTION
 

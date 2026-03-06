@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Sybase::FreeTDS;
+# ABSTRACT: Base class for drivers using DBD::Sybase over FreeTDS.
 
 use strict;
 use warnings;
@@ -6,11 +7,6 @@ use base qw/DBIO::Storage::DBI::Sybase/;
 use mro 'c3';
 use Try::Tiny;
 use namespace::clean;
-
-=head1 NAME
-
-DBIO::Storage::DBI::Sybase::FreeTDS - Base class for drivers using
-DBD::Sybase over FreeTDS.
 
 =head1 DESCRIPTION
 

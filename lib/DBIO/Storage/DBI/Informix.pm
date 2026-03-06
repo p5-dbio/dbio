@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Informix;
+# ABSTRACT: Base Storage Class for Informix Support
 use strict;
 use warnings;
 
@@ -17,10 +18,6 @@ __PACKAGE__->datetime_parser_type (
 
 
 __PACKAGE__->mk_group_accessors('simple' => '__last_insert_id');
-
-=head1 NAME
-
-DBIO::Storage::DBI::Informix - Base Storage Class for Informix Support
 
 =head1 DESCRIPTION
 

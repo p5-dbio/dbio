@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::MSSQL;
+# ABSTRACT: Base Class for Microsoft SQL Server support in DBIO
 
 use strict;
 use warnings;
@@ -278,11 +279,6 @@ sub format_smalldatetime {
 }
 
 1;
-
-=head1 NAME
-
-DBIO::Storage::DBI::MSSQL - Base Class for Microsoft SQL Server support
-in DBIO
 
 =head1 SYNOPSIS
 

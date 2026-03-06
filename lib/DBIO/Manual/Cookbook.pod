@@ -1,7 +1,5 @@
-=head1 NAME
-
-DBIO::Manual::Cookbook - Miscellaneous recipes
-
+# PODNAME: DBIO::Manual::Cookbook
+# ABSTRACT: Miscellaneous recipes
 =head1 SEARCHING
 
 =head2 Paged results

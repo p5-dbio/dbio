@@ -1,7 +1,5 @@
-=head1 NAME
-
-DBIO::Manual - Index of the Manual
-
+# PODNAME: DBIO::Manual
+# ABSTRACT: Index of the Manual
 =head1 DESCRIPTION
 
 This is the L<DBIO> users manual. DBIO is a SQL->OOP mapper.

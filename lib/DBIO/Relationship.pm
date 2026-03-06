@@ -1,4 +1,5 @@
 package DBIO::Relationship;
+# ABSTRACT: Inter-table relationships
 
 use strict;
 use warnings;
@@ -16,10 +17,6 @@ __PACKAGE__->load_own_components(qw/
 1;
 
 __END__
-
-=head1 NAME
-
-DBIO::Relationship - Inter-table relationships
 
 =head1 SYNOPSIS
 

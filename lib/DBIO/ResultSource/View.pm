@@ -1,4 +1,5 @@
 package DBIO::ResultSource::View;
+# ABSTRACT: ResultSource object representing a view
 
 use strict;
 use warnings;
@@ -9,10 +10,6 @@ use base qw/DBIO/;
 __PACKAGE__->load_components(qw/ResultSource/);
 __PACKAGE__->mk_group_accessors(
     'simple' => qw(is_virtual view_definition deploy_depends_on) );
-
-=head1 NAME
-
-DBIO::ResultSource::View - ResultSource object representing a view
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,5 @@
 package DBIO::ResultSourceProxy::Table;
+# ABSTRACT: provides a classdata table object and method proxies
 
 use strict;
 use warnings;
@@ -47,11 +48,6 @@ sub _init_result_source_instance {
 
     return $table;
 }
-
-=head1 NAME
-
-DBIO::ResultSourceProxy::Table - provides a classdata table
-object and method proxies
 
 =head1 SYNOPSIS
 

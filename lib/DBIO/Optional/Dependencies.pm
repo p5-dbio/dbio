@@ -1,4 +1,5 @@
 package DBIO::Optional::Dependencies;
+# ABSTRACT: Optional dependency declarations for DBIO
 
 use warnings;
 use strict;

@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::Sybase::Microsoft_SQL_Server;
+# ABSTRACT: Support for Microsoft SQL Server via DBD::Sybase
 
 use strict;
 use warnings;
@@ -11,11 +12,6 @@ use mro 'c3';
 
 use DBIO::Carp;
 use namespace::clean;
-
-=head1 NAME
-
-DBIO::Storage::DBI::Sybase::Microsoft_SQL_Server - Support for Microsoft
-SQL Server via DBD::Sybase
 
 =head1 SYNOPSIS
 

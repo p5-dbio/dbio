@@ -1,8 +1,5 @@
 package SQL::Translator::Producer::DBIO::File;
-
-=head1 NAME
-
-SQL::Translator::Producer::DBIO::File - DBIO file producer
+# ABSTRACT: DBIO file producer
 
 =head1 SYNOPSIS
 
@@ -71,6 +68,7 @@ sub produce
     my $schemaoutput .= << "DATA";
 
 package ${dbixschema};
+# ABSTRACT: DBIO file producer
 use base 'DBIO::Schema';
 use strict;
 use warnings;
@@ -84,6 +82,7 @@ DATA
         my $output .= qq{
 
 package ${dbixschema}::${tname};
+# ABSTRACT: DBIO file producer
 use base 'DBIO';
 use strict;
 use warnings;

@@ -1,4 +1,5 @@
 package DBIO::SQLMaker;
+# ABSTRACT: An SQL::Abstract-based SQL maker class
 
 use strict;
 use warnings;
@@ -15,10 +16,6 @@ use base qw(
 1;
 
 __END__
-
-=head1 NAME
-
-DBIO::SQLMaker - An SQL::Abstract-based SQL maker class
 
 =head1 DESCRIPTION
 

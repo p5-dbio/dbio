@@ -1,4 +1,5 @@
 package DBIO::Storage::DBI::InterBase;
+# ABSTRACT: Driver for the Firebird RDBMS via L<DBD::InterBase>
 
 use strict;
 use warnings;
@@ -6,11 +7,6 @@ use base qw/DBIO::Storage::DBI::Firebird::Common/;
 use mro 'c3';
 use Try::Tiny;
 use namespace::clean;
-
-=head1 NAME
-
-DBIO::Storage::DBI::InterBase - Driver for the Firebird RDBMS via
-L<DBD::InterBase>
 
 =head1 DESCRIPTION
 

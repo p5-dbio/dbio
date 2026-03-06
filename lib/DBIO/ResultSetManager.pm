@@ -1,4 +1,5 @@
 package DBIO::ResultSetManager;
+# ABSTRACT: scheduled for deletion in 09000
 use strict;
 use warnings;
 use base 'DBIO';
@@ -11,10 +12,6 @@ migrate any and all code using it to explicit resultset classes using either
 __PACKAGE__->resultset_class(...) calls or by switching from using
 DBIO::Schema->load_classes() to load_namespaces() and creating
 appropriate My::Schema::ResultSet::* classes for it to pick up.";
-
-=head1 NAME
-
-DBIO::ResultSetManager - scheduled for deletion in 09000
 
 =head1 DESCRIPTION
 

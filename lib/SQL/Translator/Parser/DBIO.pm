@@ -1,4 +1,5 @@
 package SQL::Translator::Parser::DBIO;
+# ABSTRACT: Create a SQL::Translator schema from a DBIO::Schema instance
 
 # AUTHOR: Jess Robinson
 
@@ -434,11 +435,6 @@ sub _resolve_deps {
 }
 
 1;
-
-=head1 NAME
-
-SQL::Translator::Parser::DBIO - Create a SQL::Translator schema
-from a DBIO::Schema instance
 
 =head1 SYNOPSIS
 

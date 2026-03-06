@@ -1,13 +1,10 @@
 package DBIO::Storage::DBI::Firebird::Common;
+# ABSTRACT: Driver Base Class for the Firebird RDBMS
 
 use strict;
 use warnings;
 use base qw/DBIO::Storage::DBI/;
 use mro 'c3';
-
-=head1 NAME
-
-DBIO::Storage::DBI::Firebird::Common - Driver Base Class for the Firebird RDBMS
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,5 @@
 package DBIO::Row;
+# ABSTRACT: Basic row methods
 
 use strict;
 use warnings;
@@ -24,10 +25,6 @@ BEGIN {
 use namespace::clean;
 
 __PACKAGE__->mk_group_accessors ( simple => [ in_storage => '_in_storage' ] );
-
-=head1 NAME
-
-DBIO::Row - Basic row methods
 
 =head1 SYNOPSIS
 

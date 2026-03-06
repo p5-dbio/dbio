@@ -1,7 +1,5 @@
-=head1 NAME
-
-DBIO::Manual::Joining - Manual on joining tables with DBIO
-
+# PODNAME: DBIO::Manual::Joining
+# ABSTRACT: Manual on joining tables with DBIO
 =head1 DESCRIPTION
 
 This document should help you to use L<DBIO> if you are trying

@@ -1,7 +1,5 @@
-=head1 NAME
-
-DBIO::Manual::Glossary - Clarification of terms used.
-
+# PODNAME: DBIO::Manual::Glossary
+# ABSTRACT: Clarification of terms used.
 =head1 INTRODUCTION
 
 This document lists various terms used in DBIO and attempts to

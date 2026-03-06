@@ -1,11 +1,8 @@
 package DBIO::ResultClass::HashRefInflator;
+# ABSTRACT: Get raw hashrefs from a resultset
 
 use strict;
 use warnings;
-
-=head1 NAME
-
-DBIO::ResultClass::HashRefInflator - Get raw hashrefs from a resultset
 
 =head1 SYNOPSIS
 

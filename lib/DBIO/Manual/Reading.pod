@@ -1,7 +1,5 @@
-
-=head1 NAME
-
-DBIO::Manual::Reading - How to read and write DBIO POD.
+# PODNAME: DBIO::Manual::Reading
+# ABSTRACT: How to read and write DBIO POD.
 
 =head1 DESCRIPTION
 

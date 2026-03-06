@@ -1,12 +1,9 @@
 package DBIO::Storage::DBI::Replicated::Balancer::First;
+# ABSTRACT: Just get the First Balancer
 
 use Moose;
 with 'DBIO::Storage::DBI::Replicated::Balancer';
 use namespace::clean -except => 'meta';
-
-=head1 NAME
-
-DBIO::Storage::DBI::Replicated::Balancer::First - Just get the First Balancer
 
 =head1 SYNOPSIS
 

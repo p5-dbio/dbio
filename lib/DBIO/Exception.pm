@@ -1,4 +1,5 @@
 package DBIO::Exception;
+# ABSTRACT: Exception objects for DBIO
 
 use strict;
 use warnings;
@@ -13,10 +14,6 @@ use DBIO::Carp ();
 use overload
     '""' => sub { shift->{msg} },
     fallback => 1;
-
-=head1 NAME
-
-DBIO::Exception - Exception objects for DBIO
 
 =head1 DESCRIPTION
 

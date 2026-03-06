@@ -1,4 +1,5 @@
 package DBIO::SQLMaker::OracleJoins;
+# ABSTRACT: Pre-ANSI Joins-via-Where-Clause Syntax
 
 use warnings;
 use strict;
@@ -117,10 +118,6 @@ sub _recurse_oracle_joins {
 1;
 
 __END__
-
-=head1 NAME
-
-DBIO::SQLMaker::OracleJoins - Pre-ANSI Joins-via-Where-Clause Syntax
 
 =head1 PURPOSE
 
