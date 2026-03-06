@@ -85,6 +85,18 @@ my $rdbms_ase = {
 my $rdbms_db2 = {
   'DBD::DB2'                      => '0',
 };
+my $rdbms_informix = {
+  'DBD::Informix'                 => '0',
+};
+my $rdbms_firebird = {
+  'DBD::Firebird'                 => '0',
+};
+my $rdbms_firebird_interbase = {
+  'DBD::InterBase'                => '0',
+};
+my $rdbms_firebird_odbc = {
+  'DBD::ODBC'                     => '0',
+};
 my $reqs = {
   replicated => {
     req => $replicated,
@@ -310,6 +322,46 @@ my $reqs = {
     },
   },
 
+  rdbms_informix => {
+    req => {
+      %$rdbms_informix,
+    },
+    pod => {
+      title => 'Informix support',
+      desc => 'Modules required to connect to Informix',
+    },
+  },
+
+  rdbms_firebird => {
+    req => {
+      %$rdbms_firebird,
+    },
+    pod => {
+      title => 'Firebird support',
+      desc => 'Modules required to connect to Firebird',
+    },
+  },
+
+  rdbms_firebird_interbase => {
+    req => {
+      %$rdbms_firebird_interbase,
+    },
+    pod => {
+      title => 'Firebird support via DBD::InterBase',
+      desc => 'Modules required to connect to Firebird via DBD::InterBase',
+    },
+  },
+
+  rdbms_firebird_odbc => {
+    req => {
+      %$rdbms_firebird_odbc,
+    },
+    pod => {
+      title => 'Firebird support via DBD::ODBC',
+      desc => 'Modules required to connect to Firebird via DBD::ODBC',
+    },
+  },
+
 # the order does matter because the rdbms support group might require
 # a different version that the test group
   test_rdbms_pg => {
@@ -375,6 +427,42 @@ my $reqs = {
       $ENV{DBICTEST_DB2_DSN}
         ? (
           %$rdbms_db2,
+        ) : ()
+    },
+  },
+
+  test_rdbms_informix => {
+    req => {
+      $ENV{DBICTEST_INFORMIX_DSN}
+        ? (
+          %$rdbms_informix,
+        ) : ()
+    },
+  },
+
+  test_rdbms_firebird => {
+    req => {
+      $ENV{DBICTEST_FIREBIRD_DSN}
+        ? (
+          %$rdbms_firebird,
+        ) : ()
+    },
+  },
+
+  test_rdbms_firebird_interbase => {
+    req => {
+      $ENV{DBICTEST_FIREBIRD_INTERBASE_DSN}
+        ? (
+          %$rdbms_firebird_interbase,
+        ) : ()
+    },
+  },
+
+  test_rdbms_firebird_odbc => {
+    req => {
+      $ENV{DBICTEST_FIREBIRD_ODBC_DSN}
+        ? (
+          %$rdbms_firebird_odbc,
         ) : ()
     },
   },
