@@ -24,7 +24,8 @@ DBICTest::Kubernetes - Provision temporary database pods in Kubernetes for DBIO 
     $k8s->setup_port_forwards;
     my %env = $k8s->env_vars;
     local @ENV{keys %env} = values %env;
-    system('prove', '-l', 't/72pg.t');
+    # PostgreSQL tests moved to dbio-postgresql distribution
+    system('prove', '-l', 't/');
 
     $k8s->cleanup;
 

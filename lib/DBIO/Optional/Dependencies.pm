@@ -225,7 +225,6 @@ my $reqs = {
   test_dt_mysql => {
     req => {
       %$datetime_basic,
-      # t/inflate/datetime_mysql.t
       # (doesn't need Mysql itself)
       'DateTime::Format::MySQL'   => '0',
     },
@@ -234,7 +233,6 @@ my $reqs = {
   test_dt_pg => {
     req => {
       %$datetime_basic,
-      # t/inflate/datetime_pg.t
       # (doesn't need PG itself)
       'DateTime::Format::Pg'      => '0.16004',
     },

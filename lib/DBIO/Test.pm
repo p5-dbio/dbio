@@ -124,7 +124,36 @@ sub init_schema {
     );
     # Re-bless storage to our fake one
     require DBIO::Test::Storage;
-    my $storage = DBIO::Test::Storage->new($schema);
+
+    my $storage_class = 'DBIO::Test::Storage';
+
+    if (my $st = $args{storage_type}) {
+      # Create a dynamic subclass that combines fake execution
+      # (from DBIO::Test::Storage) with SQL generation behavior
+      # (from the requested storage type)
+      (my $st_file = "$st.pm") =~ s|::|/|g;
+      require $st_file;
+
+      $storage_class = "DBIO::Test::Storage::_hybrid_::${st}";
+      if (!$storage_class->isa('DBIO::Test::Storage')) {
+        no strict 'refs';
+        @{"${storage_class}::ISA"} = ('DBIO::Test::Storage', $st);
+        mro::set_mro($storage_class, 'c3');
+        # Copy class data from the requested storage type
+        for my $attr (qw(sql_limit_dialect sql_quote_char sql_name_sep datetime_parser_type)) {
+          my $val = $st->$attr;
+          $storage_class->$attr($val) if defined $val;
+        }
+      }
+    }
+
+    my $storage = $storage_class->new($schema);
+    # If the requested storage type sets sql_quote_char, propagate it
+    # to the sql_maker_opts so the sql_maker picks it up
+    if (my $qc = $storage_class->sql_quote_char) {
+      $storage->{_sql_maker_opts}{quote_char} = $qc;
+      $storage->{_sql_maker_opts}{name_sep} = $storage_class->sql_name_sep || '.';
+    }
     $schema->storage($storage);
   }
 
