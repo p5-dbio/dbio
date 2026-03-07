@@ -1,0 +1,203 @@
+package DBIO::Test::Schema;
+# ABSTRACT: Standard test schema for the DBIO ecosystem
+
+use strict;
+use warnings;
+no warnings 'qw';
+
+use base 'DBIO::Schema';
+
+=head1 DESCRIPTION
+
+A test schema with a standard set of Result classes (Artist, CD, Track,
+etc.) used across the DBIO test suite and by driver distributions.
+
+All Result classes live under C<DBIO::Test::Schema::*>.
+
+=head1 SYNOPSIS
+
+  use DBIO::Test::Schema;
+
+  my $schema = DBIO::Test::Schema->connect(@connect_info);
+  my $rs = $schema->resultset('Artist');
+
+=cut
+
+__PACKAGE__->mk_group_accessors(simple => 'custom_attr');
+
+__PACKAGE__->load_classes(qw/
+  Artist
+  SequenceTest
+  BindType
+  Employee
+  CD
+  Genre
+  Bookmark
+  Link
+  #dummy
+  Track
+  Tag
+  Year2000CDs
+  Year1999CDs
+  CustomSql
+  Money
+  TimestampPrimaryKey
+  /,
+  { 'DBIO::Test::Schema' => [qw/
+    LinerNotes
+    Artwork
+    Artwork_to_Artist
+    Image
+    Lyrics
+    LyricVersion
+    OneKey
+    #dummy
+    TwoKeys
+    Serialized
+  /]},
+  (
+    'FourKeys',
+    'FourKeys_to_TwoKeys',
+    '#dummy',
+    'SelfRef',
+    'ArtistUndirectedMap',
+    'ArtistSourceName',
+    'ArtistSubclass',
+    'Producer',
+    'CD_to_Producer',
+    'Dummy',    # this is a real result class we remove in the hook below
+  ),
+  qw/SelfRefAlias TreeLike TwoKeyTreeLike Event EventTZ NoPrimaryKey/,
+  qw/Collection CollectionObject TypedObject Owners BooksInLibrary/,
+  qw/ForceForeign Encoded/,
+);
+
+sub sqlt_deploy_hook {
+  my ($self, $sqlt_schema) = @_;
+
+  $sqlt_schema->drop_table('dummy');
+}
+
+=method capture_executed_sql_bind
+
+  my $sqlbinds = $schema->capture_executed_sql_bind(sub {
+    $schema->resultset('Artist')->all;
+  });
+
+Runs the coderef with SQL tracing enabled and returns an arrayref of
+C<[$op, [$sql, @bind]]> tuples.
+
+=cut
+
+sub capture_executed_sql_bind {
+  my ($self, $cref) = @_;
+
+  $self->throw_exception("Expecting a coderef to run") unless ref $cref eq 'CODE';
+
+  require DBIO::Test::SQLTracerObj;
+
+  # hack around API to get raw bind values
+  no warnings 'redefine';
+  local *DBIO::Storage::DBI::_format_for_trace = sub { $_[1] };
+  Class::C3->reinitialize if DBIO::_ENV_::OLD_MRO;
+
+  local $self->storage->{debugcb};
+  local $self->storage->{debugobj} = my $tracer_obj = DBIO::Test::SQLTracerObj->new;
+  local $self->storage->{debug} = 1;
+
+  local $Test::Builder::Level = $Test::Builder::Level + 2;
+  $cref->();
+
+  return $tracer_obj->{sqlbinds} || [];
+}
+
+=method is_executed_querycount
+
+  $schema->is_executed_querycount(sub { ... }, $expected_count, $msg);
+  $schema->is_executed_querycount(sub { ... }, { SELECT => 1, INSERT => 2 }, $msg);
+
+Runs the coderef and asserts the number of queries executed.
+
+=cut
+
+sub is_executed_querycount {
+  my ($self, $cref, $exp_counts, $msg) = @_;
+
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  $self->throw_exception("Expecting an hashref of counts or an integer representing total query count")
+    unless ref $exp_counts eq 'HASH' or (defined $exp_counts and ! ref $exp_counts);
+
+  my @got = map { $_->[0] } @{ $self->capture_executed_sql_bind($cref) };
+
+  return Test::More::is( scalar @got, $exp_counts, $msg )
+    unless ref $exp_counts;
+
+  my $got_counts = { map { $_ => 0 } keys %$exp_counts };
+  $got_counts->{$_}++ for @got;
+
+  return Test::More::is_deeply(
+    $got_counts,
+    $exp_counts,
+    $msg,
+  );
+}
+
+=method is_executed_sql_bind
+
+  $schema->is_executed_sql_bind(
+    sub { $rs->all },
+    [[ 'SELECT me.* FROM artist me', [] ]],
+    'correct SQL generated',
+  );
+
+Runs the coderef and asserts the generated SQL matches expectations.
+
+=cut
+
+sub is_executed_sql_bind {
+  my ($self, $cref, $sqlbinds, $msg) = @_;
+
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  $self->throw_exception("Expecting an arrayref of SQL/Bind pairs") unless ref $sqlbinds eq 'ARRAY';
+
+  my @expected = @$sqlbinds;
+
+  my @got = map { $_->[1] } @{ $self->capture_executed_sql_bind($cref) };
+
+  return Test::Builder->new->ok(1, $msg || "No queries executed while running $cref")
+    if !@got and !@expected;
+
+  require SQL::Abstract::Test;
+  my $ret = 1;
+  while (@expected or @got) {
+    my $left = shift @got;
+    my $right = shift @expected;
+
+    if ($left and $right) {
+      $left = [ @$left ];
+      for my $i (1..$#$right) {
+        if (
+          ! ref $right->[$i]
+            and
+          ref $left->[$i] eq 'ARRAY'
+            and
+          @{$left->[$i]} == 2
+        ) {
+          $left->[$i] = $left->[$i][1]
+        }
+      }
+    }
+
+    $ret &= SQL::Abstract::Test::is_same_sql_bind(
+      \( $left || [] ),
+      \( $right || [] ),
+      $msg,
+    );
+  }
+
+  return $ret;
+}
+
+1;
