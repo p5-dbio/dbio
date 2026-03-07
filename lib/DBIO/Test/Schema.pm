@@ -27,7 +27,6 @@ __PACKAGE__->mk_group_accessors(simple => 'custom_attr');
 
 __PACKAGE__->load_classes(qw/
   Artist
-  SequenceTest
   BindType
   Employee
   CD
@@ -40,7 +39,6 @@ __PACKAGE__->load_classes(qw/
   Year2000CDs
   Year1999CDs
   CustomSql
-  Money
   TimestampPrimaryKey
   /,
   { 'DBIO::Test::Schema' => [qw/
@@ -67,7 +65,7 @@ __PACKAGE__->load_classes(qw/
     'CD_to_Producer',
     'Dummy',    # this is a real result class we remove in the hook below
   ),
-  qw/SelfRefAlias TreeLike TwoKeyTreeLike Event EventTZ NoPrimaryKey/,
+  qw/SelfRefAlias TreeLike TwoKeyTreeLike Event NoPrimaryKey/,
   qw/Collection CollectionObject TypedObject Owners BooksInLibrary/,
   qw/ForceForeign Encoded/,
 );
