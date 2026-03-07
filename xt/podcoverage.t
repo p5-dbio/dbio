@@ -144,7 +144,6 @@ my $exceptions = {
 # internals
     'DBIO::_Util'                            => { skip => 1 },
     'DBIO::SQLMaker*'                        => { skip => 1 },
-    'DBIO::SQLAHacks*'                       => { skip => 1 },
     'DBIO::Storage::DBI*'                    => { skip => 1 },
     'SQL::Translator::*'                            => { skip => 1 },
 
