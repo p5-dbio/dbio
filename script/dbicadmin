@@ -1,4 +1,6 @@
 #!/usr/bin/env perl
+# PODNAME: dbicadmin
+# ABSTRACT: CLI for DBIO schema administration
 
 use strict;
 use warnings;
