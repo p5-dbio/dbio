@@ -139,8 +139,7 @@ sub connect_call_datetime_setup {
 }
 
 
-package # hide from PAUSE
-  DBIO::Storage::DBI::Sybase::Microsoft_SQL_Server::DateTime::Format;
+package DBIO::Storage::DBI::Sybase::Microsoft_SQL_Server::DateTime::Format;
 
 my $datetime_parse_format  = '%Y-%m-%dT%H:%M:%S.%3NZ';
 my $datetime_format_format = '%Y-%m-%d %H:%M:%S.%3N'; # %F %T

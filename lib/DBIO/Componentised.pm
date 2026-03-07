@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Componentised;
+package DBIO::Componentised;
 
 use strict;
 use warnings;

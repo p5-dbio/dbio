@@ -1,5 +1,4 @@
-package # Hide from PAUSE
-  DBIO::SQLMaker::MSSQL;
+package DBIO::SQLMaker::MSSQL;
 
 use warnings;
 use strict;

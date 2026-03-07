@@ -1,5 +1,4 @@
-package # hide from PAUSE
-  DBIO::Storage::DBI::Replicated::Types;
+package DBIO::Storage::DBI::Replicated::Types;
 
 # DBIO::Storage::DBI::Replicated::Types - Types used internally by
 # L<DBIO::Storage::DBI::Replicated>

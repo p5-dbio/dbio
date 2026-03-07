@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Relationship::CascadeActions;
+package DBIO::Relationship::CascadeActions;
 
 use strict;
 use warnings;

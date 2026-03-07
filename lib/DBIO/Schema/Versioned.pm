@@ -1,5 +1,4 @@
-package # Hide from PAUSE
-  DBIO::Version::Table;
+package DBIO::Version::Table;
 use base 'DBIO::Core';
 use strict;
 use warnings;
@@ -28,8 +27,7 @@ __PACKAGE__->add_columns
       );
 __PACKAGE__->set_primary_key('version');
 
-package # Hide from PAUSE
-  DBIO::Version::TableCompat;
+package DBIO::Version::TableCompat;
 use base 'DBIO::Core';
 __PACKAGE__->table('SchemaVersions');
 
@@ -43,16 +41,14 @@ __PACKAGE__->add_columns
       );
 __PACKAGE__->set_primary_key('Version');
 
-package # Hide from PAUSE
-  DBIO::Version;
+package DBIO::Version;
 use base 'DBIO::Schema';
 use strict;
 use warnings;
 
 __PACKAGE__->register_class('Table', 'DBIO::Version::Table');
 
-package # Hide from PAUSE
-  DBIO::VersionCompat;
+package DBIO::VersionCompat;
 use base 'DBIO::Schema';
 use strict;
 use warnings;

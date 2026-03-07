@@ -1,5 +1,4 @@
-package     # hide from PAUSE
-    DBIO::Admin::Usage;
+package DBIO::Admin::Usage;
 
 use warnings;
 use strict;

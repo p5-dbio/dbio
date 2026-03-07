@@ -1,5 +1,4 @@
-package # Hide from PAUSE
-  DBIO::SQLMaker::SQLite;
+package DBIO::SQLMaker::SQLite;
 
 use warnings;
 use strict;

@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Admin::Types;
+package DBIO::Admin::Types;
 
 # Workaround for https://rt.cpan.org/Public/Bug/Display.html?id=83336
 use warnings;

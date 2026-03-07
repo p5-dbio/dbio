@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Relationship::ManyToMany;
+package DBIO::Relationship::ManyToMany;
 
 use strict;
 use warnings;

@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Relationship::HasMany;
+package DBIO::Relationship::HasMany;
 
 use strict;
 use warnings;

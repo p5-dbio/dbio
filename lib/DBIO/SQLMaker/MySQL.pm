@@ -1,5 +1,4 @@
-package # Hide from PAUSE
-  DBIO::SQLMaker::MySQL;
+package DBIO::SQLMaker::MySQL;
 
 use warnings;
 use strict;

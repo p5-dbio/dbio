@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::ResultSourceProxy;
+package DBIO::ResultSourceProxy;
 
 use strict;
 use warnings;

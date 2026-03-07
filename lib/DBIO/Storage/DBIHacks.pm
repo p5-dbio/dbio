@@ -1,5 +1,4 @@
-package   #hide from PAUSE
-  DBIO::Storage::DBIHacks;
+package DBIO::Storage::DBIHacks;
 
 #
 # This module contains code supporting a battery of special cases and tests for

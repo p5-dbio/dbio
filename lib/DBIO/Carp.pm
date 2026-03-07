@@ -1,5 +1,4 @@
-package # hide from pause
-  DBIO::Carp;
+package DBIO::Carp;
 
 use strict;
 use warnings;

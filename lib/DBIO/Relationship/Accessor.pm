@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Relationship::Accessor;
+package DBIO::Relationship::Accessor;
 
 use strict;
 use warnings;

@@ -930,8 +930,7 @@ sub _exec_svp_rollback {
   $self->_dbh->do("ROLLBACK TRANSACTION $name");
 }
 
-package # hide from PAUSE
-  DBIO::Storage::DBI::Sybase::ASE::DateTime::Format;
+package DBIO::Storage::DBI::Sybase::ASE::DateTime::Format;
 
 my $datetime_parse_format  = '%Y-%m-%dT%H:%M:%S.%3NZ';
 my $datetime_format_format = '%m/%d/%Y %H:%M:%S.%3N';

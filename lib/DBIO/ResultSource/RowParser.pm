@@ -1,5 +1,4 @@
-package # hide from the pauses
-  DBIO::ResultSource::RowParser;
+package DBIO::ResultSource::RowParser;
 
 use strict;
 use warnings;

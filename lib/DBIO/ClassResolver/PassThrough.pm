@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::ClassResolver::PassThrough;
+package DBIO::ClassResolver::PassThrough;
 
 use strict;
 use warnings;

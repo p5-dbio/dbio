@@ -1,5 +1,4 @@
-package # hide from PAUSE
-  DBIO::Schema::PopulateMore;
+package DBIO::Schema::PopulateMore;
 
 # ABSTRACT: Enhanced populate with cross-source references
 

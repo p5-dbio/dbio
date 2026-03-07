@@ -1,5 +1,4 @@
-package # Hide from PAUSE
-  DBIO::SQLMaker::Oracle;
+package DBIO::SQLMaker::Oracle;
 
 use warnings;
 use strict;

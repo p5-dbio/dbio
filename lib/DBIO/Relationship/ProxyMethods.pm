@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Relationship::ProxyMethods;
+package DBIO::Relationship::ProxyMethods;
 
 use strict;
 use warnings;

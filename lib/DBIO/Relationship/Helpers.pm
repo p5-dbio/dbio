@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Relationship::Helpers;
+package DBIO::Relationship::Helpers;
 
 use strict;
 use warnings;

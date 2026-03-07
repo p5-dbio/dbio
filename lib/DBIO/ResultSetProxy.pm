@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::ResultSetProxy;
+package DBIO::ResultSetProxy;
 
 unless ($INC{"DBIO/DB.pm"}) {
   warn "IMPORTANT: DBIO::ResultSetProxy is DEPRECATED AND *WILL* BE REMOVED. DO NOT USE.\n";

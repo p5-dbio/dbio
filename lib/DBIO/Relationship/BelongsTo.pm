@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Relationship::BelongsTo;
+package DBIO::Relationship::BelongsTo;
 
 # Documentation for these methods can be found in
 # DBIO::Relationship

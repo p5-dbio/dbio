@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Relationship::HasOne;
+package DBIO::Relationship::HasOne;
 
 use strict;
 use warnings;

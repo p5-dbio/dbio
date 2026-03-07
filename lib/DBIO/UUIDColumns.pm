@@ -1,5 +1,4 @@
-package # hide from PAUSE
-  DBIO::UUIDColumns;
+package DBIO::UUIDColumns;
 
 # ABSTRACT: Implicit UUID columns for DBIO
 

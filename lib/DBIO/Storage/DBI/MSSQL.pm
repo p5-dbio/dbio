@@ -230,8 +230,7 @@ sub with_deferred_fk_checks {
     };
 }
 
-package # hide from PAUSE
-  DBIO::Storage::DBI::MSSQL::DateTime::Format;
+package DBIO::Storage::DBI::MSSQL::DateTime::Format;
 
 my $datetime_format      = '%Y-%m-%d %H:%M:%S.%3N'; # %F %T
 my $smalldatetime_format = '%Y-%m-%d %H:%M:%S';

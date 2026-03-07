@@ -111,8 +111,7 @@ SELECT rdb$get_context('SYSTEM', 'ENGINE_VERSION') FROM rdb$database
   });
 }
 
-package # hide from PAUSE
-  DBIO::Storage::DBI::InterBase::DateTime::Format;
+package DBIO::Storage::DBI::InterBase::DateTime::Format;
 
 my $timestamp_format = '%Y-%m-%d %H:%M:%S.%4N'; # %F %T
 my $date_format      = '%Y-%m-%d';

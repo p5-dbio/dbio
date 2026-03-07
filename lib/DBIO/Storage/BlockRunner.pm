@@ -1,5 +1,4 @@
-package # hide from pause until we figure it all out
-  DBIO::Storage::BlockRunner;
+package DBIO::Storage::BlockRunner;
 
 use warnings;
 use strict;

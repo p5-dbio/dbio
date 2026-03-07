@@ -118,8 +118,7 @@ sub connect_call_datetime_setup {
   $ENV{GL_DATETIME} = "%Y-%m-%d %H:%M:%S%F5";
 }
 
-package # hide from PAUSE
-  DBIO::Storage::DBI::Informix::DateTime::Format;
+package DBIO::Storage::DBI::Informix::DateTime::Format;
 
 my $timestamp_format = '%Y-%m-%d %H:%M:%S.%5N'; # %F %T
 my $date_format      = '%m/%d/%Y';
