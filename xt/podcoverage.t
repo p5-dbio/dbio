@@ -130,7 +130,6 @@ my $exceptions = {
     'DBIO::Componentised'                    => { skip => 1 },
     'DBIO::AccessorGroup'                    => { skip => 1 },
     'DBIO::Relationship::*'                  => { skip => 1 },
-    'DBIO::ResultSetProxy'                   => { skip => 1 },
     'DBIO::ResultSourceProxy'                => { skip => 1 },
     'DBIO::ResultSource::*'                  => { skip => 1 },
     'DBIO::Storage::Statistics'              => { skip => 1 },
@@ -149,10 +148,6 @@ my $exceptions = {
 
 # deprecated / backcompat stuff
     'DBIO::Serialize::Storable'              => { skip => 1 },
-    'DBIO::ResultSetManager'                 => { skip => 1 },
-
-# skipped because the synopsis covers it clearly
-    'DBIO::InflateColumn::File'              => { skip => 1 },
 };
 
 my $ex_lookup = {};

@@ -394,8 +394,6 @@ sub fail_on_internal_call {
     $argdesc
       and
     $fr->[0] =~ /^(?:DBIO|DBICx::)/
-      and
-    $fr->[1] !~ /\bResultSetProxy\b/  # no point touching there
   ) {
     DBIO::Exception->throw( sprintf (
       "Illegal internal call of indirect proxy-method %s() with argument %s: examine the last lines of the proxy method deparse below to determine what to call directly instead at %s on line %d\n\n%s\n\n    Stacktrace starts",
