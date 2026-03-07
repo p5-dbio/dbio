@@ -39,7 +39,7 @@ By default, when you start L<DBIO>, your Schema (L<DBIO::Schema>)
 is assigned a storage_type, which when fully connected will reflect your
 underlying storage engine as defined by your chosen database driver.  For
 example, if you connect to a MySQL database, your storage_type will be
-L<DBIO::Storage::DBI::mysql>  Your storage type class will contain
+L<DBIO::MySQL::Storage>  Your storage type class will contain
 database specific code to help smooth over the differences between databases
 and let L<DBIO> do its thing.
 

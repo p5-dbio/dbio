@@ -23,6 +23,6 @@ is(
 my $parser = $schema->storage->datetime_parser();
 
 is($parser, 'DateTime::Format::SQLite', 'Got expected storage-set datetime_parser');
-isa_ok($schema->storage, 'DBIO::Storage::DBI::SQLite', 'storage');
+isa_ok($schema->storage, 'DBIO::SQLite::Storage', 'storage');
 
 done_testing;

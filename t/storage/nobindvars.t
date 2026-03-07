@@ -9,7 +9,7 @@ use DBICTest;
   package DBICTest::SQLite::NoBindVars;
   use base qw(
     DBIO::Storage::DBI::NoBindVars
-    DBIO::Storage::DBI::SQLite
+    DBIO::SQLite::Storage
   );
   use mro 'c3';
 }

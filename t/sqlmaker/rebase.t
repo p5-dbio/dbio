@@ -37,8 +37,8 @@ is_deeply(
   mro::get_linear_isa( ref( $schema->storage->sql_maker ) ),
   [
     qw(
-      DBIO::SQLMaker::SQLite__REBASED_ON__DBICTest::SQLMRebase
-      DBIO::SQLMaker::SQLite
+      DBIO::SQLite::SQLMaker__REBASED_ON__DBICTest::SQLMRebase
+      DBIO::SQLite::SQLMaker
       DBIO::SQLMaker
       DBICTest::SQLMRebase
       DBIO::SQLMaker::ClassicExtensions
@@ -63,7 +63,7 @@ $base_schema->resultset('Artist')->count_rs->as_query;
 
 is(
   ref( $base_schema->storage->sql_maker ),
-  'DBIO::SQLMaker::SQLite',
+  'DBIO::SQLite::SQLMaker',
   'Expected core SQLM object on original schema remains',
 );
 

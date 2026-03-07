@@ -11,31 +11,31 @@ my %expected = (
       # no default quote_char
     {                             name_sep => '.' },
 
-  'DBIO::Storage::DBI::MSSQL'             =>
+  'DBIO::MSSQL::Storage'                  =>
     { quote_char => [ '[', ']' ], name_sep => '.' },
 
-  'DBIO::Storage::DBI::DB2'               =>
+  'DBIO::DB2::Storage'                    =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIO::Storage::DBI::Informix'          =>
+  'DBIO::Informix::Storage'               =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIO::Storage::DBI::InterBase'         =>
+  'DBIO::Firebird::Storage::InterBase'    =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIO::Storage::DBI::mysql'             =>
+  'DBIO::MySQL::Storage'                  =>
     { quote_char => '`',          name_sep => '.' },
 
-  'DBIO::Storage::DBI::Pg'             =>
+  'DBIO::PostgreSQL::Storage'             =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIO::Storage::DBI::Oracle::Generic'   =>
+  'DBIO::Oracle::Storage'                 =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIO::Storage::DBI::SQLite'            =>
+  'DBIO::SQLite::Storage'                 =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIO::Storage::DBI::Sybase::ASE'       =>
+  'DBIO::Sybase::Storage::ASE'            =>
     { quote_char => [ '[', ']' ], name_sep => '.' },
 );
 
@@ -64,16 +64,16 @@ for my $class (keys %expected) { SKIP: {
 # the SQLITE is a fake memory dsn
 local $ENV{DBICTEST_SQLITE_DSN} = 'dbi:SQLite::memory:';
 my %dbs = (
-  SQLITE           => 'DBIO::Storage::DBI::SQLite',
-  ORA              => 'DBIO::Storage::DBI::Oracle::Generic',
-  PG               => 'DBIO::Storage::DBI::Pg',
-  MYSQL            => 'DBIO::Storage::DBI::mysql',
-  DB2              => 'DBIO::Storage::DBI::DB2',
-  SYBASE           => 'DBIO::Storage::DBI::Sybase::ASE',
-  FIREBIRD         => 'DBIO::Storage::DBI::InterBase',
-  FIREBIRD_ODBC    => 'DBIO::Storage::DBI::InterBase',
-  INFORMIX         => 'DBIO::Storage::DBI::Informix',
-  MSSQL_ODBC       => 'DBIO::Storage::DBI::MSSQL',
+  SQLITE           => 'DBIO::SQLite::Storage',
+  ORA              => 'DBIO::Oracle::Storage',
+  PG               => 'DBIO::PostgreSQL::Storage',
+  MYSQL            => 'DBIO::MySQL::Storage',
+  DB2              => 'DBIO::DB2::Storage',
+  SYBASE           => 'DBIO::Sybase::Storage::ASE',
+  FIREBIRD         => 'DBIO::Firebird::Storage::InterBase',
+  FIREBIRD_ODBC    => 'DBIO::Firebird::Storage::InterBase',
+  INFORMIX         => 'DBIO::Informix::Storage',
+  MSSQL_ODBC       => 'DBIO::MSSQL::Storage',
 );
 
 # lie that we already locked stuff - the tests below do not touch anything

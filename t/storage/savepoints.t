@@ -49,11 +49,11 @@ for ('', keys %$env2optdep) { SKIP: {
 
     my $create_sql;
     $schema->storage->ensure_connected;
-    if ($schema->storage->isa('DBIO::Storage::DBI::Pg')) {
+    if ($schema->storage->isa('DBIO::PostgreSQL::Storage')) {
       $create_sql = "CREATE TABLE artist (artistid serial PRIMARY KEY, name VARCHAR(100), rank INTEGER NOT NULL DEFAULT '13', charfield CHAR(10))";
       $schema->storage->dbh->do('SET client_min_messages=WARNING');
     }
-    elsif ($schema->storage->isa('DBIO::Storage::DBI::mysql')) {
+    elsif ($schema->storage->isa('DBIO::MySQL::Storage')) {
       $create_sql = "CREATE TABLE artist (artistid INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), rank INTEGER NOT NULL DEFAULT '13', charfield CHAR(10)) ENGINE=InnoDB";
     }
     else {

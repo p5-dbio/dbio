@@ -300,7 +300,7 @@ my $fail_code = sub {
 
     # this should logically work just fine - but it does not,
     # only direct override of the existing method dtrt
-    #local *DBIO::Storage::DBI::SQLite::txn_rollback = sub { die 'FAILED' };
+    #local *DBIO::SQLite::Storage::txn_rollback = sub { die 'FAILED' };
 
     local *DBIO::Storage::DBI::txn_rollback = sub { die 'FAILED' };
     Class::C3->reinitialize() if DBIO::_ENV_::OLD_MRO;

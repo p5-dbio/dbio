@@ -1283,7 +1283,8 @@ sub _describe_connection {
 }
 
 # Driver registry: maps DBD driver names to DBIO Storage classes.
-# External DBIO::* distributions register themselves here.
+# External DBIO::* distributions register themselves here via
+# register_driver(), or are discovered via the default mapping below.
 my %_driver_registry = (
   Pg        => 'DBIO::PostgreSQL::Storage',
   mysql     => 'DBIO::MySQL::Storage',
@@ -1295,11 +1296,24 @@ my %_driver_registry = (
   InterBase => 'DBIO::Firebird::Storage::InterBase',
   Informix  => 'DBIO::Informix::Storage',
   DB2       => 'DBIO::DB2::Storage',
+  ODBC      => 'DBIO::Storage::DBI::ODBC',
+);
+
+# Connector registry: maps SQL_DBMS_NAME values (via ODBC/ADO) to
+# DBIO Storage classes for secondary driver detection.
+my %_connector_registry = (
+  'Microsoft_SQL_Server' => 'DBIO::MSSQL::Storage::Sybase',
+  'Firebird'             => 'DBIO::Firebird::Storage',
 );
 
 sub register_driver {
   my ($class, $driver_name, $storage_class) = @_;
   $_driver_registry{$driver_name} = $storage_class;
+}
+
+sub register_connector_driver {
+  my ($class, $dbms_name, $storage_class) = @_;
+  $_connector_registry{$dbms_name} = $storage_class;
 }
 
 sub _determine_driver {
@@ -1408,17 +1422,27 @@ sub _determine_connector_driver {
 
   $dbtype =~ s/\W/_/gi;
 
-  my $subclass = "DBIO::Storage::DBI::${conn}::${dbtype}";
-  return if $self->isa($subclass);
+  my $subclass = $_connector_registry{$dbtype};
 
-  if ($self->load_optional_class($subclass)) {
-    bless $self, $subclass;
-    $self->_rebless;
+  if ($subclass) {
+    return if $self->isa($subclass);
+
+    if ($self->load_optional_class($subclass)) {
+      bless $self, $subclass;
+      $self->_rebless;
+    }
+    else {
+      $self->_warn_undetermined_driver(
+        "DBIO driver '$subclass' for $conn/$dbtype could not be loaded. "
+      . "Make sure the corresponding distribution is installed."
+      );
+    }
   }
   else {
     $self->_warn_undetermined_driver(
-      'This version of DBIC does not yet seem to supply a driver for '
-    . "your particular RDBMS and/or connection method ('$conn/$dbtype')."
+      "No DBIO driver registered for connector '$conn/$dbtype'. "
+    . "Install the appropriate DBIO::* distribution for your database, "
+    . "or register via DBIO::Storage::DBI->register_connector_driver."
     );
   }
 }
@@ -2908,7 +2932,7 @@ sub last_insert_id {
 
 This API is B<EXPERIMENTAL>, will almost definitely change in the future, and
 currently only used by L<::AutoCast|DBIO::Storage::DBI::AutoCast> and
-L<::Sybase::ASE|DBIO::Storage::DBI::Sybase::ASE>.
+L<::Sybase::ASE|DBIO::Sybase::Storage::ASE>.
 
 The default implementation returns C<undef>, implement in your Storage driver if
 you need this functionality.

@@ -75,33 +75,33 @@ delete @ENV{qw(DBI_DSN DBI_DRIVER)};
 
 $schema = DBICTest::Schema->connect("dbi:SQLite:$dbname");
 lives_ok { count_sheep($schema) } 'SQLite passed to connect_info';
-isa_ok $schema->storage, 'DBIO::Storage::DBI::SQLite';
+isa_ok $schema->storage, 'DBIO::SQLite::Storage';
 
 $schema = DBICTest::Schema->connect("dbi:SQLite(ReadOnly=1):$dbname");
 lives_ok { count_sheep($schema) } 'SQLite passed to connect_info despite extra arguments present';
-isa_ok $schema->storage, 'DBIO::Storage::DBI::SQLite';
+isa_ok $schema->storage, 'DBIO::SQLite::Storage';
 
 $ENV{DBI_DRIVER} = 'SQLite';
 $schema = DBICTest::Schema->connect("dbi::$dbname");
 lives_ok { count_sheep($schema) } 'SQLite in DBI_DRIVER';
-isa_ok $schema->storage, 'DBIO::Storage::DBI::SQLite';
+isa_ok $schema->storage, 'DBIO::SQLite::Storage';
 
 delete $ENV{DBI_DRIVER};
 $ENV{DBI_DSN} = "dbi:SQLite:$dbname";
 $schema = DBICTest::Schema->connect;
 lives_ok { count_sheep($schema) } 'SQLite in DBI_DSN';
-isa_ok $schema->storage, 'DBIO::Storage::DBI::SQLite';
+isa_ok $schema->storage, 'DBIO::SQLite::Storage';
 
 $ENV{DBI_DRIVER} = 'SQLite';
 $schema = DBICTest::Schema->connect;
 lives_ok { count_sheep($schema) } 'SQLite in DBI_DSN (and DBI_DRIVER)';
-isa_ok $schema->storage, 'DBIO::Storage::DBI::SQLite';
+isa_ok $schema->storage, 'DBIO::SQLite::Storage';
 
 $ENV{DBI_DSN} = "dbi::$dbname";
 $ENV{DBI_DRIVER} = 'SQLite';
 $schema = DBICTest::Schema->connect;
 lives_ok { count_sheep($schema) } 'SQLite in DBI_DRIVER (not DBI_DSN)';
-isa_ok $schema->storage, 'DBIO::Storage::DBI::SQLite';
+isa_ok $schema->storage, 'DBIO::SQLite::Storage';
 
 # make sure that dynamically setting DBI_DSN post-connect works
 {
@@ -117,7 +117,7 @@ isa_ok $schema->storage, 'DBIO::Storage::DBI::SQLite';
   $ENV{DBI_DSN} = 'dbi:SQLite::memory:';
 
   lives_ok { $s->storage->ensure_connected } 'Second connection attempt worked';
-  isa_ok ( $s->storage, 'DBIO::Storage::DBI::SQLite' );
+  isa_ok ( $s->storage, 'DBIO::SQLite::Storage' );
 }
 
 done_testing;

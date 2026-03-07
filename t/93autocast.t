@@ -9,7 +9,7 @@ use DBICTest;
     package DBICTest::SQLite::AutoCast;
     use base qw/
         DBIO::Storage::DBI::AutoCast
-        DBIO::Storage::DBI::SQLite
+        DBIO::SQLite::Storage
     /;
     use mro 'c3';
 

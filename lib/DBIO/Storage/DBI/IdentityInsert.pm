@@ -9,8 +9,8 @@ use mro 'c3';
 =head1 DESCRIPTION
 
 This is a storage component for Sybase ASE
-(L<DBIO::Storage::DBI::Sybase::ASE>) and Microsoft SQL Server
-(L<DBIO::Storage::DBI::MSSQL>) to support identity inserts, that is
+(L<DBIO::Sybase::Storage::ASE>) and Microsoft SQL Server
+(L<DBIO::MSSQL::Storage>) to support identity inserts, that is
 inserts of explicit values into C<IDENTITY> columns.
 
 This is done by wrapping C<INSERT> operations in a pair of table identity
