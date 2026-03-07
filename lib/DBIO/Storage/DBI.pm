@@ -1282,6 +1282,26 @@ sub _describe_connection {
   $res;
 }
 
+# Driver registry: maps DBD driver names to DBIO Storage classes.
+# External DBIO::* distributions register themselves here.
+my %_driver_registry = (
+  Pg        => 'DBIO::PostgreSQL::Storage',
+  mysql     => 'DBIO::MySQL::Storage',
+  MariaDB   => 'DBIO::MySQL::Storage::MariaDB',
+  SQLite    => 'DBIO::SQLite::Storage',
+  Oracle    => 'DBIO::Oracle::Storage',
+  Sybase    => 'DBIO::Sybase::Storage',
+  Firebird  => 'DBIO::Firebird::Storage',
+  InterBase => 'DBIO::Firebird::Storage::InterBase',
+  Informix  => 'DBIO::Informix::Storage',
+  DB2       => 'DBIO::DB2::Storage',
+);
+
+sub register_driver {
+  my ($class, $driver_name, $storage_class) = @_;
+  $_driver_registry{$driver_name} = $storage_class;
+}
+
 sub _determine_driver {
   my ($self) = @_;
 
@@ -1300,23 +1320,30 @@ sub _determine_driver {
       }
 
       if ($driver) {
-        my $storage_class = "DBIO::Storage::DBI::${driver}";
-        if ($self->load_optional_class($storage_class)) {
+        my $storage_class = $_driver_registry{$driver};
+
+        if ($storage_class && $self->load_optional_class($storage_class)) {
           mro::set_mro($storage_class, 'c3');
           bless $self, $storage_class;
           $self->_rebless();
         }
+        elsif ($storage_class) {
+          $self->_warn_undetermined_driver(
+            "DBIO driver '$storage_class' for DBD driver '$driver' could not be loaded. "
+          . "Make sure the corresponding distribution is installed."
+          );
+        }
         else {
           $self->_warn_undetermined_driver(
-            'This version of DBIC does not yet seem to supply a driver for '
-          . "your particular RDBMS and/or connection method ('$driver')."
+            "No DBIO driver registered for DBD driver '$driver'. "
+          . "Install the appropriate DBIO::* distribution for your database, "
+          . "or register a custom driver via DBIO::Storage::DBI->register_driver."
           );
         }
       }
       else {
         $self->_warn_undetermined_driver(
-          'Unable to extract a driver name from connect info - this '
-        . 'should not have happened.'
+          'Unable to extract a driver name from connect info.'
         );
       }
     }
@@ -1324,15 +1351,6 @@ sub _determine_driver {
     $self->_driver_determined(1);
 
     Class::C3->reinitialize() if DBIO::_ENV_::OLD_MRO;
-
-    if ($self->can('source_bind_attributes')) {
-      $self->throw_exception(
-        "Your storage subclass @{[ ref $self ]} provides (or inherits) the method "
-      . 'source_bind_attributes() for which support has been removed as of Jan 2013. '
-      . 'If you are not sure how to proceed please contact the development team via '
-      . DBIO::_ENV_::HELP_URL
-      );
-    }
 
     $self->_init; # run driver-specific initializations
 
