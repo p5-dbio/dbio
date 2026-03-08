@@ -34,16 +34,12 @@ my $replicated = {
 };
 
 my $admin_basic = {
-  %$moose_basic,
-  %$min_json_any,
-  'MooseX::Types::Path::Class'    => '0.05',
-  'MooseX::Types::JSON'           => '0.02',
+  'Config::Any'                   => '0',
+  'JSON::MaybeXS'                 => '0',
 };
 
 my $admin_script = {
-  %$moose_basic,
   %$admin_basic,
-  'Getopt::Long::Descriptive' => '0.081',
   'Text::CSV'                 => '1.16',
 };
 
@@ -131,8 +127,18 @@ my $reqs = {
       %$admin_script,
     },
     pod => {
-      title => 'dbicadmin',
-      desc => 'Modules required for the CLI DBIO interface dbicadmin',
+      title => 'dbioadmin',
+      desc => 'Modules required for the CLI DBIO interface dbioadmin',
+    },
+  },
+
+  encoded_column => {
+    req => {
+      'Crypt::URandom' => '0',
+    },
+    pod => {
+      title => 'EncodedColumn',
+      desc => 'Recommended stronger RNG backend for L<DBIO::EncodedColumn> salt generation',
     },
   },
 
@@ -189,16 +195,10 @@ my $reqs = {
   test_admin_script => {
     req => {
       %$admin_script,
-      %$test_and_dist_json_any,
-      'JSON' => 0,
-      'JSON::PP' => 0,
-      'Cpanel::JSON::XS' => 0,
-      'JSON::XS' => 0,
       $^O eq 'MSWin32'
-        # for t/admin/10script.t
+        # for script invocation argument quoting on Win32
         ? ('Win32::ShellQuote' => 0)
-        # DWIW does not compile (./configure even) on win32
-        : ('JSON::DWIW' => 0 )
+        : ()
       ,
     }
   },
@@ -240,7 +240,7 @@ my $reqs = {
   },
 
   # this is just for completeness as SQLite
-  # is a core dep of DBIC for testing
+  # is a core dep of DBIO for testing
   rdbms_sqlite => {
     req => {
       %$rdbms_sqlite,
@@ -817,11 +817,11 @@ Returns a hashref containing the actual errors that occurred while attempting
 to load each module in the requirement group.
 EOD
     '=head1 FURTHER QUESTIONS?',
-    'Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.',
+    'Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.',
     '=head1 COPYRIGHT AND LICENSE',
     <<'EOL',
 This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+by the L<DBIO authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.
 EOL

@@ -1,0 +1,160 @@
+#!/usr/bin/env perl
+# PODNAME: dbioadmin
+# ABSTRACT: CLI for DBIO schema administration
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config no_ignore_case bundling);
+
+sub usage {
+  my ($exit_code) = @_;
+  $exit_code = 1 unless defined $exit_code;
+
+  print <<'USAGE';
+Usage: dbioadmin [OPTIONS]
+
+Actions (pick one):
+  --create            Create DDL files / diffs
+  --upgrade           Upgrade the database to the current schema
+  --install           Install schema version metadata
+  --deploy            Deploy the schema to the database
+  --select            Select data from a resultset
+  --insert            Insert data into a resultset
+  --update            Update rows in a resultset
+  --delete            Delete rows from a resultset
+  --op=ACTION         Compatibility alias for action flags
+
+Arguments:
+  --schema-class=CLASS  Schema class (required)
+  --schema=CLASS        Alias for --schema-class
+  --connect=JSON        connect_info as JSON, e.g. ["dsn","user","pass",{}]
+  --connect-info        connect_info as key=value pairs (dsn=... user=...)
+  --config=FILE         Config file parsable by Config::Any
+  --config-stanza=PATH  Stanza path for connect_info (e.g. Model::DB)
+  --resultset=CLASS     Resultset to operate on for select/insert/update/delete
+  --class=CLASS         Alias for --resultset
+  --sql-dir=DIR         SQL directory for create/upgrade/deploy
+  --sql-type=TYPE       SQL translator type for create
+  --version=VERSION     Version for install
+  --preversion=VERSION  Previous version for create-diff
+  --mode=MODE           upgrade mode: auto|native|legacy (default: auto)
+  --set=JSON            JSON payload for insert/update
+  --attrs=JSON          JSON attrs hash for search
+  --where=JSON          JSON where hash for search
+  --format=FMT          select output format: tsv|csv (default: tsv)
+  --force               Skip confirmation prompts for destructive actions
+  --trace               Enable DBIO SQL trace output
+  --quiet               Reduce output
+  -I PATH               Prepend PATH to \@INC (repeatable)
+  --help                Show this help
+USAGE
+
+  exit $exit_code;
+}
+
+my %opts;
+my @include_paths;
+
+GetOptions(
+  'create'          => \$opts{create},
+  'upgrade'         => \$opts{upgrade},
+  'install'         => \$opts{install},
+  'deploy'          => \$opts{deploy},
+  'select'          => \$opts{select},
+  'insert'          => \$opts{insert},
+  'update'          => \$opts{update},
+  'delete'          => \$opts{delete},
+  'op=s'            => \$opts{op},
+  'schema-class|schema=s' => \$opts{schema_class},
+  'connect=s'       => \$opts{connect},
+  'connect-info=s%' => \$opts{connect_info_hash},
+  'config|config-file=s' => \$opts{config_file},
+  'config-stanza=s' => \$opts{config_stanza},
+  'resultset|resultset-class|class=s' => \$opts{resultset},
+  'sql-dir=s'       => \$opts{sql_dir},
+  'sql-type=s'      => \$opts{sql_type},
+  'version=s'       => \$opts{version},
+  'preversion=s'    => \$opts{preversion},
+  'mode=s'          => \$opts{mode},
+  'set=s'           => \$opts{set},
+  'attrs=s'         => \$opts{attrs},
+  'where=s'         => \$opts{where},
+  'format=s'        => \$opts{format},
+  'force'           => \$opts{force},
+  'trace'           => \$opts{trace},
+  'quiet'           => \$opts{quiet},
+  'I=s@'            => \@include_paths,
+  'help'            => \$opts{help},
+) or usage(1);
+
+usage(0) if $opts{help};
+
+if (@include_paths) {
+  require lib;
+  lib->import(@include_paths);
+}
+
+require DBIO::Admin;
+
+my $action;
+for my $act (qw(create upgrade install deploy select insert update delete)) {
+  if ($opts{$act}) {
+    die "Multiple actions specified\n" if $action;
+    $action = $act;
+  }
+}
+
+if ($opts{op}) {
+  die "Multiple actions specified\n" if $action;
+  $action = $opts{op};
+}
+
+die "No action specified. Use --help for usage.\n" unless $action;
+die "No --schema-class specified. Use --help for usage.\n" unless $opts{schema_class};
+
+my %admin_args = (schema_class => $opts{schema_class});
+
+if ($opts{connect}) {
+  $admin_args{connect_info} = $opts{connect};
+}
+elsif ($opts{connect_info_hash}) {
+  $admin_args{connect_info} = $opts{connect_info_hash};
+}
+
+for my $key (qw(config_file config_stanza resultset sql_dir sql_type
+                version preversion mode set attrs where force trace quiet)) {
+  $admin_args{$key} = $opts{$key} if defined $opts{$key};
+}
+
+my $admin = DBIO::Admin->new(%admin_args);
+print "Performing action $action...\n" if !$opts{quiet};
+
+my $res = eval { $admin->$action(); };
+if (my $err = $@) {
+  die $err;
+}
+
+if ($action eq 'select') {
+  my $format = lc($opts{format} || 'tsv');
+  die "Invalid --format '$format' (expected tsv|csv)\n"
+    unless $format =~ /\A(?:tsv|csv)\z/;
+
+  if ($format eq 'tsv') {
+    for my $row (@{$res||[]}) {
+      my @vals = map { defined $_ ? $_ : '' } @$row;
+      print join("\t", @vals), "\n";
+    }
+  }
+  else {
+    require Text::CSV;
+    my $csv = Text::CSV->new({ binary => 1 })
+      or die "Failed to create Text::CSV object\n";
+    for my $row (@{$res||[]}) {
+      $csv->combine(map { defined $_ ? $_ : '' } @$row);
+      print $csv->string, "\n";
+    }
+  }
+}
+
+exit 0;

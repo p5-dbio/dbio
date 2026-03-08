@@ -25,6 +25,9 @@ requires 'namespace::clean', '0.24';
 requires 'SQL::Abstract', '2.000001';
 requires 'Try::Tiny', '0.07';
 
+# Recommended for stronger salt generation in DBIO::EncodedColumn.
+recommends 'Crypt::URandom', '0';
+
 on 'test' => sub {
   requires 'File::Temp', '0.22';
   requires 'Test::Deep', '0.101';
