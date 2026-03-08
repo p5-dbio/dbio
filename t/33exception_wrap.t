@@ -9,7 +9,7 @@ my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 throws_ok (sub {
   $schema->txn_do (sub { die 'lol' } );
-}, 'DBIO::Exception', 'a DBIC::Exception object thrown');
+}, 'DBIO::Exception', 'a DBIO::Exception object thrown');
 
 throws_ok (sub {
   $schema->txn_do (sub { die [qw/lol wut/] });

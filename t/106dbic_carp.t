@@ -11,17 +11,17 @@ use DBIO::Test;
 use DBIO::Carp;
 
 {
-  sub DBIOTest::DBICCarp::frobnicate {
-    DBIOTest::DBICCarp::branch1();
-    DBIOTest::DBICCarp::branch2();
+  sub DBIOTest::DBIOCarp::frobnicate {
+    DBIOTest::DBIOCarp::branch1();
+    DBIOTest::DBIOCarp::branch2();
   }
 
-  sub DBIOTest::DBICCarp::branch1 { carp_once 'carp1' }
-  sub DBIOTest::DBICCarp::branch2 { carp_once 'carp2' }
+  sub DBIOTest::DBIOCarp::branch1 { carp_once 'carp1' }
+  sub DBIOTest::DBIOCarp::branch2 { carp_once 'carp2' }
 
 
   warnings_exist {
-    DBIOTest::DBICCarp::frobnicate();
+    DBIOTest::DBIOCarp::frobnicate();
   } [
     qr/carp1/,
     qr/carp2/,
@@ -30,10 +30,10 @@ use DBIO::Carp;
 
 {
   {
-    package DBIOTest::DBICCarp::Exempt;
+    package DBIOTest::DBIOCarp::Exempt;
     use DBIO::Carp;
 
-    sub _skip_namespace_frames { qr/^DBIOTest::DBICCarp::Exempt/ }
+    sub _skip_namespace_frames { qr/^DBIOTest::DBIOCarp::Exempt/ }
 
     sub thrower {
       sub {
@@ -65,14 +65,14 @@ use DBIO::Carp;
   }
 
   # the __LINE__ relationship below is important - do not reformat
-  throws_ok { DBIOTest::DBICCarp::Exempt::dcaller() }
-    qr/\QDBIOTest::DBICCarp::Exempt::thrower(): time to die at @{[ __FILE__ ]} line @{[ __LINE__ - 1 ]}\E$/,
+  throws_ok { DBIOTest::DBIOCarp::Exempt::dcaller() }
+    qr/\QDBIOTest::DBIOCarp::Exempt::thrower(): time to die at @{[ __FILE__ ]} line @{[ __LINE__ - 1 ]}\E$/,
     'Expected exception callsite and originator'
   ;
 
   # the __LINE__ relationship below is important - do not reformat
-  warnings_like { DBIOTest::DBICCarp::Exempt::wcaller() }
-    qr/\QDBIOTest::DBICCarp::Exempt::warner(): time to warn at @{[ __FILE__ ]} line @{[ __LINE__ - 1 ]}\E$/,
+  warnings_like { DBIOTest::DBIOCarp::Exempt::wcaller() }
+    qr/\QDBIOTest::DBIOCarp::Exempt::warner(): time to warn at @{[ __FILE__ ]} line @{[ __LINE__ - 1 ]}\E$/,
   ;
 }
 

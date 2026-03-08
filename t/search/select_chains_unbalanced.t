@@ -105,7 +105,7 @@ while (@chain) {
   is_deeply(
     $rs->_resolved_attrs->{as},
     $as,
-    "Correct dbic-side aliasing for test $testno",
+    "Correct dbio-side aliasing for test $testno",
   );
 
   $testno++;

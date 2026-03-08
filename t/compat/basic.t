@@ -73,13 +73,13 @@ ok(!DBIO->isa('DBIx::Class::Core'), 'DBIO->isa(DBIx::Class::Core) is false (DBIO
 # Test: MRO includes DBIO::Core's hierarchy
 {
   require mro;
-  my @dbic_mro = @{mro::get_linear_isa('DBIO::Core')};
+  my @dbio_mro = @{mro::get_linear_isa('DBIO::Core')};
   my @dbix_mro = @{mro::get_linear_isa('DBIx::Class::Core')};
   ok(scalar @dbix_mro > 1, 'DBIx::Class::Core has a non-trivial MRO');
   is($dbix_mro[0], 'DBIx::Class::Core', 'MRO starts with DBIx::Class::Core');
   is($dbix_mro[1], 'DBIO::Core', 'MRO second entry is DBIO::Core');
   # The rest should match DBIO::Core's MRO (minus DBIO::Core itself)
-  is_deeply([@dbix_mro[1..$#dbix_mro]], \@dbic_mro,
+  is_deeply([@dbix_mro[1..$#dbix_mro]], \@dbio_mro,
     'DBIx::Class::Core MRO tail matches full DBIO::Core MRO');
 }
 
