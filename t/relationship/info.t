@@ -2,14 +2,13 @@ use strict;
 use warnings;
 
 use Test::More;
-use lib qw(t/lib);
-use DBICTest;
+use DBIO::Test;
 
 #
 # The test must be performed on non-registered result classes
 #
 {
-  package DBICTest::Thing;
+  package DBIO::Test::Thing;
   use warnings;
   use strict;
   use base qw/DBIO::Core/;
@@ -19,29 +18,29 @@ use DBICTest;
   __PACKAGE__->has_many(children => __PACKAGE__, 'id');
   __PACKAGE__->belongs_to(parent => __PACKAGE__, 'id', { join_type => 'left' } );
 
-  __PACKAGE__->has_many(subthings => 'DBICTest::SubThing', 'thing_id');
+  __PACKAGE__->has_many(subthings => 'DBIO::Test::SubThing', 'thing_id');
 }
 
 {
-  package DBICTest::SubThing;
+  package DBIO::Test::SubThing;
   use warnings;
   use strict;
   use base qw/DBIO::Core/;
   __PACKAGE__->table('subthing');
   __PACKAGE__->add_columns(qw/thing_id/);
-  __PACKAGE__->belongs_to(thing => 'DBICTest::Thing', 'thing_id');
-  __PACKAGE__->belongs_to(thing2 => 'DBICTest::Thing', 'thing_id', { join_type => 'left' } );
+  __PACKAGE__->belongs_to(thing => 'DBIO::Test::Thing', 'thing_id');
+  __PACKAGE__->belongs_to(thing2 => 'DBIO::Test::Thing', 'thing_id', { join_type => 'left' } );
 }
 
-my $schema = DBICTest->init_schema;
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 for my $without_schema (1,0) {
 
   my ($t, $s) = $without_schema
-    ? (qw/DBICTest::Thing DBICTest::SubThing/)
+    ? (qw/DBIO::Test::Thing DBIO::Test::SubThing/)
     : do {
-      $schema->register_class(relinfo_thing => 'DBICTest::Thing');
-      $schema->register_class(relinfo_subthing => 'DBICTest::SubThing');
+      $schema->register_class(relinfo_thing => 'DBIO::Test::Thing');
+      $schema->register_class(relinfo_subthing => 'DBIO::Test::SubThing');
 
       map { $schema->source ($_) } qw/relinfo_thing relinfo_subthing/;
     }

@@ -4,8 +4,7 @@ use Test::More;
 use Test::Warn;
 use Test::Exception;
 
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 use DBIO::Util 'UNRESOLVABLE_CONDITION';
 
 use Data::Dumper;
@@ -16,7 +15,7 @@ BEGIN {
   }
 }
 
-my $schema = DBICTest->init_schema( no_deploy => 1);
+my $schema = DBIO::Test->init_schema( no_deploy => 1);
 my $sm = $schema->storage->sql_maker;
 
 {

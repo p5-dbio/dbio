@@ -1,35 +1,3 @@
-BEGIN {
-  if ($] < 5.010) {
-
-    # Pre-5.10 perls pollute %INC on unsuccesfull module
-    # require, making it appear as if the module is already
-    # loaded on subsequent require()s
-    # Can't seem to find the exact RT/perldelta entry
-    #
-    # The reason we can't just use a sane, clean loader, is because
-    # if a Module require()s another module the %INC will still
-    # get filled with crap and we are back to square one. A global
-    # fix is really the only way for this test, as we try to load
-    # each available module separately, and have no control (nor
-    # knowledge) over their common dependencies.
-    #
-    # we want to do this here, in the very beginning, before even
-    # warnings/strict are loaded
-
-    unshift @INC, 't/lib';
-    require DBICTest::Util::OverrideRequire;
-
-    DBICTest::Util::OverrideRequire::override_global_require( sub {
-      my $res = eval { $_[0]->() };
-      if ($@ ne '') {
-        delete $INC{$_[1]};
-        die $@;
-      }
-      return $res;
-    } );
-  }
-}
-
 use strict;
 use warnings;
 
@@ -58,15 +26,7 @@ EOS
 
 use Test::More;
 
-use lib 't/lib';
-
-BEGIN {
-  require DBICTest::RunMode;
-  plan( skip_all => "Skipping test on plain module install" )
-    if DBICTest::RunMode->is_plain;
-}
-
-use DBICTest;
+use DBIO::Test;
 use File::Find;
 use File::Spec;
 use B qw/svref_2object/;
@@ -98,6 +58,14 @@ my $skip_idx = { map { $_ => 1 } (
   # utility classes, not part of the inheritance chain
   'DBIO::ResultSource::RowParser::Util',
   'DBIO::Util',
+
+  # test schema classes that use runtime-resolved imported helpers
+  # (check_customcond_args is called via &check_customcond_args)
+  'DBIO::Test::Schema::Artist',
+  'DBIO::Test::Schema::Artwork',
+  'DBIO::Test::Schema::Artwork_to_Artist',
+  'DBIO::Test::Schema::CD',
+  'DBIO::Test::Schema::Track',
 ) };
 
 my $has_moose = eval { require Moose::Util };

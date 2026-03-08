@@ -4,8 +4,7 @@ use Test::More;
 use Test::Exception;
 use Test::Warn;
 
-use lib 't/lib';
-use DBICTest;
+use DBIO::Test;
 
 throws_ok {
   package Foo;

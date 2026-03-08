@@ -4,23 +4,31 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 my $new_rs = $schema->resultset('Artist')->search({
    'artwork_to_artist.artist_id' => 1
 }, {
    join => 'artwork_to_artist'
 });
-lives_ok { $new_rs->count } 'regular search works';
-lives_ok { $new_rs->search({ 'artwork_to_artist.artwork_cd_id' => 1})->count }
-   '... and chaining off that using join works';
-lives_ok { $new_rs->search({ 'artwork_to_artist.artwork_cd_id' => 1})->as_subselect_rs->count }
-   '... and chaining off the virtual view works';
-dies_ok  { $new_rs->as_subselect_rs->search({'artwork_to_artist.artwork_cd_id'=> 1})->count }
-   q{... but chaining off of a virtual view using join doesn't work};
+
+# as_query tests don't need a real DB
+is_same_sql_bind (
+  $new_rs->as_subselect_rs->as_query,
+  '(SELECT me.artistid, me.name, me.rank, me.charfield
+      FROM (
+        SELECT me.artistid, me.name, me.rank, me.charfield
+          FROM artist me
+          LEFT JOIN artwork_to_artist artwork_to_artist ON artwork_to_artist.artist_id = me.artistid
+        WHERE ( artwork_to_artist.artist_id = ? )
+      ) me
+  )',
+  [ [ { dbic_colname => 'artwork_to_artist.artist_id', sqlt_datatype => 'integer' }
+      => 1 ] ],
+  'as_subselect_rs wraps correctly',
+);
 
 my $book_rs = $schema->resultset ('BooksInLibrary')->search ({}, { join => 'owner' });
 

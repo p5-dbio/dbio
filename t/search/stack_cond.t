@@ -2,8 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 use SQL::Abstract::Util qw(is_plain_value is_literal_value);
 use List::Util 'shuffle';
 use Data::Dumper;
@@ -11,7 +10,7 @@ $Data::Dumper::Terse = 1;
 $Data::Dumper::Useqq = 1;
 $Data::Dumper::Indent = 0;
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 for my $c (
   { cond => undef, sql => 'IS NULL' },

@@ -2,11 +2,11 @@ use strict;
 use warnings;
 
 use Test::More;
+plan skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)';
 
-use lib qw(t/lib);
 use List::Util 'min';
 
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
 my ($ROWS, $OFFSET) = (
    DBIO::SQLMaker::ClassicExtensions->__rows_bindtype,

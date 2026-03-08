@@ -2,9 +2,9 @@ use strict;
 use warnings;
 
 use Test::More;
+plan skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)';
 use Test::Deep;
-use lib qw(t/lib);
-use DBICTest;
+use DBIO::Test;
 
 # More tests like this in t/prefetch/manual.t
 

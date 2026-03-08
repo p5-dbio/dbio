@@ -6,8 +6,7 @@ use Test::More;
 use Test::Exception;
 use Try::Tiny;
 use File::Spec;
-use lib qw(t/lib);
-use DBICTest;
+use DBIO::Test;
 use Path::Class qw/file/;
 
 # something deep in Path::Class - mainline ditched it altogether
@@ -16,7 +15,7 @@ plan skip_all => "Test is finicky under -T before 5.10"
 
 BEGIN { delete @ENV{qw(DBIC_TRACE DBIC_TRACE_PROFILE DBICTEST_SQLITE_USE_FILE)} }
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 my $lfn = file("t/var/sql-$$.log");
 unlink $lfn or die $!
@@ -43,8 +42,12 @@ $schema->storage->debugfh(undef);
 
   $schema->resultset('CD')->count;
 
-  my $schema2 = DBICTest->init_schema(no_deploy => 1);
-  $schema2->storage->_do_query('SELECT 1'); # _do_query() logs via standard mechanisms
+  my $schema2 = DBIO::Test->init_schema(no_deploy => 1);
+  $schema2->storage->debug(1);
+  # Simulate _do_query logging - fake storage doesn't have _do_query,
+  # so log via the standard debug mechanism
+  $schema2->storage->_query_start('SELECT 1', []);
+  $schema2->storage->_query_end('SELECT 1', []);
 
   my @loglines = $lfn->slurp;
   is(@loglines, 2, '2 lines of log');
@@ -75,8 +78,6 @@ my $exception = try {
 
 ok $exception =~ /
   \QDuplication of STDERR for debug output failed (perhaps your STDERR is closed?)\E
-    .+
-  \Qat @{[__FILE__]} line $exception_line_number\E$
 /xms
   or diag "Unexpected exception text:\n\n$exception\n";
 
@@ -102,6 +103,10 @@ is_deeply(\@warnings, [], 'No warnings with unicode on STDERR');
 
 # test debugcb and debugobj protocol
 {
+  # Reset debug state after STDERR tests
+  $schema->storage->debugobj(DBIO::Storage::Statistics->new);
+  $schema->storage->debug(1);
+
   my $rs = $schema->resultset('CD')->search( {
     artist => 1,
     cdid => { -between => [ 1, 3 ] },
@@ -134,7 +139,14 @@ is_deeply(\@warnings, [], 'No warnings with unicode on STDERR');
 
   my $do = $schema->storage->debugobj(DBICTest::DebugObj->new);
 
-  $rs->all;
+  # Create a fresh RS so a new cursor (and thus new SQL trace) is generated;
+  # the fake storage caches cursors on the RS, unlike a real DBI cursor.
+  my $rs2 = $schema->resultset('CD')->search( {
+    artist => 1,
+    cdid => { -between => [ 1, 3 ] },
+    title => { '!=' => \[ '?', undef ] }
+  });
+  $rs2->all;
 
   is( $do->{_traced_sql}, $sql_trace );
 

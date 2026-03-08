@@ -2,8 +2,8 @@ use strict;
 use warnings;
 
 use Test::More;
-use lib qw(t/lib);
-use DBICTest;
+plan skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)';
+use DBIO::Test;
 
 plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('test_dt_sqlite')
   unless DBIO::Optional::Dependencies->req_ok_for ('test_dt_sqlite');

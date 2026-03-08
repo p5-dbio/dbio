@@ -2,9 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-BEGIN {
-  plan skip_all => 'Disable test entirely until multicreate is rewritten in terms of subqueries';
-}
+plan skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)';
 
 use Test::Exception;
 use lib qw(t/lib);

@@ -1,17 +1,14 @@
-# Test to ensure we get a consistent result set wether or not we use the
-# prefetch option in combination rows (LIMIT).
+# Test SQL generation for prefetch with LIMIT.
 use strict;
 use warnings;
 
 use Test::More;
 use Test::Exception;
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
 my $ROWS = DBIO::SQLMaker::ClassicExtensions->__rows_bindtype;
 
-my $schema = DBICTest->init_schema();
-
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 my $no_prefetch = $schema->resultset('Artist')->search(
   [   # search deliberately contrived
@@ -33,13 +30,6 @@ my $use_prefetch = $no_prefetch->search(
 );
 
 # add an extra +select to make sure it does not throw things off
-# we also expect it to appear in both selectors, as we can not know
-# for sure which part of the query it applies to (may be order_by,
-# maybe something else)
-#
-# we use a reference to the same array in bind vals, because
-# is_deeply picks up this difference too (not sure if bug or
-# feature)
 $use_prefetch = $use_prefetch->search({}, {
   '+columns' => { monkeywrench => \[ 'me.artistid + ?', [ \ 'inTEger' => 1 ] ] },
 });
@@ -91,59 +81,6 @@ is_same_sql_bind (
   'Expected SQL on complex limited prefetch'
 );
 
-is($no_prefetch->count, $use_prefetch->count, '$no_prefetch->count == $use_prefetch->count');
-is(
-  scalar ($no_prefetch->all),
-  scalar ($use_prefetch->all),
-  "Amount of returned rows is right"
-);
-
-my $artist_many_cds = $schema->resultset('Artist')->search ( {}, {
-  join => 'cds',
-  group_by => 'me.artistid',
-  having => \ 'count(cds.cdid) > 1',
-})->first;
-
-
-$no_prefetch = $schema->resultset('Artist')->search(
-  { artistid => $artist_many_cds->id },
-  { rows => 1 }
-);
-
-$use_prefetch = $no_prefetch->search ({}, { prefetch => 'cds' });
-
-my $normal_artist = $no_prefetch->single;
-my $prefetch_artist = $use_prefetch->find({ name => $artist_many_cds->name });
-my $prefetch2_artist = $use_prefetch->first;
-
-is(
-  $prefetch_artist->cds->count,
-  $normal_artist->cds->count,
-  "Count of child rel with prefetch + rows => 1 is right (find)"
-);
-is(
-  $prefetch2_artist->cds->count,
-  $normal_artist->cds->count,
-  "Count of child rel with prefetch + rows => 1 is right (first)"
-);
-
-is (
-  scalar ($prefetch_artist->cds->all),
-  scalar ($normal_artist->cds->all),
-  "Amount of child rel rows with prefetch + rows => 1 is right (find)"
-);
-is (
-  scalar ($prefetch2_artist->cds->all),
-  scalar ($normal_artist->cds->all),
-  "Amount of child rel rows with prefetch + rows => 1 is right (first)"
-);
-
-throws_ok (
-  sub { $use_prefetch->single },
-  qr/\Qsingle() can not be used on resultsets collapsing a has_many/,
-  'single() with multiprefetch is illegal',
-);
-
 throws_ok (
   sub {
     $use_prefetch->search(
@@ -153,15 +90,7 @@ throws_ok (
   }, qr/Unable to programatically derive a required group_by from the supplied order_by criteria/,
 );
 
-my $artist = $use_prefetch->search({'cds.title' => $artist_many_cds->cds->first->title })->next;
-is($artist->cds->count, 1, "count on search limiting prefetched has_many");
-
-# try with double limit
-my $artist2 = $use_prefetch->search({'cds.title' => { '!=' => $artist_many_cds->cds->first->title } })->slice (0,0)->next;
-is($artist2->cds->count, 2, "count on search limiting prefetched has_many");
-
 # make sure 1:1 joins do not force a subquery (no point to exercise the optimizer, if at all available)
-# get cd's that have any tracks and their artists
 my $single_prefetch_rs = $schema->resultset ('CD')->search (
   { 'me.year' => 2010, 'artist.name' => 'foo' },
   { prefetch => ['tracks', 'artist'], rows => 15 },

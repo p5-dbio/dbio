@@ -1,3 +1,5 @@
+BEGIN { require Test::More; Test::More::plan(skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)') }
+
 # work around brain damage in PPerl (yes, it has to be a global)
 $SIG{__WARN__} = sub {
   warn @_ unless $_[0] =~ /\QUse of "goto" to jump into a construct is deprecated/

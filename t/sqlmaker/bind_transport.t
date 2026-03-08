@@ -5,15 +5,14 @@ use Test::More;
 use Test::Exception;
 use Math::BigInt;
 
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
 my ($ROWS, $OFFSET) = (
    DBIO::SQLMaker::ClassicExtensions->__rows_bindtype,
    DBIO::SQLMaker::ClassicExtensions->__offset_bindtype,
 );
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 my $rs = $schema->resultset('CD')->search({ -and => [
   'me.artist' => { '!=', '666' },
@@ -62,6 +61,7 @@ for (1,2) {
 }
 
 # see if we get anything back at all
+$schema->storage->mock_persistent(qr/SELECT.*FROM cd/i, [[1, 1, 'Title', 2001, 1, undef]]);
 isa_ok ($complex_rs->next, 'DBIO::Row');
 
 # Make sure that the bind shorthand syntax translation is accurate (and doesn't error)

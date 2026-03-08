@@ -3,10 +3,10 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
-use lib qw(t/lib);
-use DBICTest::Schema::Artist;
+use DBIO::Test;
+use DBIO::Test::Schema::Artist;
 
-my $pkg = 'DBICTest::Schema::Artist';
+my $pkg = 'DBIO::Test::Schema::Artist';
 
 for my $call (qw(has_many might_have has_one belongs_to)) {
   {

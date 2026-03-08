@@ -3,13 +3,12 @@ use warnings;
 
 use Test::More;
 
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 use DBIO::Util 'sigwarn_silencer';
 
 my $ROWS = DBIO::SQLMaker::ClassicExtensions->__rows_bindtype;
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 my $art_rs = $schema->resultset('Artist');
 my $cdrs = $schema->resultset('CD');
 

@@ -3,10 +3,9 @@ use warnings;
 
 use Test::More;
 
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 # make sure order + distinct do not double-inject group criteria
 my $rs = $schema->resultset ('CD')->search ({}, {

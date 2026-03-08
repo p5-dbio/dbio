@@ -2,10 +2,9 @@ use strict;
 use warnings;
 
 use Test::More;
+plan skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)';
 
 use lib qw(t/lib);
-
-use DBICTest;
 
 my $schema = DBICTest->init_schema();
 my $cd_rs = $schema->resultset('CD')->search ({}, { rows => 1, order_by => 'cdid' });

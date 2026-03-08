@@ -3,10 +3,9 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
-use lib qw(t/lib);
-use DBICTest;
+use DBIO::Test;
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 # --- columns_info (batch) ---
 {
@@ -53,7 +52,7 @@ my $schema = DBICTest->init_schema();
   # Create a new source for testing remove_columns
   my $test_src = DBIO::ResultSource::Table->new({
     name => 'test_remove',
-    result_class => 'DBICTest::Schema::Artist',
+    result_class => 'DBIO::Test::Schema::Artist',
   });
   $test_src->add_columns(
     id   => { data_type => 'integer' },
@@ -116,7 +115,7 @@ my $schema = DBICTest->init_schema();
 {
   my $test_src = DBIO::ResultSource::Table->new({
     name => 'test_batch_uc',
-    result_class => 'DBICTest::Schema::Artist',
+    result_class => 'DBIO::Test::Schema::Artist',
   });
   $test_src->add_columns(
     id   => { data_type => 'integer' },
@@ -140,7 +139,7 @@ my $schema = DBICTest->init_schema();
 {
   my $test_src = DBIO::ResultSource::Table->new({
     name => 'test_batch_uc2',
-    result_class => 'DBICTest::Schema::Artist',
+    result_class => 'DBIO::Test::Schema::Artist',
   });
   $test_src->add_columns(
     id   => { data_type => 'integer' },

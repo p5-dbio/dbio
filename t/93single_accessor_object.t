@@ -2,9 +2,9 @@ use strict;
 use warnings;
 
 use Test::More;
+plan skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)';
 use Test::Exception;
-use lib qw(t/lib);
-use DBICTest;
+use DBIO::Test;
 
 # Test various uses of passing an object to find, create, and update on a single
 # rel accessor

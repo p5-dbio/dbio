@@ -1,9 +1,13 @@
 use strict;
 use warnings;
 
+use Test::More;
+
+plan skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)';
+
 # !!! do not replace this with done_testing - tests reside in the callbacks
 # !!! number of calls is important
-use Test::More tests => 13;
+#use Test::More tests => 13;
 # !!!
 use Test::Warn;
 use Test::Exception;

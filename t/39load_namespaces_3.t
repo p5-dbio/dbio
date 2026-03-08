@@ -5,7 +5,7 @@ use Test::Exception;
 use Test::Warn;
 
 use lib qw(t/lib);
-use DBICTest; # do not remove even though it is not used
+use DBIO::Test;
 
 lives_ok (sub {
   warnings_exist ( sub {

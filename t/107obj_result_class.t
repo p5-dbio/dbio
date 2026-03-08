@@ -11,10 +11,9 @@ use warnings;
 
 use Test::More tests => 6;
 use Test::Exception;
-use lib qw(t/lib);
-use DBICTest;
+use DBIO::Test;
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 my $source = $schema->source('CD');
 

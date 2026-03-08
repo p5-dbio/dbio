@@ -2,12 +2,17 @@ use strict;
 use warnings;
 
 use Test::More;
+
+plan skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)';
+
 use lib qw(t/lib);
 use DBICTest;
 
 { # Fake storage driver for SQLite + no bind variables
   package DBICTest::SQLite::NoBindVars;
-  use base qw(
+  require DBIO::Storage::DBI::NoBindVars;
+  require DBIO::SQLite::Storage;
+  our @ISA = qw(
     DBIO::Storage::DBI::NoBindVars
     DBIO::SQLite::Storage
   );

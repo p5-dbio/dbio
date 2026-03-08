@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 use lib qw(t/lib);
-use DBICTest; # do not remove even though it is not used
+use DBIO::Test;
 
 plan tests => 6;
 

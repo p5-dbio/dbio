@@ -4,8 +4,7 @@ use warnings;
 use Test::More;
 use Test::Warn;
 
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
 # This is legacy stuff from SQL::Absract::Limit
 # Keep it around just in case someone is using it
@@ -22,7 +21,7 @@ use DBICTest ':DiffSQL';
     );
   }
 }
-my $s = DBICTest::Schema->connect (DBICTest->_database);
+my $s = DBIO::Test->init_schema(no_deploy => 1);
 $s->storage->sql_maker_class ('DBICTest::SQLMaker::CustomDialect');
 
 my $rs = $s->resultset ('CD');

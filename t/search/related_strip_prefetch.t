@@ -3,12 +3,11 @@ use warnings;
 
 use Test::More;
 
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
 my $ROWS = DBIO::SQLMaker::ClassicExtensions->__rows_bindtype;
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 my $rs = $schema->resultset('CD')->search (
   { 'tracks.trackid' => { '!=', 666 }},

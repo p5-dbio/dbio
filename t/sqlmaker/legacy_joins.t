@@ -2,8 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 use DBIO::Util 'sigwarn_silencer';
 
 use DBIO::SQLMaker;

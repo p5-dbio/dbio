@@ -3,10 +3,9 @@ use warnings;
 
 use Test::More;
 
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 my $art_rs = $schema->resultset('Artist');
 my $cdrs = $schema->resultset('CD');
 
@@ -63,7 +62,19 @@ my $rscol = $art_rs->get_column( 'charfield' );
     { join => [qw/artist/]}
   );
   my $subsel_rs = $schema->resultset("CD")->search( { cdid => { IN => $rs->get_column('cdid')->as_query } } );
-  is($subsel_rs->count, $rs->count, 'Subselect on PK got the same row count');
+
+  # Just verify the SQL is generated correctly (no real DB)
+  is_same_sql_bind(
+    $subsel_rs->as_query,
+    "(SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
+       FROM cd me
+       WHERE cdid IN (
+         SELECT me.cdid FROM cd me JOIN artist artist ON artist.artistid = me.artist WHERE artist.name = ?
+       )
+    )",
+    [ [{ sqlt_datatype => 'varchar', sqlt_size => 100, dbic_colname => 'artist.name' }
+        => 'Caterwauler McCrae'] ],
+  );
 }
 
 

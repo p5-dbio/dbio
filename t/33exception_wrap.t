@@ -4,10 +4,8 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-use lib qw(t/lib);
-
-use DBICTest;
-my $schema = DBICTest->init_schema;
+use DBIO::Test;
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 throws_ok (sub {
   $schema->txn_do (sub { die 'lol' } );

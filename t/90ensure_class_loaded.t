@@ -2,8 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use lib qw(t/lib);
-use DBICTest;
+use DBIO::Test;
 use DBIO::Util 'sigwarn_silencer';
 use Class::Inspector;
 
@@ -12,19 +11,19 @@ BEGIN {
   sub some_method {}
 }
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 plan tests => 28;
 
 # Test ensure_class_found
 ok( $schema->ensure_class_found('DBIO::Schema'),
     'loaded package DBIO::Schema was found' );
-ok( !Class::Inspector->loaded('DBICTest::FakeComponent'),
-    'DBICTest::FakeComponent not loaded yet' );
-ok( $schema->ensure_class_found('DBICTest::FakeComponent'),
-    'package DBICTest::FakeComponent was found' );
-ok( !Class::Inspector->loaded('DBICTest::FakeComponent'),
-    'DBICTest::FakeComponent not loaded by ensure_class_found()' );
+ok( !Class::Inspector->loaded('DBIO::Test::FakeComponent'),
+    'DBIO::Test::FakeComponent not loaded yet' );
+ok( $schema->ensure_class_found('DBIO::Test::FakeComponent'),
+    'package DBIO::Test::FakeComponent was found' );
+ok( !Class::Inspector->loaded('DBIO::Test::FakeComponent'),
+    'DBIO::Test::FakeComponent not loaded by ensure_class_found()' );
 ok( $schema->ensure_class_found('TestPackage::A'),
     'anonymous package TestPackage::A found' );
 ok( !$schema->ensure_class_found('FAKE::WONT::BE::FOUND'),
@@ -34,12 +33,12 @@ ok( !$schema->ensure_class_found('FAKE::WONT::BE::FOUND'),
 my $retval = eval { $schema->load_optional_class('ANOTHER::FAKE::PACKAGE') };
 ok( !$@, 'load_optional_class on a nonexistent class did not throw' );
 ok( !$retval, 'nonexistent package not loaded' );
-$retval = eval { $schema->load_optional_class('DBICTest::OptionalComponent') };
+$retval = eval { $schema->load_optional_class('DBIO::Test::OptionalComponent') };
 ok( !$@, 'load_optional_class on an existing class did not throw' );
-ok( $retval, 'DBICTest::OptionalComponent loaded' );
-eval { $schema->load_optional_class('DBICTest::ErrorComponent') };
+ok( $retval, 'DBIO::Test::OptionalComponent loaded' );
+eval { $schema->load_optional_class('DBIO::Test::ErrorComponent') };
 like( $@, qr/did not return a true value/,
-      'DBICTest::ErrorComponent threw ok' );
+      'DBIO::Test::ErrorComponent threw ok' );
 
 # Simulate a PAR environment
 {
@@ -92,12 +91,12 @@ ok( !$@, 'ensure_class_loaded detected an anon. class' );
 eval { $schema->ensure_class_loaded('FakePackage::B'); };
 like( $@, qr/Can't locate/,
      'ensure_class_loaded threw exception for nonexistent class' );
-ok( !Class::Inspector->loaded('DBICTest::FakeComponent'),
-   'DBICTest::FakeComponent not loaded yet' );
-eval { $schema->ensure_class_loaded('DBICTest::FakeComponent'); };
+ok( !Class::Inspector->loaded('DBIO::Test::FakeComponent'),
+   'DBIO::Test::FakeComponent not loaded yet' );
+eval { $schema->ensure_class_loaded('DBIO::Test::FakeComponent'); };
 ok( !$@, 'ensure_class_loaded detected an existing but non-loaded class' );
-ok( Class::Inspector->loaded('DBICTest::FakeComponent'),
-   'DBICTest::FakeComponent now loaded' );
+ok( Class::Inspector->loaded('DBIO::Test::FakeComponent'),
+   'DBIO::Test::FakeComponent now loaded' );
 
 {
   # Squash warnings about syntax errors in SytaxErrorComponent.pm
@@ -105,12 +104,12 @@ ok( Class::Inspector->loaded('DBICTest::FakeComponent'),
     qr/String found where operator expected|Missing operator before/
   );
 
-  eval { $schema->ensure_class_loaded('DBICTest::SyntaxErrorComponent1') };
+  eval { $schema->ensure_class_loaded('DBIO::Test::SyntaxErrorComponent1') };
   like( $@, qr/syntax error/,
-        'ensure_class_loaded(DBICTest::SyntaxErrorComponent1) threw ok' );
-  eval { $schema->load_optional_class('DBICTest::SyntaxErrorComponent2') };
+        'ensure_class_loaded(DBIO::Test::SyntaxErrorComponent1) threw ok' );
+  eval { $schema->load_optional_class('DBIO::Test::SyntaxErrorComponent2') };
   like( $@, qr/syntax error/,
-        'load_optional_class(DBICTest::SyntaxErrorComponent2) threw ok' );
+        'load_optional_class(DBIO::Test::SyntaxErrorComponent2) threw ok' );
 }
 
 
@@ -119,10 +118,10 @@ eval {
 
   use base 'DBIO::ResultSet';
 
-  __PACKAGE__->load_components('+DBICTest::SyntaxErrorComponent3');
+  __PACKAGE__->load_components('+DBIO::Test::SyntaxErrorComponent3');
 };
 
 # Make sure the errors in components of resultset classes are reported right.
-like($@, qr!\Qsyntax error at t/lib/DBICTest/SyntaxErrorComponent3.pm!, "Errors from RS components reported right");
+like($@, qr!syntax error at .*\QDBIO/Test/SyntaxErrorComponent3.pm\E!, "Errors from RS components reported right");
 
 1;

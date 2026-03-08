@@ -2,14 +2,13 @@ use strict;
 use warnings;
 
 use Test::More;
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
-my $schema = DBICTest->init_schema;
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 # based on toplimit.t
-delete $schema->storage->_sql_maker->{_cached_syntax};
-$schema->storage->_sql_maker->limit_dialect ('FetchFirst');
+delete $schema->storage->sql_maker->{_cached_syntax};
+$schema->storage->sql_maker->limit_dialect ('FetchFirst');
 
 my $books_45_and_owners = $schema->resultset ('BooksInLibrary')->search ({}, {
   prefetch => 'owner', rows => 2, offset => 3,
@@ -134,7 +133,8 @@ for my $ord_set (
 
   my $rs = $books_45_and_owners->search ({}, {order_by => $ord_set->{order_by}});
 
-  # query actually works
+  # query actually works (mock count for fake storage)
+  $schema->storage->mock(qr/SELECT COUNT/i, [[1]]);
   ok( defined $rs->count, 'Query actually works' );
 
   is_same_sql_bind(

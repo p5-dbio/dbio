@@ -2,22 +2,21 @@ use strict;
 use warnings;
 use Test::More;
 
-use lib 't/lib';
-use DBICTest;
+use DBIO::Test;
 
 my $warnings;
 eval {
     local $SIG{__WARN__} = sub { $warnings .= shift };
-    package DBICTest::Schema;
+    package DBIO::Test::Schema;
     use base qw/DBIO::Schema/;
     __PACKAGE__->load_classes;
 };
 ok(!$@, 'Loaded all loadable classes') or diag $@;
-like($warnings, qr/Failed to load DBICTest::Schema::NoSuchClass. Can't find source_name method. Is DBICTest::Schema::NoSuchClass really a full DBIC result class?/, 'Warned about broken result class');
+like($warnings, qr/Failed to load DBIO::Test::Schema::NoSuchClass. Can't find source_name method. Is DBIO::Test::Schema::NoSuchClass really a full DBIC result class?/, 'Warned about broken result class');
 
-my $source_a = DBICTest::Schema->source('Artist');
+my $source_a = DBIO::Test::Schema->source('Artist');
 isa_ok($source_a, 'DBIO::ResultSource::Table');
-my $rset_a   = DBICTest::Schema->resultset('Artist');
+my $rset_a   = DBIO::Test::Schema->resultset('Artist');
 isa_ok($rset_a, 'DBIO::ResultSet');
 
 done_testing;

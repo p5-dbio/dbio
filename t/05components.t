@@ -2,12 +2,11 @@ use strict;
 use warnings;
 use Test::More;
 
-use lib qw(t/lib);
-use DBICTest;
-use DBICTest::ForeignComponent;
+use DBIO::Test;
+use DBIO::Test::ForeignComponent;
 
 #   Tests if foreign component was loaded by calling foreign's method
-ok( DBICTest::ForeignComponent->foreign_test_method, 'foreign component' );
+ok( DBIO::Test::ForeignComponent->foreign_test_method, 'foreign component' );
 
 #   Test for inject_base to filter out duplicates
 {   package DBICTest::_InjectBaseTest;

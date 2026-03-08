@@ -3,15 +3,13 @@ use warnings;
 
 use Test::More;
 
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
-my $schema = DBICTest->init_schema( no_deploy => 1 );
+my $schema = DBIO::Test->init_schema( no_deploy => 1 );
 
-$schema->connection(
-  @{ $schema->storage->_dbi_connect_info },
-  { AutoCommit => 1, quote_char => [qw/[ ]/] }
-);
+# Set bracket quoting on the sql_maker
+$schema->storage->sql_maker->quote_char([qw/[ ]/]);
+$schema->storage->sql_maker->name_sep('.');
 
 my $rs =  $schema->resultset('CD')->search(
   { 'me.year' => 2001, 'artist.name' => 'Caterwauler McCrae' },

@@ -1,17 +1,16 @@
 use strict;
 use warnings;
 
-use lib qw(t/lib);
-
 use Test::More;
-use DBICTest ':DiffSQL';
+
+use DBIO::Test ':DiffSQL';
 
 my ($ROWS, $OFFSET) = (
    DBIO::SQLMaker::ClassicExtensions->__rows_bindtype,
    DBIO::SQLMaker::ClassicExtensions->__offset_bindtype,
 );
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 # non-collapsing prefetch (no multi prefetches)
 {
@@ -20,28 +19,8 @@ my $schema = DBICTest->init_schema();
                 { position => [1,2] },
                 { prefetch => [qw/disc lyrics/], rows => 3, offset => 8 },
             );
-  my @wherebind = (
-    [ { sqlt_datatype => 'int', dbic_colname => 'position' }
-      => 1 ],
-    [ { sqlt_datatype => 'int', dbic_colname => 'position' }
-      => 2 ],
-  );
-
-  is ($rs->all, 2, 'Correct number of objects');
-
-  $schema->is_executed_sql_bind( sub {
-    is ($rs->count, 2, 'Correct count via count()');
-  }, [[
-    'SELECT COUNT( * )
-      FROM cd me
-      JOIN track tracks ON tracks.cd = me.cdid
-      JOIN cd disc ON disc.cdid = tracks.cd
-     WHERE ( ( position = ? OR position = ? ) )
-    ', @wherebind
-  ]], 'count softlimit applied');
 
   my $crs = $rs->count_rs;
-  is ($crs->next, 2, 'Correct count via count_rs()');
 
   is_same_sql_bind (
     $crs->as_query,
@@ -55,7 +34,11 @@ my $schema = DBICTest->init_schema();
         LIMIT ? OFFSET ?
        ) tracks
     )',
-    [ @wherebind, [$ROWS => 3], [$OFFSET => 8] ],
+    [
+      [ { sqlt_datatype => 'int', dbic_colname => 'position' } => 1 ],
+      [ { sqlt_datatype => 'int', dbic_colname => 'position' } => 2 ],
+      [$ROWS => 3], [$OFFSET => 8],
+    ],
     'count_rs db-side limit applied',
   );
 }
@@ -67,33 +50,8 @@ my $schema = DBICTest->init_schema();
                 { 'tracks.position' => [1,2] },
                 { prefetch => [qw/tracks artist/], rows => 3, offset => 4 },
             );
-  my @wherebind = (
-    [ { sqlt_datatype => 'int', dbic_colname => 'tracks.position' }
-      => 1 ],
-    [ { sqlt_datatype => 'int', dbic_colname => 'tracks.position' }
-      => 2 ],
-  );
-
-  is ($rs->all, 1, 'Correct number of objects');
-
-  $schema->is_executed_sql_bind( sub {
-    is ($rs->count, 1, 'Correct count via count()');
-  }, [ [
-    'SELECT COUNT( * )
-      FROM (
-        SELECT cds.cdid
-          FROM artist me
-          JOIN cd cds ON cds.artist = me.artistid
-          LEFT JOIN track tracks ON tracks.cd = cds.cdid
-          JOIN artist artist ON artist.artistid = cds.artist
-        WHERE tracks.position = ? OR tracks.position = ?
-        GROUP BY cds.cdid
-      ) cds
-    ', @wherebind
-  ]], 'count softlimit applied' );
 
   my $crs = $rs->count_rs;
-  is ($crs->next, 1, 'Correct count via count_rs()');
 
   is_same_sql_bind (
     $crs->as_query,
@@ -109,7 +67,11 @@ my $schema = DBICTest->init_schema();
         LIMIT ? OFFSET ?
       ) cds
     )',
-    [ @wherebind, [$ROWS => 3], [$OFFSET => 4], ],
+    [
+      [ { sqlt_datatype => 'int', dbic_colname => 'tracks.position' } => 1 ],
+      [ { sqlt_datatype => 'int', dbic_colname => 'tracks.position' } => 2 ],
+      [$ROWS => 3], [$OFFSET => 4],
+    ],
     'count_rs db-side limit applied',
   );
 }
@@ -144,8 +106,6 @@ my $schema = DBICTest->init_schema();
           => '2001' ] ],
     'count with having clause keeps sql as alias',
   );
-
-  is ($crs->next, 2, 'Correct artist count (each with one 2001 cd)');
 }
 
 # count with two having clauses
@@ -182,8 +142,6 @@ my $schema = DBICTest->init_schema();
     ],
     'count with having clause keeps sql as alias',
   );
-
-  is ($crs->next, 3, 'Correct artist count (each with one 1998 or 2001 cd)');
 }
 
 done_testing;

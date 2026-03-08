@@ -2,16 +2,15 @@ use strict;
 use warnings;
 
 use Test::More;
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
-my $schema = DBICTest->init_schema;
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 # Trick the sqlite DB to use Top limit emulation
 # We could test all of this via $sq->$op directly,
 # but some conditions need a $rsrc
-delete $schema->storage->_sql_maker->{_cached_syntax};
-$schema->storage->_sql_maker->limit_dialect ('Top');
+delete $schema->storage->sql_maker->{_cached_syntax};
+$schema->storage->sql_maker->limit_dialect ('Top');
 
 my $books_45_and_owners = $schema->resultset ('BooksInLibrary')->search ({}, {
   prefetch => 'owner', rows => 2, offset => 3,

@@ -2,10 +2,10 @@ use strict;
 use warnings;
 
 use Test::More;
+plan skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)';
 use Test::Warn;
 use Try::Tiny;
-use lib qw(t/lib);
-use DBICTest;
+use DBIO::Test;
 
 # so user's env doesn't screw us
 delete $ENV{DBIC_DT_SEARCH_OK};

@@ -2,11 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Warn;
-use lib qw(t/lib);
-
-use DBICTest;
-my $schema = DBICTest->init_schema();
+BEGIN { plan skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)' }
 
 # select from a class with resultset_attributes
 my $resultset = $schema->resultset('BooksInLibrary');

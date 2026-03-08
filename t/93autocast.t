@@ -1,9 +1,8 @@
 use strict;
 use warnings;
 
-use Test::More;
-use lib qw(t/lib);
-use DBICTest;
+BEGIN { require Test::More; Test::More::plan(skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)') }
+use DBIO::Test;
 
 { # Fake storage driver for sqlite with autocast
     package DBICTest::SQLite::AutoCast;

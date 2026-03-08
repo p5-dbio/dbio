@@ -4,11 +4,9 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Test::Warn;
-use lib qw(t/lib);
-use DBICTest;
+use DBIO::Test;
 
-# Set up the "usual" sqlite for DBICTest
-my $schema = DBICTest->init_schema;
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 # This is how we're generating exceptions in the rest of these tests,
 #  which might need updating at some future time to be some other

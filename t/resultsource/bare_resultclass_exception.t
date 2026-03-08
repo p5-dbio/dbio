@@ -4,14 +4,13 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-use lib 't/lib';
-use DBICTest;
+use DBIO::Test;
 
 {
-  package DBICTest::Foo;
+  package DBIO::Test::Foo;
   use base "DBIO::Core";
 }
 
-throws_ok { DBICTest::Foo->new("urgh") } qr/must be a hashref/;
+throws_ok { DBIO::Test::Foo->new("urgh") } qr/must be a hashref/;
 
 done_testing;

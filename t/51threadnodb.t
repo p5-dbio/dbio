@@ -17,14 +17,10 @@ use warnings;
 use Test::More;
 use DBIO::Util 'sigwarn_silencer';
 
-use lib qw(t/lib);
-use DBICTest;
+use DBIO::Test;
 
-plan skip_all => 'DBIC does not actively support threads before perl 5.8.5'
+plan skip_all => 'DBIO does not actively support threads before perl 5.8.5'
   if $] < '5.008005';
-
-plan skip_all => 'Potential problems on Win32 Perl < 5.14 and Variable::Magic - investigation pending'
-  if $^O eq 'MSWin32' && $] < 5.014 && DBICTest::RunMode->is_plain;
 
 # README: If you set the env var to a number greater than 10,
 #   we will use that many children
@@ -33,8 +29,8 @@ if($num_children !~ /^[0-9]+$/ || $num_children < 10) {
    $num_children = 10;
 }
 
-my $schema = DBICTest->init_schema(no_deploy => 1);
-isa_ok ($schema, 'DBICTest::Schema');
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
+isa_ok ($schema, 'DBIO::Test::Schema');
 
 my @threads;
 SKIP: {
@@ -45,7 +41,7 @@ SKIP: {
     push @threads, threads->create(sub {
       my $rsrc = $schema->source('Artist');
       undef $schema;
-      isa_ok ($rsrc->schema, 'DBICTest::Schema');
+      isa_ok ($rsrc->schema, 'DBIO::Test::Schema');
       my $s2 = $rsrc->schema->clone;
 
       sleep 1;  # without this many tasty crashes

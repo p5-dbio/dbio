@@ -1,7 +1,6 @@
 use strict;
 use warnings;
-use lib qw(t/lib);
-use DBICTest;
+use DBIO::Test;
 use Test::More;
 
 BEGIN {
@@ -13,7 +12,7 @@ BEGIN {
 BEGIN { delete @ENV{qw(DBIC_TRACE_PROFILE)} }
 
 {
-   my $schema = DBICTest->init_schema;
+   my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
    isa_ok($schema->storage->debugobj, 'DBIO::Storage::Statistics');
 }
@@ -21,7 +20,7 @@ BEGIN { delete @ENV{qw(DBIC_TRACE_PROFILE)} }
 {
    local $ENV{DBIC_TRACE_PROFILE} = 'console';
 
-   my $schema = DBICTest->init_schema;
+   my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
    isa_ok($schema->storage->debugobj, 'DBIO::Storage::Debug::PrettyTrace');;
    is($schema->storage->debugobj->_sqlat->indent_string, ' ', 'indent string set correctly from console profile');
@@ -30,7 +29,7 @@ BEGIN { delete @ENV{qw(DBIC_TRACE_PROFILE)} }
 {
    local $ENV{DBIC_TRACE_PROFILE} = './t/lib/awesome.json';
 
-   my $schema = DBICTest->init_schema;
+   my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
    isa_ok($schema->storage->debugobj, 'DBIO::Storage::Debug::PrettyTrace');;
    is($schema->storage->debugobj->_sqlat->indent_string, 'frioux', 'indent string set correctly from file-based profile');

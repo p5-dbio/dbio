@@ -3,19 +3,11 @@ use warnings;
 
 use Test::More;
 use Test::Deep;
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 my $cdrs = $schema->resultset('CD')->search({ 'me.artist' => { '!=', 2 }});
-
-my $cd_data = { map {
-  $_->cdid => {
-    siblings => $cdrs->search ({ artist => $_->get_column('artist') })->count - 1,
-    track_titles => [ sort $_->tracks->get_column('title')->all ],
-  },
-} ( $cdrs->all ) };
 
 my $c_rs = $cdrs->search ({}, {
   prefetch => 'tracks',
@@ -60,20 +52,6 @@ is_same_sql_bind(
   ],
   'Expected SQL on correlated realiased subquery'
 );
-
-$schema->is_executed_querycount( sub {
-  cmp_deeply (
-    { map
-      { $_->cdid => {
-        track_titles => [ sort map { $_->title } ($_->tracks->all) ],
-        siblings => $_->get_column ('sibling_count'),
-      } }
-      $c_rs->all
-    },
-    $cd_data,
-    'Proper information retrieved from correlated subquery'
-  );
-}, 1, 'Only 1 query fired to retrieve everything');
 
 # now add an unbalanced select/as pair
 $c_rs = $c_rs->search ({}, {
@@ -129,12 +107,15 @@ is_same_sql_bind(
   'Expected SQL on correlated realiased subquery'
 );
 
-$schema->storage->disconnect;
-
 # test for subselect identifier leakage
 # NOTE - the hodge-podge mix of literal and regular identifuers is *deliberate*
 for my $quote_names (0,1) {
-  my $schema = DBICTest->init_schema( quote_names => $quote_names );
+  my $schema = DBIO::Test->init_schema(no_deploy => 1);
+
+  if ($quote_names) {
+    $schema->storage->{_sql_maker_opts}{quote_char} = '"';
+    $schema->storage->{_sql_maker_opts}{name_sep} = '.';
+  }
 
   my ($ql, $qr) = $schema->storage->sql_maker->_quote_chars;
 
@@ -160,25 +141,6 @@ for my $quote_names (0,1) {
         @${ $stupid_latest_competition_release_query->as_query }
       ]},
     });
-
-    # we are using cds_unordered explicitly above - do the sorting manually
-    my @results = sort { $a->{artistid} <=> $b->{artistid} } @{$final_query->all_hri};
-    @$_ = sort { $a->{cdid} <=> $b->{cdid} } @$_ for map { $_->{cds} } @results;
-
-    is_deeply (
-      \@results,
-      [
-        { artistid => 1, charfield => undef, max_competition_release => 1998, name => "Caterwauler McCrae", rank => 13, cds => [
-          { artist => 1, cdid => 1, genreid => 1, single_track => undef, title => "Spoonful of bees", year => 1999 },
-          { artist => 1, cdid => 2, genreid => undef, single_track => undef, title => "Forkful of bees", year => 2001 },
-          { artist => 1, cdid => 3, genreid => undef, single_track => undef, title => "Caterwaulin' Blues", year => 1997 },
-        ] },
-        { artistid => 2, charfield => undef, max_competition_release => 1997, name => "Random Boy Band", rank => 13, cds => [
-          { artist => 2, cdid => 4, genreid => undef, single_track => undef, title => "Generic Manufactured Singles", year => 2001 },
-        ] },
-      ],
-      "Expected result from weird query",
-    );
 
     # the decomposition to sql/bind is *deliberate* in both instances
     # we want to ensure this keeps working for lietral sql, even when

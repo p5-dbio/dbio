@@ -1,14 +1,12 @@
 use strict;
 use warnings;
 
-use lib 't/lib';
-use DBICTest::RunMode;
 BEGIN {
-  if( DBICTest::RunMode->is_plain ) {
-    print "1..0 # SKIP not running dangerous segfault-prone test on plain install\n";
-    exit 0;
-  }
+  print "1..0 # SKIP Test requires a real database connection (use DBIO::SQLite test suite)\n";
+  exit 0;
 }
+
+use DBIO::Test;
 
 use File::Temp ();
 use DBIO::Util 'scope_guard';

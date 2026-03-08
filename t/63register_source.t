@@ -2,12 +2,10 @@ use strict;
 use warnings;
 
 use Test::Exception tests => 1;
-use lib qw(t/lib);
-use DBICTest;
-use DBICTest::Schema;
+use DBIO::Test;
 use DBIO::ResultSource::Table;
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 my $foo = DBIO::ResultSource::Table->new({ name => "foo" });
 my $bar = DBIO::ResultSource::Table->new({ name => "bar" });

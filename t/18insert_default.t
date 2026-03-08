@@ -2,8 +2,9 @@ use strict;
 use warnings;
 
 use Test::More;
+plan skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)';
+
 use lib qw(t/lib);
-use DBICTest;
 
 my $schema = DBICTest->init_schema();
 $schema->storage->sql_maker->quote_char('"');

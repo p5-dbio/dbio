@@ -7,8 +7,7 @@ BEGIN { $ENV{DBIC_TRACE} = 0 }
 use Test::More;
 use Test::Warn;
 use Test::Exception;
-use lib 't/lib';
-use DBICTest;
+use DBIO::Test;
 use DBIO::Carp;
 
 {
@@ -38,7 +37,7 @@ use DBIO::Carp;
 
     sub thrower {
       sub {
-        DBICTest->init_schema(no_deploy => 1)->storage->dbh_do(sub {
+        DBIO::Test->init_schema(no_deploy => 1)->storage->dbh_do(sub {
           shift->throw_exception('time to die');
         })
       }->();

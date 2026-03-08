@@ -2,17 +2,16 @@ use strict;
 use warnings;
 
 use Test::More;
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
 my ($LIMIT, $OFFSET) = (
    DBIO::SQLMaker::ClassicExtensions->__rows_bindtype,
    DBIO::SQLMaker::ClassicExtensions->__offset_bindtype,
 );
 
-my $schema = DBICTest->init_schema;
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
-$schema->storage->_sql_maker->limit_dialect ('SkipFirst');
+$schema->storage->sql_maker->limit_dialect ('SkipFirst');
 
 my $rs_selectas_col = $schema->resultset ('BooksInLibrary')->search ({}, {
   '+select' => ['owner.name'],
@@ -37,8 +36,8 @@ is_same_sql_bind(
   ],
 );
 
-$schema->storage->_sql_maker->quote_char ([qw/ [ ] /]);
-$schema->storage->_sql_maker->name_sep ('.');
+$schema->storage->sql_maker->quote_char ([qw/ [ ] /]);
+$schema->storage->sql_maker->name_sep ('.');
 
 my $rs_selectas_rel = $schema->resultset ('BooksInLibrary')->search ({}, {
   '+select' => ['owner.name'],

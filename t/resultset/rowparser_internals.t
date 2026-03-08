@@ -2,9 +2,8 @@ use strict;
 use warnings;
 
 use Test::More;
-use lib qw(t/lib);
-use DBICTest;
 use B::Deparse;
+use DBIO::Test;
 use DBIO::Util 'perlstring';
 
 # globally set for the rest of test
@@ -15,7 +14,7 @@ use DBIO::Util 'perlstring';
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 
-my $schema = DBICTest->init_schema(no_deploy => 1);
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 my $infmap = [qw/
   single_track.cd.artist.name
   year

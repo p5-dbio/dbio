@@ -3,8 +3,7 @@ use warnings;
 use Test::More;
 use Data::Dumper::Concise;
 use Try::Tiny;
-use lib qw(t/lib);
-use DBICTest;
+use DBIO::Test;
 
 my %expected = (
   'DBIO::Storage::DBI'                    =>
@@ -59,12 +58,8 @@ for my $class (keys %expected) { SKIP: {
 }}
 
 # Try quote_names with available DBs.
-
-# Env var to base class mapping, these are the DBs I actually have.
-# the SQLITE is a fake memory dsn
-local $ENV{DBICTEST_SQLITE_DSN} = 'dbi:SQLite::memory:';
+# This section requires real database connections via env vars.
 my %dbs = (
-  SQLITE           => 'DBIO::SQLite::Storage',
   ORA              => 'DBIO::Oracle::Storage',
   PG               => 'DBIO::PostgreSQL::Storage',
   MYSQL            => 'DBIO::MySQL::Storage',
@@ -75,11 +70,6 @@ my %dbs = (
   INFORMIX         => 'DBIO::Informix::Storage',
   MSSQL_ODBC       => 'DBIO::MSSQL::Storage',
 );
-
-# lie that we already locked stuff - the tests below do not touch anything
-# unless we are under travis, where the OOM killers reign and things are rough
-$ENV{DBICTEST_LOCK_HOLDER} = -1
-  unless DBICTest::RunMode->is_ci;
 
 # Make sure oracle is tried last - some clients (e.g. 10.2) have symbol
 # clashes with libssl, and will segfault everything coming after them
@@ -95,7 +85,7 @@ for my $db (sort {
   my $schema;
 
   my $sql_maker = try {
-    $schema = DBICTest::Schema->connect($dsn, $user, $pass, {
+    $schema = DBIO::Test::Schema->connect($dsn, $user, $pass, {
       quote_names => 1
     });
     $schema->storage->ensure_connected;

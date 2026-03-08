@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-use lib qw(t/lib);
-
 use Test::More;
-use DBICTest ':DiffSQL';
+plan skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)';
+
+use lib qw(t/lib);
 
 my $schema = DBICTest->init_schema();
 

@@ -3,8 +3,7 @@ use warnings;
 
 use Test::More;
 
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
 my ($TOTAL, $OFFSET, $ROWS) = (
    DBIO::SQLMaker::ClassicExtensions->__total_bindtype,
@@ -12,14 +11,14 @@ my ($TOTAL, $OFFSET, $ROWS) = (
    DBIO::SQLMaker::ClassicExtensions->__rows_bindtype,
 );
 
-my $s = DBICTest->init_schema (no_deploy => 1, );
+my $s = DBIO::Test->init_schema (no_deploy => 1, );
 $s->storage->sql_maker->limit_dialect ('RowNum');
 
 my $rs = $s->resultset ('CD')->search({ id => 1 });
 
 # important for a test below, never traversed
 $rs->result_source->add_relationship(
-  ends_with_me => 'DBICTest::Schema::Artist', sub {}
+  ends_with_me => 'DBIO::Test::Schema::Artist', sub {}
 );
 
 

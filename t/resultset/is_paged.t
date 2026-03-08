@@ -1,11 +1,11 @@
 use strict;
 use warnings;
 
-use lib qw(t/lib);
 use Test::More;
-use DBICTest;
 
-my $schema = DBICTest->init_schema();
+use DBIO::Test;
+
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 my $tkfks = $schema->resultset('Artist');
 

@@ -2,15 +2,14 @@ use strict;
 use warnings;
 
 use Test::More;
-use lib qw(t/lib);
-use DBICTest;
+use DBIO::Test;
 
-require DBICTest::DynamicForeignCols::TestComputer;
+require DBIO::Test::DynamicForeignCols::TestComputer;
 
 is_deeply (
-  [ DBICTest::DynamicForeignCols::TestComputer->columns ],
+  [ DBIO::Test::DynamicForeignCols::TestComputer->columns ],
   [qw( test_id computer_id )],
-  'All columns properly defined from DBICTest::DynamicForeignCols::Computer parentclass'
+  'All columns properly defined from DBIO::Test::DynamicForeignCols::Computer parentclass'
 );
 
 done_testing;

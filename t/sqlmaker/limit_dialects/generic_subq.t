@@ -2,9 +2,8 @@ use strict;
 use warnings;
 
 use Test::More;
-use lib qw(t/lib);
 use List::Util 'min';
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 my ($ROWS, $TOTAL, $OFFSET) = (
    DBIO::SQLMaker::ClassicExtensions->__rows_bindtype,
    DBIO::SQLMaker::ClassicExtensions->__total_bindtype,
@@ -12,9 +11,9 @@ my ($ROWS, $TOTAL, $OFFSET) = (
 );
 
 
-my $schema = DBICTest->init_schema;
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
-$schema->storage->_sql_maker->limit_dialect ('GenericSubQ');
+$schema->storage->sql_maker->limit_dialect ('GenericSubQ');
 
 my $rs = $schema->resultset ('BooksInLibrary')->search ({}, {
   '+columns' => [{ owner_name => 'owner.name' }],
@@ -49,14 +48,16 @@ is_same_sql_bind(
   ],
 );
 
+# Mock results for get_column calls
+$schema->storage->mock(qr/SELECT.*title/i, [['Best Recipe Cookbook'], ['Dynamical Systems']]);
 is_deeply (
   [ $rs->get_column ('title')->all ],
   ['Best Recipe Cookbook', 'Dynamical Systems'],
   'Correct columns selected with rows',
 );
 
-$schema->storage->_sql_maker->quote_char ('"');
-$schema->storage->_sql_maker->name_sep ('.');
+$schema->storage->sql_maker->quote_char ('"');
+$schema->storage->sql_maker->name_sep ('.');
 
 $rs = $schema->resultset ('BooksInLibrary')->search ({}, {
   order_by => { -desc => 'title' },
@@ -94,6 +95,7 @@ is_same_sql_bind(
   ],
 );
 
+$schema->storage->mock(qr/SELECT.*title/i, [['Dynamical Systems'], ['Best Recipe Cookbook']]);
 is_deeply (
   [ $rs->get_column ('title')->all ],
   [ 'Dynamical Systems', 'Best Recipe Cookbook' ],
@@ -133,6 +135,7 @@ is_same_sql_bind(
   ],
 );
 
+$schema->storage->mock(qr/SELECT.*owner_name/i, [['Newton'], ['Newton']]);
 is_deeply (
   [ $rs->get_column ('owner_name')->all ],
   [ ('Newton') x 2 ],
@@ -145,6 +148,25 @@ $rs = $schema->resultset('CD')->search({}, {
   collapse => 1,
   order_by => [ { -asc => 'me.genreid' }, { -desc => 'year' }, 'me.title', \ 'single_track DESC', { -desc => [qw( me.cdid tracks.position )] } ],
 });
+
+# Mock CD+tracks data for all_hri
+$schema->storage->mock_persistent(qr/SELECT.*FROM.*cd/i, [
+  [2, "Forkful of bees", undef, 2001, 3, "Sticky Honey"],
+  [2, "Forkful of bees", undef, 2001, 2, "Stripy"],
+  [2, "Forkful of bees", undef, 2001, 1, "Stung with Success"],
+  [4, "Generic Manufactured Singles", undef, 2001, 3, "No More Ideas"],
+  [4, "Generic Manufactured Singles", undef, 2001, 2, "Boring Song"],
+  [4, "Generic Manufactured Singles", undef, 2001, 1, "Boring Name"],
+  [5, "Come Be Depressed With Us", undef, 1998, 3, "Suicidal"],
+  [5, "Come Be Depressed With Us", undef, 1998, 2, "Under The Weather"],
+  [5, "Come Be Depressed With Us", undef, 1998, 1, "Sad"],
+  [3, "Caterwaulin' Blues", undef, 1997, 3, "Fowlin"],
+  [3, "Caterwaulin' Blues", undef, 1997, 2, "Howlin"],
+  [3, "Caterwaulin' Blues", undef, 1997, 1, "Yowlin"],
+  [1, "Spoonful of bees", 1, 1999, 3, "Beehind You"],
+  [1, "Spoonful of bees", 1, 1999, 2, "Apiary"],
+  [1, "Spoonful of bees", 1, 1999, 1, "The Bees Knees"],
+]);
 
 my @full_res = @{$rs->all_hri};
 

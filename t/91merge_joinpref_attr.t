@@ -2,11 +2,10 @@ use strict;
 use warnings;
 
 use Test::More;
-use lib qw(t/lib);
-use DBICTest;
-use Test::More;
 
-my $schema = DBICTest->init_schema();
+use DBIO::Test;
+
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 my $rs = $schema->resultset( 'CD' );
 
 {

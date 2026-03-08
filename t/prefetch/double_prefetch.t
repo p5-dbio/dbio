@@ -2,10 +2,9 @@ use warnings;
 use strict;
 
 use Test::More;
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 # While this is a rather GIGO case, make sure it behaves as pre-103,
 # as it may result in hard-to-track bugs

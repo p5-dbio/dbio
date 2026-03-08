@@ -2,11 +2,13 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Exception;
-use lib qw(t/lib);
-use DBICTest;
+use DBIO::Test;
 
-my $schema = DBICTest->init_schema(no_populate => 1);
+my $schema = DBIO::Test->init_schema(no_deploy => 1);
 my $ars    = $schema->resultset('Artist');
+
+# Mock search results so ->first returns a row
+$schema->storage->mock_persistent(qr/SELECT.*FROM artist/i, [[666, 'test', 13]]);
 
 my $rank = \13;
 my $ref1 = \['?', [name => 'foo']];

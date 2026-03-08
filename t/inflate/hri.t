@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+plan skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)';
 
 use DBIO::Util 'modver_gt_or_eq_and_lt';
 use base();
@@ -11,9 +12,8 @@ BEGIN {
 }
 
 use Test::Exception;
-use lib qw(t/lib);
-use DBICTest;
-my $schema = DBICTest->init_schema();
+use DBIO::Test;
+my $schema = DBIO::Test->init_schema();
 
 # Under some versions of SQLite if the $rs is left hanging around it will lock
 # So we create a scope here cos I'm lazy

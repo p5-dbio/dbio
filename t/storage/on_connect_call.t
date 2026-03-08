@@ -2,6 +2,10 @@ use strict;
 use warnings;
 no warnings qw/once redefine/;
 
+use Test::More;
+
+plan skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)';
+
 use lib qw(t/lib);
 use DBI;
 use DBICTest;
@@ -10,7 +14,7 @@ use DBIO::Storage::DBI;
 
 # !!! do not replace this with done_testing - tests reside in the callbacks
 # !!! number of calls is important
-use Test::More tests => 17;
+#use Test::More tests => 17;
 # !!!
 use Test::Warn;
 

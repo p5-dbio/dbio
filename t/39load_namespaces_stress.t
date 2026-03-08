@@ -3,8 +3,7 @@ use warnings;
 use Test::More;
 use Time::HiRes qw/gettimeofday/;
 
-use lib qw(t/lib);
-use DBICTest; # do not remove even though it is not used
+use DBIO::Test;
 
 our $src_count = 100;
 

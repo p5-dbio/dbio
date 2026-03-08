@@ -13,8 +13,7 @@ BEGIN {
     if DBICTest::RunMode->is_smoker;
 }
 
-# globalllock so that the test runs alone
-use DBICTest ':GlobalLock';
+# GlobalLock functionality not available without old DBICTest
 
 use Benchmark;
 

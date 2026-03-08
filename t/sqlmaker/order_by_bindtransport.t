@@ -4,8 +4,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Data::Dumper::Concise;
-use lib qw(t/lib);
-use DBICTest ':DiffSQL';
+use DBIO::Test ':DiffSQL';
 
 sub test_order {
     my $rs = shift;
@@ -93,7 +92,7 @@ my @tests = (
     },
 );
 
-my $rs = DBICTest->init_schema->resultset('FourKeys');
+my $rs = DBIO::Test->init_schema(no_deploy => 1)->resultset('FourKeys');
 test_order($rs, $_) for @tests;
 
 done_testing;

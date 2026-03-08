@@ -1,13 +1,12 @@
 use strict;
 use warnings;
 
-use Test::More;
+BEGIN { require Test::More; Test::More::plan(skip_all => 'Test requires a real database connection (use DBIO::SQLite test suite)') }
 use Test::Warn;
 use Test::Exception;
 use Scalar::Util ();
 
-use lib qw(t/lib);
-use DBICTest;
+use DBIO::Test;
 use DBIO::Util 'sigwarn_silencer';
 
 BEGIN {
