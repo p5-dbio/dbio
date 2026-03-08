@@ -2,8 +2,7 @@ use warnings;
 use strict;
 
 use Test::More;
-use lib qw(t/lib maint/.Generated_Pod/lib);
-use DBICTest;
+use lib qw(maint/.Generated_Pod/lib);
 
 plan skip_all => "Skipping finicky test on older perl"
   if "$]" < 5.008005;
@@ -103,19 +102,6 @@ my $exceptions = {
         /]
     },
 
-    'DBIO::Admin'        => {
-        ignore => [ qw/
-            BUILD
-        /]
-     },
-
-    'DBIO::Storage::DBI::Replicated*'        => {
-        ignore => [ qw/
-            connect_call_do_sql
-            disconnect_call_do_sql
-        /]
-    },
-
     'DBIO::Storage::Debug::PrettyTrace'      => {
         ignore => [ qw/
           print
@@ -124,7 +110,6 @@ my $exceptions = {
         /]
     },
 
-    'DBIO::Admin::*'                         => { skip => 1 },
     'DBIO::Optional::Dependencies'           => { skip => 1 },
     'DBIO::ClassResolver::PassThrough'       => { skip => 1 },
     'DBIO::Componentised'                    => { skip => 1 },
@@ -133,7 +118,6 @@ my $exceptions = {
     'DBIO::ResultSourceProxy'                => { skip => 1 },
     'DBIO::ResultSource::*'                  => { skip => 1 },
     'DBIO::Storage::Statistics'              => { skip => 1 },
-    'DBIO::Storage::DBI::Replicated::Types'  => { skip => 1 },
     'DBIO::GlobalDestruction'                => { skip => 1 },
     'DBIO::Storage::BlockRunner'             => { skip => 1 }, # temporary
 

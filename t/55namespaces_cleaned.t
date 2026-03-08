@@ -86,9 +86,7 @@ for my $mod (@modules) {
   SKIP: {
     skip "$mod exempt from namespace checks",1
       if $skip_idx->{$mod}
-      || $mod =~ /^DBIO::Test::Schema::/
-      # Namespace fixtures include deliberately broken inheritance targets.
-      || $mod =~ /^DBIO::Test::Namespace::/;
+      || $mod =~ /^DBIO::Test::Schema::/;
 
     my %all_method_like = (map
       { %{stash_for($_)->get_all_symbols('CODE')} }

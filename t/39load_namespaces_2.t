@@ -13,7 +13,7 @@ eval {
     package DBIO::Test::Namespace;
     use base qw/DBIO::Schema/;
     __PACKAGE__->load_namespaces(
-        result_namespace => 'Rslt',
+        result_namespace => '+TestDBIO::Broken::Rslt',
         resultset_namespace => 'RSet',
     );
 };

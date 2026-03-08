@@ -18,6 +18,42 @@ database connection you supply.
 External driver distributions (e.g. L<DBIO::PostgreSQL>, L<DBIO::MySQL>)
 should depend on this module for their test suites.
 
+=head1 API CONTRACT
+
+Anything under C<DBIO::Test::*> is intended to be reusable test support for
+driver distributions and plugins.
+
+Intentionally broken fixtures used to trigger edge cases belong under
+C<t/lib/TestDBIO/Broken/*> only, and must not live in installed
+C<DBIO::Test::*> namespaces.
+
+=head1 CORE VS EXTERNAL TESTS
+
+Use C<DBIO::Test> in the core distribution for:
+
+=over 4
+
+=item *
+
+SQL generation and query-shape assertions (offline/fake storage)
+
+=item *
+
+Generic schema/result class behavior that is backend-agnostic
+
+=item *
+
+Shared fixtures used by multiple DBIO ecosystem distributions
+
+=back
+
+Put backend-specific integration tests in the corresponding driver
+distribution (for example C<DBIO-SQLite>, C<DBIO-PostgreSQL>, C<DBIO-MySQL>).
+
+Put admin/CLI-specific tests in C<dbio-admin>.
+
+Put replicated-storage-specific tests in C<dbio-replicated>.
+
 =head1 SYNOPSIS
 
   use DBIO::Test;
@@ -27,13 +63,41 @@ should depend on this module for their test suites.
 
   # With a real database
   my $schema = DBIO::Test->init_schema(
-    dsn  => $ENV{DBIOTEST_PG_DSN},
-    user => $ENV{DBIOTEST_PG_USER},
-    pass => $ENV{DBIOTEST_PG_PASS},
+    dsn  => $ENV{DBIO_TEST_PG_DSN},
+    user => $ENV{DBIO_TEST_PG_USER},
+    pass => $ENV{DBIO_TEST_PG_PASS},
   );
 
   # Only SQL generation tests (no deploy/populate)
   my $schema = DBIO::Test->init_schema(no_deploy => 1);
+
+=cut
+
+=head1 MIGRATING FROM DBICTest
+
+If you still have older tests based on C<DBICTest>, the usual replacements are:
+
+=over 4
+
+=item *
+
+C<use DBICTest;> -> C<use DBIO::Test;>
+
+=item *
+
+C<DBICTest-E<gt>init_schema(...)> -> C<DBIO::Test-E<gt>init_schema(...)>
+
+=item *
+
+C<DBICTest::Schema> -> C<DBIO::Test::Schema>
+
+=item *
+
+C<DBICTest::Util::...> -> C<DBIO::Test::Util::...>
+
+=back
+
+C<:DiffSQL> export support is preserved.
 
 =cut
 

@@ -11,7 +11,7 @@ eval {
     package DBIO::Test::Namespace;
     use base qw/DBIO::Schema/;
     __PACKAGE__->load_namespaces(
-        result_namespace => 'Bogus',
+        result_namespace => '+TestDBIO::Broken::Bogus',
         resultset_namespace => 'RSet',
     );
 };

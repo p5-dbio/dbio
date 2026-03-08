@@ -12,7 +12,7 @@ lives_ok (sub {
       package DBIO::Test::Namespace::Other;
       use base qw/DBIO::Schema/;
       __PACKAGE__->load_namespaces(
-          result_namespace => [ '+DBIO::Test::Namespace::Rslt', '+DBIO::Test::Namespace::OtherRslt' ],
+          result_namespace => [ '+TestDBIO::Broken::Rslt', '+DBIO::Test::Namespace::OtherRslt' ],
           resultset_namespace => '+DBIO::Test::Namespace::RSet',
       );
     },

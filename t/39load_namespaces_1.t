@@ -10,12 +10,14 @@ eval {
     local $SIG{__WARN__} = sub { $warnings .= shift };
     package DBIO::Test::Namespace;
     use base qw/DBIO::Schema/;
-    __PACKAGE__->load_namespaces;
+    __PACKAGE__->load_namespaces(
+      resultset_namespace => [ 'ResultSet', '+TestDBIO::Broken::ResultSet' ],
+    );
 };
 ok(!$@, 'load_namespaces doesnt die') or diag $@;
 like($warnings, qr/load_namespaces found ResultSet class 'DBIO::Test::Namespace::ResultSet::C' with no corresponding Result class/, 'Found warning about extra ResultSet classes');
 
-like($warnings, qr/load_namespaces found ResultSet class 'DBIO::Test::Namespace::ResultSet::D' that does not subclass DBIO::ResultSet/, 'Found warning about ResultSets with incorrect subclass');
+like($warnings, qr/load_namespaces found ResultSet class 'TestDBIO::Broken::ResultSet::D' that does not subclass DBIO::ResultSet/, 'Found warning about ResultSets with incorrect subclass');
 
 my $source_a = DBIO::Test::Namespace->source('A');
 isa_ok($source_a, 'DBIO::ResultSource::Table');
