@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-BEGIN { delete $ENV{DBICTEST_VERSION_WARNS_INDISCRIMINATELY} }
+BEGIN { delete @ENV{qw(DBIO_TEST_VERSION_WARNS_INDISCRIMINATELY DBICTEST_VERSION_WARNS_INDISCRIMINATELY)} }
 
 use DBIO::Util 'sigwarn_silencer';
 use if DBIO::_ENV_::BROKEN_FORK, 'threads';
@@ -10,18 +10,17 @@ use Test::More;
 use File::Find;
 use Time::HiRes 'sleep';
 
-
-use lib 't/lib';
+use lib qw(lib t/lib);
 
 my $worker = sub {
   my $fn = shift;
 
-  if (my @offenders = grep { $_ !~ m{DBIO/(?:_Util|Carp)\.pm} } grep { $_ =~ /(^|\/)DBI/ } keys %INC) {
+  if (my @offenders = grep { $_ !~ m{DBIO/(?:Util|_Util|Carp)\.pm} } grep { $_ =~ /(^|\/)DBI/ } keys %INC) {
     die "Wtf - DBI* modules present in %INC: @offenders";
   }
 
   local $SIG{__WARN__} = sigwarn_silencer( qr/\bdeprecated\b/i );
-  require( ( $fn =~ m| t/lib/ (.+) |x )[0] ); # untaint and strip lib-part (. is unavailable under -T)
+  require( ( $fn =~ m{ (?:t/lib|lib)/ (.+) }x )[0] ); # untaint and strip lib-part (. is unavailable under -T)
 
   return 42;
 };
@@ -56,6 +55,6 @@ find({
   },
 
   no_chdir => 1,
-}, 't/lib/DBICTest/Schema/');
+}, 'lib/DBIO/Test/Schema/');
 
 done_testing;

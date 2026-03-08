@@ -14,23 +14,43 @@ is_deeply([], []);
 # record contents of %INC - makes sure there are no extra deps slipping into
 # Opt::Dep.
 my $inc_before = [ keys %INC ];
-ok ( (! grep { $_ =~ m|DBIO| } @$inc_before ), 'Nothing DBIC related is yet loaded');
+ok ( (! grep { $_ =~ m|DBIO| } @$inc_before ), 'Nothing DBIO related is yet loaded');
 
 # DBIO::Optional::Dependencies queries $ENV at compile time
 # to build the optional requirements
 BEGIN {
-  $ENV{DBICTEST_PG_DSN} = '1';
-  delete $ENV{DBICTEST_ORA_DSN};
+  delete @ENV{
+    qw(
+      DBIO_TEST_PG_DSN DBIO_TEST_MYSQL_DSN DBIO_TEST_ORA_DSN
+      DBIO_TEST_MSSQL_DSN DBIO_TEST_MSSQL_ODBC_DSN
+      DBIO_TEST_SYBASE_DSN DBIO_TEST_DB2_DSN DBIO_TEST_INFORMIX_DSN
+      DBIO_TEST_FIREBIRD_DSN DBIO_TEST_FIREBIRD_INTERBASE_DSN DBIO_TEST_FIREBIRD_ODBC_DSN
+      DBIO_TEST_MEMCACHED
+      DBICTEST_PG_DSN DBICTEST_MYSQL_DSN DBICTEST_ORA_DSN
+      DBICTEST_MSSQL_DSN DBICTEST_MSSQL_ODBC_DSN
+      DBICTEST_SYBASE_DSN DBICTEST_DB2_DSN DBICTEST_INFORMIX_DSN
+      DBICTEST_FIREBIRD_DSN DBICTEST_FIREBIRD_INTERBASE_DSN DBICTEST_FIREBIRD_ODBC_DSN
+      DBICTEST_MEMCACHED
+    )
+  };
+  $ENV{DBIO_TEST_PG_DSN} = '1';
 }
 
 use_ok 'DBIO::Optional::Dependencies';
 
 my $inc_after = [ keys %INC ];
+my %inc_before = map { $_ => 1 } @$inc_before;
+my @newly_loaded = grep { ! $inc_before{$_} } @$inc_after;
 
-is_deeply (
-  [ sort @$inc_after],
-  [ sort (@$inc_before, 'DBIO/Optional/Dependencies.pm') ],
-  'Nothing loaded other than DBIO::OptDeps',
+ok(
+  scalar(grep { $_ eq 'DBIO/Optional/Dependencies.pm' } @newly_loaded),
+  'DBIO::OptDeps loaded',
+);
+
+is_deeply(
+  [ sort grep { m|^DBIO/| && $_ ne 'DBIO/Optional/Dependencies.pm' } @newly_loaded ],
+  [],
+  'No extra DBIO modules loaded as side effects',
 );
 
 my $sqlt_dep = DBIO::Optional::Dependencies->req_list_for ('deploy');

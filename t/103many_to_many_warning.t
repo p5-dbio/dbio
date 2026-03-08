@@ -11,12 +11,12 @@ my $exp_warn = qr/The many-to-many relationship 'bars' is trying to create/;
   local $SIG{__WARN__} = sub { $_[0] =~ $exp_warn ? push @w, $_[0] : warn $_[0] };
   my $code = gen_code ( suffix => 1 );
 
-  local $ENV{DBIC_OVERWRITE_HELPER_METHODS_OK};
+  local $ENV{DBIO_OVERWRITE_HELPER_METHODS_OK};
   eval "$code";
   ok (! $@, 'Eval code without warnings suppression')
     || diag $@;
 
-  ok (@w, "Warning triggered without DBIC_OVERWRITE_HELPER_METHODS_OK");
+  ok (@w, "Warning triggered without DBIO_OVERWRITE_HELPER_METHODS_OK");
 }
 
 {
@@ -25,12 +25,12 @@ my $exp_warn = qr/The many-to-many relationship 'bars' is trying to create/;
 
   my $code = gen_code ( suffix => 2 );
 
-  local $ENV{DBIC_OVERWRITE_HELPER_METHODS_OK} = 1;
+  local $ENV{DBIO_OVERWRITE_HELPER_METHODS_OK} = 1;
   eval "$code";
   ok (! $@, 'Eval code with warnings suppression')
     || diag $@;
 
-  ok (! @w, "No warning triggered with DBIC_OVERWRITE_HELPER_METHODS_OK");
+  ok (! @w, "No warning triggered with DBIO_OVERWRITE_HELPER_METHODS_OK");
 }
 
 sub gen_code {
@@ -44,7 +44,7 @@ use warnings;
 
 {
   package #
-    DBICTest::Schema::Foo${suffix};
+    DBIOTest::Schema::Foo${suffix};
   use base 'DBIO::Core';
 
   __PACKAGE__->table('foo');
@@ -57,12 +57,12 @@ use warnings;
   __PACKAGE__->set_primary_key('fooid');
 
 
-  __PACKAGE__->has_many('foo_to_bar' => 'DBICTest::Schema::FooToBar${suffix}' => 'bar');
+  __PACKAGE__->has_many('foo_to_bar' => 'DBIOTest::Schema::FooToBar${suffix}' => 'bar');
   __PACKAGE__->many_to_many( foos => foo_to_bar => 'bar' );
 }
 {
   package #
-    DBICTest::Schema::FooToBar${suffix};
+    DBIOTest::Schema::FooToBar${suffix};
 
   use base 'DBIO::Core';
   __PACKAGE__->table('foo_to_bar');
@@ -74,12 +74,12 @@ use warnings;
       data_type => 'integer',
     },
   );
-  __PACKAGE__->belongs_to('foo' => 'DBICTest::Schema::Foo${suffix}');
-  __PACKAGE__->belongs_to('bar' => 'DBICTest::Schema::Foo${suffix}');
+  __PACKAGE__->belongs_to('foo' => 'DBIOTest::Schema::Foo${suffix}');
+  __PACKAGE__->belongs_to('bar' => 'DBIOTest::Schema::Foo${suffix}');
 }
 {
   package #
-    DBICTest::Schema::Bar${suffix};
+    DBIOTest::Schema::Bar${suffix};
 
   use base 'DBIO::Core';
 
@@ -92,7 +92,7 @@ use warnings;
   );
 
   __PACKAGE__->set_primary_key('barid');
-  __PACKAGE__->has_many('foo_to_bar' => 'DBICTest::Schema::FooToBar${suffix}' => 'foo');
+  __PACKAGE__->has_many('foo_to_bar' => 'DBIOTest::Schema::FooToBar${suffix}' => 'foo');
 
   __PACKAGE__->many_to_many( bars => foo_to_bar => 'foo' );
 

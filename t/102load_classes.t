@@ -12,7 +12,7 @@ eval {
     __PACKAGE__->load_classes;
 };
 ok(!$@, 'Loaded all loadable classes') or diag $@;
-like($warnings, qr/Failed to load DBIO::Test::Schema::NoSuchClass. Can't find source_name method. Is DBIO::Test::Schema::NoSuchClass really a full DBIC result class?/, 'Warned about broken result class');
+like($warnings, qr/Failed to load DBIO::Test::Schema::NoSuchClass. Can't find source_name method. Is DBIO::Test::Schema::NoSuchClass really a full DBIO result class?/, 'Warned about broken result class');
 
 my $source_a = DBIO::Test::Schema->source('Artist');
 isa_ok($source_a, 'DBIO::ResultSource::Table');

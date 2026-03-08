@@ -40,7 +40,7 @@ Sets or retrieves the filehandle used for trace/debug output.  This should
 be an L<IO::Handle> compatible object (only the
 L<< print|IO::Handle/METHODS >> method is used). By
 default it is initially set to STDERR - although see discussion of the
-L<DBIC_TRACE|DBIO::Storage/DBIC_TRACE> environment variable.
+L<DBIO_TRACE|DBIO::Storage/DBIO_TRACE> environment variable.
 
 Invoked as a getter it will lazily open a filehandle and set it to
 L<< autoflush|perlvar/HANDLE->autoflush( EXPR ) >> (if one is not
@@ -80,7 +80,7 @@ sub _debugfh {
 sub _build_debugfh {
   my $fh;
 
-  my $debug_env = $ENV{DBIX_CLASS_STORAGE_DBI_DEBUG} || $ENV{DBIC_TRACE};
+  my $debug_env = $ENV{DBIX_CLASS_STORAGE_DBI_DEBUG} || $ENV{DBIO_TRACE} || $ENV{DBIC_TRACE};
 
   if (defined($debug_env) and ($debug_env =~ /=(.+)$/)) {
     open ($fh, '>>', $1)

@@ -105,7 +105,7 @@ sub retry_debug {
     return $_[1];
   }
   # lazy default
-  $_[0]->{retry_debug} = $ENV{DBIC_STORAGE_RETRY_DEBUG}
+  $_[0]->{retry_debug} = ($ENV{DBIO_STORAGE_RETRY_DEBUG} || $ENV{DBIC_STORAGE_RETRY_DEBUG})
     unless exists $_[0]->{retry_debug};
   return $_[0]->{retry_debug};
 }

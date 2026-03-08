@@ -1642,12 +1642,12 @@ sub _minimal_valueset_satisfying_constraint {
   if (
     $cols->{undefined}
       and
-    !$ENV{DBIC_NULLABLE_KEY_NOWARN}
+    !($ENV{DBIO_NULLABLE_KEY_NOWARN} || $ENV{DBIC_NULLABLE_KEY_NOWARN})
   ) {
     carp_unique ( sprintf (
       "NULL/undef values supplied for requested unique constraint '%s' (NULL "
     . 'values in column(s): %s). This is almost certainly not what you wanted, '
-    . 'though you can set DBIC_NULLABLE_KEY_NOWARN to disable this warning.',
+    . 'though you can set DBIO_NULLABLE_KEY_NOWARN to disable this warning.',
       $args->{constraint_name},
       join (', ', map { "'$_'" } sort keys %{$cols->{undefined}}),
     ));

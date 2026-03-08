@@ -40,7 +40,7 @@ $schema->is_executed_querycount( sub {
 }, 'liner_notes (might_have) prefetched - do not load liner_notes on update');
 
 warning_like {
-  local $ENV{DBIC_DONT_VALIDATE_RELS};
+  local $ENV{DBIO_DONT_VALIDATE_RELS};
 
   DBIO::Test::Schema::Bookmark->might_have(
     linky => 'DBIO::Test::Schema::Link',
@@ -51,7 +51,7 @@ warning_like {
   'might_have should warn if the self.id column is nullable';
 
 {
-  local $ENV{DBIC_DONT_VALIDATE_RELS} = 1;
+  local $ENV{DBIO_DONT_VALIDATE_RELS} = 1;
   warning_is {
     DBIO::Test::Schema::Bookmark->might_have(
       slinky => 'DBIO::Test::Schema::Link',
@@ -59,7 +59,7 @@ warning_like {
     );
   }
   undef,
-  'Setting DBIC_DONT_VALIDATE_RELS suppresses nullable relation warnings';
+  'Setting DBIO_DONT_VALIDATE_RELS suppresses nullable relation warnings';
 }
 
 done_testing();

@@ -58,7 +58,7 @@ sub new {
 
   $new->set_schema($schema);
   $new->debug(1)
-    if $ENV{DBIX_CLASS_STORAGE_DBI_DEBUG} || $ENV{DBIC_TRACE};
+    if $ENV{DBIX_CLASS_STORAGE_DBI_DEBUG} || $ENV{DBIO_TRACE} || $ENV{DBIC_TRACE};
 
   $new;
 }
@@ -556,7 +556,7 @@ sub debugobj {
   }
 
   $self->{debugobj} ||= do {
-    if (my $profile = $ENV{DBIC_TRACE_PROFILE}) {
+    if (my $profile = ($ENV{DBIO_TRACE_PROFILE} || $ENV{DBIC_TRACE_PROFILE})) {
       require DBIO::Storage::Debug::PrettyTrace;
       my @pp_args;
 
@@ -568,7 +568,7 @@ sub debugobj {
         } catch {
           # sanitize the error message a bit
           $_ =~ s/at \s+ .+ Storage\.pm \s line \s \d+ $//x;
-          $self->throw_exception("Failure processing \$ENV{DBIC_TRACE_PROFILE}: $_");
+          $self->throw_exception("Failure processing \$ENV{DBIO_TRACE_PROFILE} / \$ENV{DBIC_TRACE_PROFILE}: $_");
         };
 
         @pp_args = values %{$cfg->[0]};
@@ -706,9 +706,9 @@ sub columns_info_for { die "Virtual method!" }
 
 =head1 ENVIRONMENT VARIABLES
 
-=head2 DBIC_TRACE
+=head2 DBIO_TRACE
 
-If C<DBIC_TRACE> is set then trace information
+If C<DBIO_TRACE> (or legacy C<DBIC_TRACE>) is set then trace information
 is produced (as when the L</debug> method is set).
 
 If the value is of the form C<1=/path/name> then the trace output is
@@ -719,10 +719,11 @@ created (when you call connect on your schema).  So, run-time changes
 to this environment variable will not take effect unless you also
 re-connect on your schema.
 
-=head2 DBIC_TRACE_PROFILE
+=head2 DBIO_TRACE_PROFILE
 
-If C<DBIC_TRACE_PROFILE> is set, L<DBIO::Storage::Debug::PrettyTrace>
-will be used to format the output from C<DBIC_TRACE>.  The value it
+If C<DBIO_TRACE_PROFILE> (or legacy C<DBIC_TRACE_PROFILE>) is set,
+L<DBIO::Storage::Debug::PrettyTrace> will be used to format the output
+from C<DBIO_TRACE>.  The value it
 is set to is the C<profile> that it will be used.  If the value is a
 filename the file is read with L<Config::Any> and the results are
 used as the configuration for tracing.  See L<SQL::Abstract::Tree/new>
@@ -730,7 +731,7 @@ for what that structure should look like.
 
 =head2 DBIX_CLASS_STORAGE_DBI_DEBUG
 
-Old name for DBIC_TRACE
+Old alias for DBIO_TRACE.
 
 =head1 SEE ALSO
 

@@ -235,7 +235,7 @@ sub _pre_deflate_datetime {
       . " DBIO::InflateColumn::DateTime for an explanation"
       if ref( $dt->time_zone ) eq 'DateTime::TimeZone::Floating'
           and not $info->{floating_tz_ok}
-          and not $ENV{DBIC_FLOATING_TZ_OK};
+          and not ($ENV{DBIO_FLOATING_TZ_OK} || $ENV{DBIC_FLOATING_TZ_OK});
 
     $dt->set_time_zone($info->{timezone});
   }
@@ -285,7 +285,8 @@ to be supply explicit times to the database:
 
 =item Suppress the check globally
 
-Set the environment variable DBIC_FLOATING_TZ_OK to some true value.
+Set the environment variable DBIO_FLOATING_TZ_OK (legacy alias:
+DBIC_FLOATING_TZ_OK) to some true value.
 
 =back
 

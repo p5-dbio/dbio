@@ -2440,7 +2440,7 @@ sub populate {
 ### do the children relationships
   if ( $slices_with_rels ) {
     my @rels = grep { $colinfo->{$_}{is_rel} } keys %$colinfo
-      or die 'wtf... please report a bug with DBIC_TRACE=1 output (stacktrace)';
+      or die 'wtf... please report a bug with DBIO_TRACE=1 output (stacktrace)';
 
     for my $sl (@$slices_with_rels) {
 

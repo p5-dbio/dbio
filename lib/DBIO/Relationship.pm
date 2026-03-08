@@ -444,7 +444,8 @@ you shouldn't do that. The warning will look something like:
   "might_have/has_one" must not be on columns with is_nullable set to true (MySchema::SomeClass/key)
 
 If you must be naughty, you can suppress the warning by setting
-C<DBIC_DONT_VALIDATE_RELS> environment variable to a true value.  Otherwise,
+C<DBIO_DONT_VALIDATE_RELS> (legacy alias: C<DBIC_DONT_VALIDATE_RELS>)
+environment variable to a true value.  Otherwise,
 you probably just meant to use C<DBIO::Relationship/belongs_to>.
 
 =head2 has_one

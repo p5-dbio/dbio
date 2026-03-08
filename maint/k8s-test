@@ -9,7 +9,7 @@ k8s-test - Run DBIO tests against Kubernetes-provisioned databases
 =head1 SYNOPSIS
 
     # Set kubeconfig (or use KUBECONFIG / default ~/.kube/config)
-    export DBICTEST_KUBECONFIG=~/.kube/config
+    export DBIO_TEST_KUBECONFIG=~/.kube/config
 
     # Local mode (default): port-forward, run prove on your machine
     maint/k8s-test                           # run all tests
@@ -18,7 +18,7 @@ k8s-test - Run DBIO tests against Kubernetes-provisioned databases
 
     # In-cluster mode: build image, run as Job inside the cluster
     maint/k8s-test --mode cluster
-    maint/k8s-test --mode cluster --image my-registry/dbic-test:v1
+    maint/k8s-test --mode cluster --image my-registry/dbio-test:v1
 
     # Coverage
     maint/k8s-test --cover                   # run with Devel::Cover
@@ -29,7 +29,7 @@ k8s-test - Run DBIO tests against Kubernetes-provisioned databases
     --keep                  Don't delete namespace after tests
     --cover                 Run with Devel::Cover and generate report
     --namespace NAME        Use specific namespace name
-    --image IMAGE           Docker image for cluster mode (default: dbic-test:latest)
+    --image IMAGE           Docker image for cluster mode (default: dbio-test:latest)
     --db pg,mysql           Which databases to provision (default: pg,mysql)
     --timeout SECS          Readiness timeout in seconds (default: 120)
 
@@ -48,18 +48,18 @@ use Getopt::Long qw(:config pass_through);
 use File::Basename qw(dirname);
 use Cwd qw(abs_path);
 
-# Ensure we can find DBICTest::Kubernetes
-my $dbic_root = abs_path(dirname(dirname(__FILE__)));
-unshift @INC, "$dbic_root/t/lib", "$dbic_root/lib";
+# Ensure we can find DBIO::Test::Kubernetes
+my $dbio_root = abs_path(dirname(dirname(__FILE__)));
+unshift @INC, "$dbio_root/lib";
 
-require DBICTest::Kubernetes;
+require DBIO::Test::Kubernetes;
 
 # Parse our options; anything left over goes to prove
 my $mode      = 'local';
 my $keep      = 0;
 my $cover     = 0;
 my $namespace = undef;
-my $image     = 'dbic-test:latest';
+my $image     = 'dbio-test:latest';
 my $db_list   = 'pg,mysql';
 my $timeout   = 120;
 
@@ -84,7 +84,7 @@ my @databases = split /,/, $db_list;
 # MAIN
 # ============================================================================
 
-my $k8s = DBICTest::Kubernetes->new(
+my $k8s = DBIO::Test::Kubernetes->new(
     ($namespace ? (namespace => $namespace) : ()),
     databases => \@databases,
 );
@@ -159,7 +159,7 @@ sub run_local {
     my @cmd;
     if ($cover) {
         # Use cover -test which wraps prove with Devel::Cover
-        my $cover_db = "$dbic_root/cover_db";
+        my $cover_db = "$dbio_root/cover_db";
         @cmd = ('cover', "-test", "-outputdir", $cover_db, "--");
         push @cmd, '-l';
         if (@$prove_args) {
@@ -202,7 +202,7 @@ sub run_cluster {
 
     # Step 3: Build and load the test image
     print "Building Docker image $image...\n";
-    system('docker', 'build', '-t', $image, $dbic_root) == 0
+    system('docker', 'build', '-t', $image, $dbio_root) == 0
         or die "Docker build failed\n";
 
     # Try to load into local cluster (kind or minikube)

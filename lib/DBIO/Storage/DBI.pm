@@ -632,9 +632,9 @@ sub connect_info {
         'You provided explicit AutoCommit => 0 in your connection_info. '
       . 'This is almost universally a bad idea (see the footnotes of '
       . 'DBIO::Storage::DBI for more info). If you still want to '
-      . 'do this you can set $ENV{DBIC_UNSAFE_AUTOCOMMIT_OK} to disable '
+      . 'do this you can set $ENV{DBIO_UNSAFE_AUTOCOMMIT_OK} to disable '
       . 'this warning.'
-    ) if ! $attrs{AutoCommit} and ! $ENV{DBIC_UNSAFE_AUTOCOMMIT_OK};
+    ) if ! $attrs{AutoCommit} and ! ($ENV{DBIO_UNSAFE_AUTOCOMMIT_OK} || $ENV{DBIC_UNSAFE_AUTOCOMMIT_OK});
 
     push @args, \%attrs if keys %attrs;
   }
@@ -1075,9 +1075,9 @@ sub _run_connection_actions {
   if(
     DBIO::_ENV_::DEVREL
       and
-    $ENV{DBICDEVREL_SWAPOUT_SQLAC_WITH}
+    ($ENV{DBIODEVREL_SWAPOUT_SQLAC_WITH} || $ENV{DBICDEVREL_SWAPOUT_SQLAC_WITH})
       and
-    ( $sqlac_like ) = $ENV{DBICDEVREL_SWAPOUT_SQLAC_WITH} =~ /(.+)/
+    ( $sqlac_like ) = ($ENV{DBIODEVREL_SWAPOUT_SQLAC_WITH} || $ENV{DBICDEVREL_SWAPOUT_SQLAC_WITH}) =~ /(.+)/
       and
     # delay calling ->sql_maker as long as we can
     # ensure_class_loaded returns undef or throws
@@ -1223,10 +1223,10 @@ sub _describe_connection {
   my $res = do {
     local $SIG{__WARN__} = sigwarn_silencer(qr/Argument .+? isn't numeric in subroutine entry/);
     {
-      DBIC_DSN => $self->_dbi_connect_info->[0],
+      DBIO_DSN => $self->_dbi_connect_info->[0],
       DBI_VER => DBI->VERSION,
-      DBIC_VER => DBIO->VERSION,
-      DBIC_DRIVER => ref $self,
+      DBIO_VER => DBIO->VERSION,
+      DBIO_DRIVER => ref $self,
       $drv ? (
         DBD => $drv,
         DBD_VER => try { $drv->VERSION },
@@ -1900,7 +1900,7 @@ sub _gen_sql_bind {
   );
 
   if (
-    ! $ENV{DBIC_DT_SEARCH_OK}
+    ! ($ENV{DBIO_DT_SEARCH_OK} || $ENV{DBIC_DT_SEARCH_OK})
       and
     $op eq 'select'
       and
@@ -1916,7 +1916,7 @@ sub _gen_sql_bind {
       . 'properly (InflateColumn::DateTime formats and settings are not '
       . 'respected.) See ".. format a DateTime object for searching?" in '
       . 'DBIO::Manual::FAQ. To disable this warning for good '
-      . 'set $ENV{DBIC_DT_SEARCH_OK} to true'
+      . 'set $ENV{DBIO_DT_SEARCH_OK} to true'
   }
 
   return( $sql, $bind );

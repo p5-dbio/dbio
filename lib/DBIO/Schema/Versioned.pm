@@ -581,7 +581,9 @@ warns if they are not the same or if the DB is unversioned. It also provides
 compatibility between the old versions table (SchemaVersions) and the new one
 (dbix_class_schema_versions).
 
-To avoid the checks on connect, set the environment var DBIC_NO_VERSION_CHECK or alternatively you can set the ignore_version attr in the forth argument like so:
+To avoid the checks on connect, set the environment var DBIO_NO_VERSION_CHECK
+(legacy alias: DBIC_NO_VERSION_CHECK) or alternatively you can set the
+ignore_version attr in the forth argument like so:
 
   my $schema = MyApp::Schema->connect(
     $dsn,
@@ -620,7 +622,15 @@ sub _on_connect
   my $vtable = $self->{vschema}->resultset('Table');
 
   # useful when connecting from scripts etc
-  return if ($conn_attrs->{ignore_version} || ($ENV{DBIC_NO_VERSION_CHECK} && !exists $conn_attrs->{ignore_version}));
+  return if (
+    $conn_attrs->{ignore_version}
+      ||
+    (
+      ($ENV{DBIO_NO_VERSION_CHECK} || $ENV{DBIC_NO_VERSION_CHECK})
+        &&
+      !exists $conn_attrs->{ignore_version}
+    )
+  );
 
   # check for legacy versions table and move to new if exists
   unless ($self->_source_exists($vtable)) {

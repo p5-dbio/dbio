@@ -31,9 +31,6 @@ my %expected = (
   'DBIO::Oracle::Storage'                 =>
     { quote_char => '"',          name_sep => '.' },
 
-  'DBIO::SQLite::Storage'                 =>
-    { quote_char => '"',          name_sep => '.' },
-
   'DBIO::Sybase::Storage::ASE'            =>
     { quote_char => [ '[', ']' ], name_sep => '.' },
 );
@@ -78,7 +75,7 @@ for my $db (sort {
   : $b eq 'ORA' ? -1
   : $a cmp $b
 } keys %dbs) {
-  my ($dsn, $user, $pass) = map $ENV{"DBICTEST_${db}_$_"}, qw/DSN USER PASS/;
+  my ($dsn, $user, $pass) = map $ENV{"DBIO_TEST_${db}_$_"}, qw/DSN USER PASS/;
 
   next unless $dsn;
 

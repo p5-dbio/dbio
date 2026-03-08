@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 # without this the stacktrace of $schema will be activated
-BEGIN { $ENV{DBIC_TRACE} = 0 }
+BEGIN { $ENV{DBIO_TRACE} = 0 }
 
 use Test::More;
 use Test::Warn;
@@ -11,17 +11,17 @@ use DBIO::Test;
 use DBIO::Carp;
 
 {
-  sub DBICTest::DBICCarp::frobnicate {
-    DBICTest::DBICCarp::branch1();
-    DBICTest::DBICCarp::branch2();
+  sub DBIOTest::DBICCarp::frobnicate {
+    DBIOTest::DBICCarp::branch1();
+    DBIOTest::DBICCarp::branch2();
   }
 
-  sub DBICTest::DBICCarp::branch1 { carp_once 'carp1' }
-  sub DBICTest::DBICCarp::branch2 { carp_once 'carp2' }
+  sub DBIOTest::DBICCarp::branch1 { carp_once 'carp1' }
+  sub DBIOTest::DBICCarp::branch2 { carp_once 'carp2' }
 
 
   warnings_exist {
-    DBICTest::DBICCarp::frobnicate();
+    DBIOTest::DBICCarp::frobnicate();
   } [
     qr/carp1/,
     qr/carp2/,
@@ -30,10 +30,10 @@ use DBIO::Carp;
 
 {
   {
-    package DBICTest::DBICCarp::Exempt;
+    package DBIOTest::DBICCarp::Exempt;
     use DBIO::Carp;
 
-    sub _skip_namespace_frames { qr/^DBICTest::DBICCarp::Exempt/ }
+    sub _skip_namespace_frames { qr/^DBIOTest::DBICCarp::Exempt/ }
 
     sub thrower {
       sub {
@@ -65,14 +65,14 @@ use DBIO::Carp;
   }
 
   # the __LINE__ relationship below is important - do not reformat
-  throws_ok { DBICTest::DBICCarp::Exempt::dcaller() }
-    qr/\QDBICTest::DBICCarp::Exempt::thrower(): time to die at @{[ __FILE__ ]} line @{[ __LINE__ - 1 ]}\E$/,
+  throws_ok { DBIOTest::DBICCarp::Exempt::dcaller() }
+    qr/\QDBIOTest::DBICCarp::Exempt::thrower(): time to die at @{[ __FILE__ ]} line @{[ __LINE__ - 1 ]}\E$/,
     'Expected exception callsite and originator'
   ;
 
   # the __LINE__ relationship below is important - do not reformat
-  warnings_like { DBICTest::DBICCarp::Exempt::wcaller() }
-    qr/\QDBICTest::DBICCarp::Exempt::warner(): time to warn at @{[ __FILE__ ]} line @{[ __LINE__ - 1 ]}\E$/,
+  warnings_like { DBIOTest::DBICCarp::Exempt::wcaller() }
+    qr/\QDBIOTest::DBICCarp::Exempt::warner(): time to warn at @{[ __FILE__ ]} line @{[ __LINE__ - 1 ]}\E$/,
   ;
 }
 

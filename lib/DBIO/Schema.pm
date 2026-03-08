@@ -18,7 +18,7 @@ __PACKAGE__->mk_classdata('source_registrations' => {});
 __PACKAGE__->mk_classdata('storage_type' => '::DBI');
 __PACKAGE__->mk_classdata('storage');
 __PACKAGE__->mk_classdata('exception_action');
-__PACKAGE__->mk_classdata('stacktrace' => $ENV{DBIC_TRACE} || 0);
+__PACKAGE__->mk_classdata('stacktrace' => ($ENV{DBIO_TRACE} || $ENV{DBIC_TRACE} || 0));
 __PACKAGE__->mk_classdata('default_resultset_attributes' => {});
 
 =head1 SYNOPSIS
@@ -325,7 +325,7 @@ If any classes found do not appear to be Result class files, you will
 get the following warning:
 
    Failed to load $comp_class. Can't find source_name method. Is
-   $comp_class really a full DBIC result class? Fix it, move it elsewhere,
+   $comp_class really a full DBIO result class? Fix it, move it elsewhere,
    or make your load_classes call more specific.
 
 Example:
@@ -387,7 +387,7 @@ sub load_classes {
 
         my $snsub = $comp_class->can('source_name');
         if(! $snsub ) {
-          carp "Failed to load $comp_class. Can't find source_name method. Is $comp_class really a full DBIC result class? Fix it, move it elsewhere, or make your load_classes call more specific.";
+          carp "Failed to load $comp_class. Can't find source_name method. Is $comp_class really a full DBIO result class? Fix it, move it elsewhere, or make your load_classes call more specific.";
           next;
         }
         $comp = $snsub->($comp_class) || $comp;
@@ -476,7 +476,8 @@ Example:
 =back
 
 Whether L</throw_exception> should include stack trace information.
-Defaults to false normally, but defaults to true if C<$ENV{DBIC_TRACE}>
+Defaults to false normally, but defaults to true if C<$ENV{DBIO_TRACE}>
+or legacy C<$ENV{DBIC_TRACE}>
 is true.
 
 =head2 sqlt_deploy_hook

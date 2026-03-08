@@ -2,8 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 
-plan skip_all => 'Set DBICTEST_KUBECONFIG to enable Kubernetes smoke tests'
-    unless $ENV{DBICTEST_KUBECONFIG} || $ENV{KUBECONFIG};
+plan skip_all => 'Set DBIO_TEST_KUBECONFIG to enable Kubernetes smoke tests'
+    unless $ENV{DBIO_TEST_KUBECONFIG} || $ENV{KUBECONFIG};
 
 # This test verifies the Kubernetes test infrastructure works by:
 # 1. Connecting to each provisioned database
@@ -11,21 +11,21 @@ plan skip_all => 'Set DBICTEST_KUBECONFIG to enable Kubernetes smoke tests'
 
 my @tests;
 
-if ($ENV{DBICTEST_PG_DSN}) {
+if ($ENV{DBIO_TEST_PG_DSN}) {
     push @tests, {
         name => 'PostgreSQL',
-        dsn  => $ENV{DBICTEST_PG_DSN},
-        user => $ENV{DBICTEST_PG_USER},
-        pass => $ENV{DBICTEST_PG_PASS},
+        dsn  => $ENV{DBIO_TEST_PG_DSN},
+        user => $ENV{DBIO_TEST_PG_USER},
+        pass => $ENV{DBIO_TEST_PG_PASS},
     };
 }
 
-if ($ENV{DBICTEST_MYSQL_DSN}) {
+if ($ENV{DBIO_TEST_MYSQL_DSN}) {
     push @tests, {
         name => 'MySQL',
-        dsn  => $ENV{DBICTEST_MYSQL_DSN},
-        user => $ENV{DBICTEST_MYSQL_USER},
-        pass => $ENV{DBICTEST_MYSQL_PASS},
+        dsn  => $ENV{DBIO_TEST_MYSQL_DSN},
+        user => $ENV{DBIO_TEST_MYSQL_USER},
+        pass => $ENV{DBIO_TEST_MYSQL_PASS},
     };
 }
 

@@ -17,7 +17,7 @@ use SQL::Abstract::Util 'is_literal_value';
 ###
 BEGIN {
   *MULTICREATE_DEBUG =
-    $ENV{DBIC_MULTICREATE_DEBUG}
+    ($ENV{DBIO_MULTICREATE_DEBUG} || $ENV{DBIC_MULTICREATE_DEBUG})
       ? sub () { 1 }
       : sub () { 0 };
 }
@@ -746,9 +746,9 @@ sub get_columns {
         # if cached related_resultset is present assume this was a prefetch
         carp_unique(
           "Returning primary keys of prefetched 'filter' rels as part of get_columns() is deprecated and will "
-        . 'eventually be removed entirely (set DBIC_COLUMNS_INCLUDE_FILTER_RELS to disable this warning)'
+        . 'eventually be removed entirely (set DBIO_COLUMNS_INCLUDE_FILTER_RELS to disable this warning)'
         ) if (
-          ! $ENV{DBIC_COLUMNS_INCLUDE_FILTER_RELS}
+          ! ($ENV{DBIO_COLUMNS_INCLUDE_FILTER_RELS} || $ENV{DBIC_COLUMNS_INCLUDE_FILTER_RELS})
             and
           defined $self->{related_resultsets}{$col}
             and
@@ -858,7 +858,7 @@ sub get_inflated_columns {
 
   my %cols_to_return = ( %{$self->{_column_data}}, %$loaded_colinfo );
 
-  unless ($ENV{DBIC_COLUMNS_INCLUDE_FILTER_RELS}) {
+  unless ($ENV{DBIO_COLUMNS_INCLUDE_FILTER_RELS} || $ENV{DBIC_COLUMNS_INCLUDE_FILTER_RELS}) {
     for (keys %$loaded_colinfo) {
       # if cached related_resultset is present assume this was a prefetch
       if (
@@ -870,7 +870,7 @@ sub get_inflated_columns {
       ) {
         carp_unique(
           "Returning prefetched 'filter' rels as part of get_inflated_columns() is deprecated and will "
-        . 'eventually be removed entirely (set DBIC_COLUMNS_INCLUDE_FILTER_RELS to disable this warning)'
+        . 'eventually be removed entirely (set DBIO_COLUMNS_INCLUDE_FILTER_RELS to disable this warning)'
         );
         last;
       }
