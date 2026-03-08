@@ -53,17 +53,23 @@ Any test that only cares about I<what> SQL would be generated
 
 =cut
 
-__PACKAGE__->sql_limit_dialect('GenericSubQ');
+__PACKAGE__->sql_limit_dialect('LimitOffset');
 
 __PACKAGE__->mk_group_accessors(simple => qw(
   _captured_queries
   _fake_connected
+  _mock_results
+  _last_insert_ids
+  _auto_increment
 ));
 
 sub new {
   my $self = shift->next::method(@_);
   $self->_captured_queries([]);
   $self->_fake_connected(1);
+  $self->_mock_results([]);
+  $self->_last_insert_ids({});
+  $self->_auto_increment({});
   $self->{_sql_maker_opts} ||= {};
   $self;
 }
@@ -152,10 +158,22 @@ sub _execute {
   $self->_query_start($sql, $bind);
   $self->_query_end($sql, $bind);
 
-  # Return values that match what DBI would return
-  # ($rv, $sth, @bind) - we fake $sth with a minimal object
-  my $fake_sth = DBIO::Test::Storage::FakeSth->new;
-  return (wantarray ? ('0E0', $fake_sth, @{$bind||[]}) : '0E0');
+  # Track inserts for last_insert_id
+  if ($op eq 'insert') {
+    my $source_name = ref $ident ? $ident->name : ($ident || '');
+    my $id = $self->_next_auto_id($source_name);
+    $self->_last_insert_ids->{$source_name} = $id;
+  }
+
+  # Check for mock results
+  my $mock = $self->_find_mock($sql);
+  my $fake_sth = DBIO::Test::Storage::FakeSth->new($mock ? $mock->{rows} : undef);
+
+  # For DML operations (insert/update/delete), return 1 (row affected)
+  # For select, return '0E0' (zero but true)
+  my $rv = ($op =~ /^(?:insert|update|delete)$/) ? 1 : '0E0';
+
+  return (wantarray ? ($rv, $fake_sth, @{$bind||[]}) : $rv);
 }
 
 =method captured_queries
@@ -208,7 +226,9 @@ sub select {
 sub select_single {
   my $self = shift;
   my ($rv, $sth, @bind) = $self->_execute('select', @_);
-  return ();
+  my @row = $sth->fetchrow_array;
+  $sth->finish;
+  return @row;
 }
 
 # Transaction tracking
@@ -244,9 +264,136 @@ sub deploy { }
 
 sub sqlt_type { 'NULL' }
 
-# We handle last_insert_id by tracking inserts
-sub last_insert_id { undef }
-sub _dbh_last_insert_id { undef }
+# Override _insert_bulk to avoid needing a real dbh
+sub _insert_bulk {
+  my ($self, $source, $cols, $data, @rest) = @_;
+
+  # Generate SQL for capture but don't actually execute
+  my $sql = sprintf('INSERT INTO %s (%s) VALUES (%s)',
+    $source->name,
+    join(', ', @$cols),
+    join(', ', ('?') x @$cols),
+  );
+  push @{ $self->_captured_queries }, {
+    op   => 'insert',
+    sql  => $sql,
+    bind => [],
+  };
+
+  # Track auto-increment
+  my $source_name = $source->name;
+  for (1 .. scalar @$data) {
+    my $id = $self->_next_auto_id($source_name);
+    $self->_last_insert_ids->{$source_name} = $id;
+  }
+
+  return;
+}
+
+# _prepare_sth without a real dbh
+sub _prepare_sth {
+  return DBIO::Test::Storage::FakeSth->new;
+}
+
+# --- Mock result system ---
+
+=method mock
+
+  $storage->mock($sql_pattern, \@rows);
+  $storage->mock($sql_pattern, \@rows, \@columns);
+  $storage->mock(qr/SELECT.*FROM artist/i, [
+    [1, 'Caterwauler McCrae'],
+    [2, 'Random Boy Band'],
+  ]);
+
+Registers a mock result. When a query matches C<$sql_pattern> (string
+or regexp), the given rows are returned. Mocks are checked in LIFO
+order — later mocks override earlier ones. Each mock is consumed once
+unless registered with L</mock_persistent>.
+
+=cut
+
+sub mock {
+  my ($self, $pattern, $rows, $cols) = @_;
+  $pattern = qr/\Q$pattern\E/ unless ref $pattern eq 'Regexp';
+  push @{ $self->_mock_results }, {
+    pattern    => $pattern,
+    rows       => $rows || [],
+    columns    => $cols,
+    persistent => 0,
+  };
+}
+
+=method mock_persistent
+
+Like L</mock> but the mock is not consumed after matching — it keeps
+returning the same rows for every matching query.
+
+=cut
+
+sub mock_persistent {
+  my ($self, $pattern, $rows, $cols) = @_;
+  $pattern = qr/\Q$pattern\E/ unless ref $pattern eq 'Regexp';
+  push @{ $self->_mock_results }, {
+    pattern    => $pattern,
+    rows       => $rows || [],
+    columns    => $cols,
+    persistent => 1,
+  };
+}
+
+=method clear_mocks
+
+Removes all registered mocks.
+
+=cut
+
+sub clear_mocks {
+  $_[0]->_mock_results([]);
+}
+
+sub _find_mock {
+  my ($self, $sql) = @_;
+  my $mocks = $self->_mock_results;
+
+  # LIFO search — last registered mock wins
+  for my $i (reverse 0 .. $#$mocks) {
+    if ($sql =~ $mocks->[$i]{pattern}) {
+      my $mock = $mocks->[$i];
+      splice @$mocks, $i, 1 unless $mock->{persistent};
+      return $mock;
+    }
+  }
+  return undef;
+}
+
+# Track auto-increment per source for last_insert_id
+sub _next_auto_id {
+  my ($self, $source_name) = @_;
+  $self->_auto_increment->{$source_name} ||= 0;
+  return ++$self->_auto_increment->{$source_name};
+}
+
+=method set_auto_increment
+
+  $storage->set_auto_increment('Artist', 10);
+
+Sets the auto-increment counter for a source so the next insert
+returns the given ID.
+
+=cut
+
+sub set_auto_increment {
+  my ($self, $source_name, $val) = @_;
+  $self->_auto_increment->{$source_name} = $val - 1;
+}
+
+sub last_insert_id {
+  my ($self, $source, @cols) = @_;
+  my $source_name = ref $source ? $source->name : ($source || '');
+  return $self->_last_insert_ids->{$source_name};
+}
+sub _dbh_last_insert_id { $_[0]->last_insert_id }
 
 # No DBI bind attrs needed
 sub _dbi_attrs_for_bind { [] }
@@ -273,13 +420,26 @@ sub dbh_do {
   package # hide from PAUSE
     DBIO::Test::Storage::FakeSth;
 
-  sub new { bless {}, shift }
-  sub fetchrow_array { () }
+  sub new {
+    my ($class, $rows) = @_;
+    bless {
+      rows => $rows || [],
+      pos  => 0,
+    }, ref $class || $class;
+  }
+
+  sub fetchrow_array {
+    my $self = shift;
+    return () if $self->{pos} >= scalar @{$self->{rows}};
+    my $row = $self->{rows}[$self->{pos}++];
+    return ref $row eq 'ARRAY' ? @$row : @$row;
+  }
+
   sub fetchrow_hashref { undef }
   sub finish { 1 }
   sub execute { '0E0' }
   sub bind_param { 1 }
-  sub rows { 0 }
+  sub rows { scalar @{$_[0]->{rows}} }
 }
 
 # ---- Fake cursor ----
@@ -292,22 +452,53 @@ sub dbh_do {
 
   sub new {
     my ($class, $storage, $args, $attrs) = @_;
+
+    # Generate the SQL to check for mocks
+    my ($ident, $select, $condition, $a) = @$args;
+    my ($sql, $bind) = $storage->_prep_for_execute('select', $ident, [$select, $condition, $a || {}]);
+
+    push @{ $storage->_captured_queries }, {
+      op   => 'select',
+      sql  => $sql,
+      bind => $bind,
+    };
+
+    $storage->_query_start($sql, $bind);
+    $storage->_query_end($sql, $bind);
+
+    my $mock = $storage->_find_mock($sql);
+
     my $self = bless {
       storage => $storage,
       args    => $args,
       attrs   => $attrs,
+      rows    => $mock ? [ @{$mock->{rows}} ] : [],
+      pos     => 0,
     }, ref $class || $class;
-
-    # Capture the select query
-    my ($ident, $select, $condition, $a) = @$args;
-    $storage->_execute('select', $ident, $select, $condition, $a || {});
 
     return $self;
   }
 
-  sub next  { () }
-  sub all   { () }
-  sub reset { }
+  sub next {
+    my $self = shift;
+    return () if $self->{pos} >= scalar @{$self->{rows}};
+    my $row = $self->{rows}[$self->{pos}++];
+    return ref $row eq 'ARRAY' ? @$row : @$row;
+  }
+
+  sub all {
+    my $self = shift;
+    my @all;
+    while (my @row = $self->next) {
+      push @all, \@row;
+    }
+    $self->{pos} = 0;
+    return @all;
+  }
+
+  sub reset {
+    $_[0]->{pos} = 0;
+  }
 }
 
 1;
