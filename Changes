@@ -1,5 +1,18 @@
 Revision history for DBIO
 
+    * Dependency Cleanup
+        - Remove Moo dependency: rewrite Storage::Statistics and
+          Storage::BlockRunner to plain Perl OOP
+        - Remove Moose from Admin: rewrite DBIO::Admin to plain Perl OOP,
+          rename dbicadmin to dbioadmin, delete Admin::Types/Descriptive/Usage
+        - Replace Data::Dumper::Concise with core Data::Dumper via new
+          dump_value() utility in DBIO::Util
+        - Rename DBIO::_Util to DBIO::Util
+        - Remove dead dependencies from cpanfile: Class::Inspector,
+          Scope::Guard, Text::Balanced, Path::Class, Config::Any
+        - Driver loading now throws an error instead of silently falling
+          back to generic Storage::DBI when driver distribution is missing
+
     * Driver Split
         - Remove all driver-specific Storage and SQLMaker classes from core
           (27 files, ~5800 lines) — now in separate distributions:
