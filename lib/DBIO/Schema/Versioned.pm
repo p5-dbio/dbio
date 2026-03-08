@@ -261,6 +261,10 @@ Same as L<DBIO::Schema/deploy> but also calls C<install>.
 
 =cut
 
+=method deploy
+
+=cut
+
 sub deploy {
   my $self = shift;
   $self->next::method(@_);
@@ -281,6 +285,10 @@ to concatenate several files to create one upgrade file.
 
 You'll probably want the db_version retrieved via $self->get_db_version
 and the schema_version which is retrieved via $self->schema_version
+
+=cut
+
+=method create_upgrade_path
 
 =cut
 
@@ -305,6 +313,10 @@ and the schema_version which is retrieved via $self->schema_version
 
 =cut
 
+=method ordered_schema_versions
+
+=cut
+
 sub ordered_schema_versions {
   ## override this method
 }
@@ -325,6 +337,10 @@ all relevant updates are applied.
 The individual update steps are performed by using
 L</upgrade_single_step>, which will apply the update and also
 update the dbix_class_schema_versions table.
+
+=cut
+
+=method upgrade
 
 =cut
 
@@ -502,6 +518,10 @@ differently.
 
 =cut
 
+=method apply_statement
+
+=cut
+
 sub apply_statement {
     my ($self, $statement) = @_;
 
@@ -572,6 +592,10 @@ To avoid the checks on connect, set the environment var DBIC_NO_VERSION_CHECK or
 
 =cut
 
+=method connection
+
+=cut
+
 sub connection {
   my $self = shift;
   $self->next::method(@_);
@@ -627,6 +651,10 @@ sub _on_connect
 }
 
 # is this just a waste of time? if not then merge with DBI.pm
+=method _create_db_to_schema_diff
+
+=cut
+
 sub _create_db_to_schema_diff {
   my $self = shift;
 
@@ -688,6 +716,10 @@ sub _create_db_to_schema_diff {
 }
 
 
+=method _set_db_version
+
+=cut
+
 sub _set_db_version {
   my $self = shift;
   my ($params) = @_;
@@ -723,6 +755,10 @@ sub _set_db_version {
     ),
   })->insert;
 }
+
+=method _read_sql_file
+
+=cut
 
 sub _read_sql_file {
   my $self = shift;

@@ -10,6 +10,10 @@ our %_pod_inherit_config =
    class_map => { 'DBIO::Relationship::CascadeActions' => 'DBIO::Relationship' }
   );
 
+=method delete
+
+=cut
+
 sub delete {
   my ($self, @rest) = @_;
   return $self->next::method(@rest) unless ref $self;
@@ -41,6 +45,10 @@ sub delete {
 
   $self->next::method(@rest);
 }
+
+=method update
+
+=cut
 
 sub update {
   my ($self, @rest) = @_;

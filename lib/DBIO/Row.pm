@@ -172,6 +172,16 @@ sub __their_pk_needs_us { # this should maybe be in resultsource.
   return 0;
 }
 
+=method new
+
+Constructs a row object and initializes column/relationship data supplied in
+the attribute hashref.
+
+The full constructor behavior and caveats are documented in the main C<new>
+section above.
+
+=cut
+
 sub new {
   my ($class, $attrs) = @_;
   $class = ref $class if ref $class;
@@ -1338,6 +1348,12 @@ Alias for L</update_or_insert>
 
 sub insert_or_update { shift->update_or_insert(@_) }
 
+=method update_or_insert
+
+Runs C<update> for rows already in storage, otherwise runs C<insert>.
+
+=cut
+
 sub update_or_insert {
   my $self = shift;
   return ($self->in_storage ? $self->update : $self->insert);
@@ -1613,6 +1629,12 @@ sub serializable_columns {
       $self->result_source->columns
   ];
 }
+
+=method TO_JSON
+
+Returns a JSON-safe hashref of serializable column values.
+
+=cut
 
 sub TO_JSON {
   my $self = shift;

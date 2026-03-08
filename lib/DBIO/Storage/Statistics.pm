@@ -24,11 +24,11 @@ for collecting the statistics as discussed in L<DBIO::Manual::Cookbook>.
 
 =head1 METHODS
 
-=head2 new
+=method new
 
 Returns a new L<DBIO::Storage::Statistics> object.
 
-=head2 debugfh
+=method debugfh
 
 Sets or retrieves the filehandle used for trace/debug output.  This should
 be an L<IO::Handle> compatible object (only the
@@ -83,7 +83,19 @@ has [qw(_defaulted_to_stderr silence callback)] => (
   is => 'rw',
 );
 
-=head2 print
+=attr _defaulted_to_stderr
+
+Internal flag indicating that debug output currently defaults to STDERR.
+
+=attr silence
+
+Boolean flag to suppress trace output when true.
+
+=attr callback
+
+Optional callback invoked by C<query_start> instead of printing.
+
+=method print
 
 Prints the specified string to our debugging filehandle.  Provided to save our
 methods the worry of how to display the message.
@@ -103,11 +115,7 @@ sub print {
   $fh->print($msg);
 }
 
-=head2 silence
-
-Turn off all output if set to true.
-
-=head2 txn_begin
+=method txn_begin
 
 Called when a transaction begins.
 
@@ -120,7 +128,7 @@ sub txn_begin {
   $self->print("BEGIN WORK\n");
 }
 
-=head2 txn_rollback
+=method txn_rollback
 
 Called when a transaction is rolled back.
 
@@ -133,7 +141,7 @@ sub txn_rollback {
   $self->print("ROLLBACK\n");
 }
 
-=head2 txn_commit
+=method txn_commit
 
 Called when a transaction is committed.
 
@@ -146,7 +154,7 @@ sub txn_commit {
   $self->print("COMMIT\n");
 }
 
-=head2 svp_begin
+=method svp_begin
 
 Called when a savepoint is created.
 
@@ -159,7 +167,7 @@ sub svp_begin {
   $self->print("SAVEPOINT $name\n");
 }
 
-=head2 svp_release
+=method svp_release
 
 Called when a savepoint is released.
 
@@ -172,7 +180,7 @@ sub svp_release {
   $self->print("RELEASE SAVEPOINT $name\n");
 }
 
-=head2 svp_rollback
+=method svp_rollback
 
 Called when rolling back to a savepoint.
 
@@ -185,7 +193,7 @@ sub svp_rollback {
   $self->print("ROLLBACK TO SAVEPOINT $name\n");
 }
 
-=head2 query_start
+=method query_start
 
 Called before a query is executed.  The first argument is the SQL string being
 executed and subsequent arguments are the parameters used for the query.
@@ -205,7 +213,7 @@ sub query_start {
   $self->print($message);
 }
 
-=head2 query_end
+=method query_end
 
 Called when a query finishes executing.  Has the same arguments as query_start.
 

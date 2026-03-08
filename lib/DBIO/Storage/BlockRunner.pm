@@ -14,7 +14,56 @@ use namespace::clean;
 
 =head1 DESCRIPTION
 
+Utility object used by L<DBIO::Storage::DBI> to execute coderefs with
+transaction wrapping and retry semantics.
+
+=head1 ATTRIBUTES
+
+=attr storage
+
+The storage object used for transaction methods and exception handling.
+
+=attr wrap_txn
+
+Boolean. If true, wrap each execution attempt in a transaction.
+
+=attr retry_handler
+
+Coderef deciding whether to retry after a failure.
+
+=attr retry_debug
+
+Boolean controlling retry debug output.
+
+=attr max_attempts
+
+Maximum number of failed attempts before aborting.
+
+=attr failed_attempt_count
+
+Internal counter of failed attempts in the current C<run>.
+
+=attr exception_stack
+
+Collected exceptions from failed attempts in the current C<run>.
+
 =head1 METHODS
+
+=method last_exception
+
+Returns the most recent exception captured in C<exception_stack>.
+
+=method throw_exception
+
+Delegates exception throwing to the configured C<storage>.
+
+=method run
+
+Execute a coderef with configured retry and transaction behavior.
+
+=method _run
+
+Internal recursive worker for C<run>.
 
 =cut
 

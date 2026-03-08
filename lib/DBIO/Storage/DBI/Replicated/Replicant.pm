@@ -27,7 +27,7 @@ given master database.
 
 This class defines the following attributes.
 
-=head2 active
+=attr active
 
 This is a boolean which allows you to programmatically activate or deactivate a
 replicant from the pool.  This way you can do stuff like disallow a replicant
@@ -38,7 +38,7 @@ properly replicating from a master and has not fallen too many seconds behind a
 reliability threshold. For that, use
 L<DBIO::Storage::DBI::Replicated/is_replicating> and
 L<DBIO::Storage::DBI::Replicated/lag_behind_master>.
-Since the implementation of those functions database specific (and not all DBIC
+Since the implementation of those functions is database specific (and not all DBIC
 supported DBs support replication) you should refer your database-specific
 storage driver for more information.
 
@@ -52,10 +52,20 @@ has 'active' => (
   default=>1,
 );
 
+=attr dsn
+
+DSN identifier used in debug output and pool bookkeeping.
+
+=attr id
+
+Short pool-local identifier for this replicant.
+
+=cut
+
 has dsn => (is => 'rw', isa => Str);
 has id  => (is => 'rw', isa => Str);
 
-=head2 master
+=attr master
 
 Reference to the master Storage.
 
@@ -67,7 +77,7 @@ has master => (is => 'rw', isa => DBICStorageDBI, weak_ref => 1);
 
 This class defines the following methods.
 
-=head2 debugobj
+=method debugobj
 
 Override the debugobj method to redirect this method call back to the master.
 

@@ -38,6 +38,20 @@ You can also specify a particular module:
 
 =cut
 
+=attr uuid_auto_columns
+
+Configured list of columns that should receive generated UUID values.
+
+=attr uuid_maker
+
+Selected UUID generator class/module.
+
+=method uuid_columns
+
+Get or set UUID-managed columns for this result class.
+
+=cut
+
 sub uuid_columns {
   my $self = shift;
   if (scalar @_) {
@@ -48,6 +62,12 @@ sub uuid_columns {
   }
   return $self->uuid_auto_columns || [];
 }
+
+=method uuid_class
+
+Get or set the UUID generator implementation class.
+
+=cut
 
 sub uuid_class {
   my ($self, $class) = @_;
@@ -60,6 +80,12 @@ sub uuid_class {
   return $self->uuid_maker;
 }
 
+=method insert
+
+Populate missing configured UUID columns before insert.
+
+=cut
+
 sub insert {
   my $self = shift;
   for my $column (@{$self->uuid_columns}) {
@@ -68,6 +94,12 @@ sub insert {
   }
   $self->next::method(@_);
 }
+
+=method get_uuid
+
+Generate one UUID value using the configured generator.
+
+=cut
 
 sub get_uuid {
   my $self = shift;
@@ -86,6 +118,12 @@ sub get_uuid {
     return $class->new->as_string;
   }
 }
+
+=method _find_uuid_module
+
+Discover the first available UUID generation backend.
+
+=cut
 
 sub _find_uuid_module {
   if (eval { require Data::UUID; 1 }) {

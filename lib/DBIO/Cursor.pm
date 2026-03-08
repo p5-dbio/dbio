@@ -29,7 +29,7 @@ information.
 
 =head1 METHODS
 
-=head2 new
+=method new
 
 Virtual method. Returns a new L<DBIO::Cursor> object.
 
@@ -39,7 +39,7 @@ sub new {
   die "Virtual method!";
 }
 
-=head2 next
+=method next
 
 Virtual method. Advances the cursor to the next row. Returns an array of
 column values (the result of L<DBI/fetchrow_array> method).
@@ -50,7 +50,7 @@ sub next {
   die "Virtual method!";
 }
 
-=head2 reset
+=method reset
 
 Virtual method. Resets the cursor to the beginning.
 
@@ -60,7 +60,7 @@ sub reset {
   die "Virtual method!";
 }
 
-=head2 all
+=method all
 
 Virtual method. Returns all rows in the L<DBIO::ResultSet>.
 

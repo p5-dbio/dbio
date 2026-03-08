@@ -32,18 +32,16 @@ And you can recover your data structure with:
   my $obj = ...->find(...);
   my $struct = $obj->data_column;
 
-The data structures you assign to "data_column" will be saved in the database in YAML format.
+The data structures you assign to C<data_column> are saved in YAML format.
 
-=over 4
-
-=item get_freezer
+=method get_freezer
 
 Called by L<DBIO::InflateColumn::Serializer> to get the routine that serializes
 the data passed to it. Returns a coderef.
 
 =cut
 
-sub get_freezer{
+sub get_freezer {
   my ($class, $column, $info, $args) = @_;
 
   if (defined $info->{'size'}){
@@ -60,12 +58,10 @@ sub get_freezer{
   }
 }
 
-=item get_unfreezer
+=method get_unfreezer
 
 Called by L<DBIO::InflateColumn::Serializer> to get the routine that deserializes
 the data stored in the column. Returns a coderef.
-
-=back
 
 =cut
 

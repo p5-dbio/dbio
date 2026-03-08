@@ -22,6 +22,11 @@ toggles like:
 
 =cut
 
+=method _prep_for_execute
+
+When explicit identity values are supplied, wrap generated SQL with
+C<SET IDENTITY_INSERT ... ON/OFF> statements for the target table.
+
 # SET IDENTITY_X only works as part of a statement scope. We can not
 # $dbh->do the $sql and the wrapping set()s individually. Hence the
 # sql mangling. The newlines are important.

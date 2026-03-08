@@ -34,6 +34,12 @@ L<connect_info|DBIO::Storage::DBI/connect_info> as:
 
 =cut
 
+=attr auto_cast
+
+Boolean toggle enabling automatic C<CAST(? AS ...)> placeholder rewriting.
+
+=method _prep_for_execute
+
 sub _prep_for_execute {
   my $self = shift;
 
@@ -54,7 +60,7 @@ sub _prep_for_execute {
   return ($sql, $bind);
 }
 
-=head2 connect_call_set_auto_cast
+=method connect_call_set_auto_cast
 
 Executes:
 

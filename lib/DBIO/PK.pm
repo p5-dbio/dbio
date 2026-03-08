@@ -17,7 +17,7 @@ depending on them.
 
 =cut
 
-=head2 id
+=method id
 
 Returns the primary key(s) for a row. Can't be called as
 a class method.
@@ -31,6 +31,12 @@ sub id {
   my @id_vals = $self->_ident_values;
   return (wantarray ? @id_vals : $id_vals[0]);
 }
+
+=method _ident_values
+
+Internal helper returning primary-key values (optionally from in-storage state).
+
+=cut
 
 sub _ident_values {
   my ($self, $use_storage_state) = @_;
@@ -55,7 +61,7 @@ sub _ident_values {
   return @ids;
 }
 
-=head2 ID
+=method ID
 
 Returns a unique id string identifying a result object by primary key.
 
@@ -80,6 +86,12 @@ sub ID {
   return $self->_create_ID(%{$self->ident_condition});
 }
 
+=method _create_ID
+
+Internal formatter producing a unique identity string for a result object.
+
+=cut
+
 sub _create_ID {
   my ($self, %vals) = @_;
   return undef if grep { !defined } values %vals;
@@ -87,7 +99,7 @@ sub _create_ID {
     map { $_ . '=' . $vals{$_} } sort keys %vals;
 }
 
-=head2 ident_condition
+=method ident_condition
 
   my $cond = $result_source->ident_condition();
 
@@ -101,9 +113,21 @@ sub ident_condition {
   shift->_mk_ident_cond(@_);
 }
 
+=method _storage_ident_condition
+
+Internal variant of C<ident_condition> using in-storage PK values.
+
+=cut
+
 sub _storage_ident_condition {
   shift->_mk_ident_cond(shift, 1);
 }
+
+=method _mk_ident_cond
+
+Internal builder for primary-key based condition hashes.
+
+=cut
 
 sub _mk_ident_cond {
   my ($self, $alias, $use_storage_state) = @_;

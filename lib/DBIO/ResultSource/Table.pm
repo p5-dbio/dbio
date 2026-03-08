@@ -17,7 +17,7 @@ Table object that inherits from L<DBIO::ResultSource>.
 
 =head1 METHODS
 
-=head2 from
+=method from
 
 Returns the FROM entry for the table (i.e. the table name)
 

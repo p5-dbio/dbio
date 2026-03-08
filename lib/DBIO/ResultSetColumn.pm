@@ -33,6 +33,10 @@ passed as params. Used internally by L<DBIO::ResultSet/get_column>.
 
 =cut
 
+=method new
+
+=cut
+
 sub new {
   my ($class, $rs, $column) = @_;
   $class = ref $class if ref $class;
@@ -146,6 +150,10 @@ one value.
 
 =cut
 
+=method next
+
+=cut
+
 sub next {
   my $self = shift;
 
@@ -173,6 +181,10 @@ than result objects.
 
 =cut
 
+=method all
+
+=cut
+
 sub all {
   my $self = shift;
 
@@ -197,6 +209,10 @@ Much like L<DBIO::ResultSet/reset>.
 
 =cut
 
+=method reset
+
+=cut
+
 sub reset {
   my $self = shift;
   $self->_resultset->cursor->reset;
@@ -217,6 +233,10 @@ Resets the underlying resultset and returns the next value of the column in the
 resultset (or C<undef> if there is none).
 
 Much like L<DBIO::ResultSet/first> but just returning the one value.
+
+=cut
+
+=method first
 
 =cut
 
@@ -246,6 +266,10 @@ is issued before discarding the cursor.
 
 =cut
 
+=method single
+
+=cut
+
 sub single {
   my $self = shift;
 
@@ -271,6 +295,10 @@ sub single {
 
 Wrapper for ->func. Returns the lowest value of the column in the
 resultset (or C<undef> if there are none).
+
+=cut
+
+=method min
 
 =cut
 
@@ -313,6 +341,10 @@ resultset (or C<undef> if there are none).
 
 =cut
 
+=method max
+
+=cut
+
 sub max {
   return shift->func('MAX');
 }
@@ -349,6 +381,10 @@ sub max_rs { return shift->func_rs('MAX') }
 
 Wrapper for ->func. Returns the sum of all the values in the column of
 the resultset. Use on varchar-like columns at your own risk.
+
+=cut
+
+=method sum
 
 =cut
 
@@ -394,6 +430,10 @@ value. Produces the following SQL:
 
 =cut
 
+=method func
+
+=cut
+
 sub func {
   my ($self,$function) = @_;
   my $cursor = $self->func_rs($function)->cursor;
@@ -420,6 +460,10 @@ Creates the resultset that C<func()> uses to run its query.
 
 =cut
 
+=method func_rs
+
+=cut
+
 sub func_rs {
   my ($self,$function) = @_;
 
@@ -440,6 +484,10 @@ sub func_rs {
 =head2 throw_exception
 
 See L<DBIO::Schema/throw_exception> for details.
+
+=cut
+
+=method throw_exception
 
 =cut
 
@@ -465,6 +513,10 @@ sub throw_exception {
 # Returns the underlying resultset. Creates it from the parent resultset if
 # necessary.
 #
+=method _resultset
+
+=cut
+
 sub _resultset {
   my $self = shift;
 

@@ -13,6 +13,10 @@ our %_pod_inherit_config =
    class_map => { 'DBIO::Relationship::BelongsTo' => 'DBIO::Relationship' }
   );
 
+=method belongs_to
+
+=cut
+
 sub belongs_to {
   my ($class, $rel, $f_class, $cond, $attrs) = @_;
 

@@ -26,7 +26,7 @@ replicants, and gives some methods for querying information about their status.
 
 This class defines the following attributes.
 
-=head2 maximum_lag ($num)
+=attr maximum_lag ($num)
 
 This is a number which defines the maximum allowed lag returned by the
 L<DBIO::Storage::DBI/lag_behind_master> method.  The default is 0.  In
@@ -45,7 +45,7 @@ has 'maximum_lag' => (
   default=>0,
 );
 
-=head2 last_validated
+=attr last_validated
 
 This is an integer representing a time since the last time the replicants were
 validated. It's nothing fancy, just an integer provided via the perl L<time|perlfunc/time>
@@ -62,7 +62,7 @@ has 'last_validated' => (
   default=>0,
 );
 
-=head2 replicant_type ($classname)
+=attr replicant_type ($classname)
 
 Base class used to instantiate replicants that are in the pool.  Unless you
 need to subclass L<DBIO::Storage::DBI::Replicated::Replicant> you should
@@ -80,9 +80,9 @@ has 'replicant_type' => (
   },
 );
 
-=head2 replicants
+=attr replicants
 
-A hashref of replicant, with the key being the dsn and the value returning the
+A hashref of replicants, with the key being the dsn and the value returning the
 actual replicant storage.  For example, if the $dsn element is something like:
 
   "dbi:SQLite:dbname=dbfile"
@@ -149,7 +149,12 @@ has next_unknown_replicant_id => (
   },
 );
 
-=head2 master
+=attr next_unknown_replicant_id
+
+Counter used to generate fallback IDs for replicants where no DSN can be
+inferred from the C<connect_info>.
+
+=attr master
 
 Reference to the master Storage.
 
@@ -161,9 +166,10 @@ has master => (is => 'rw', isa => DBICStorageDBI, weak_ref => 1);
 
 This class defines the following methods.
 
-=head2 connect_replicants ($schema, Array[$connect_info])
+=method connect_replicants ($schema, Array[$connect_info])
 
-Given an array of $dsn or connect_info structures suitable for connected to a
+Given an array of C<$dsn> or C<connect_info> structures suitable for connecting
+to a
 database, create an L<DBIO::Storage::DBI::Replicated::Replicant> object
 and store it in the L</replicants> attribute.
 
@@ -223,7 +229,7 @@ sub connect_replicants {
   return @newly_created;
 }
 
-=head2 connect_replicant ($schema, $connect_info)
+=method connect_replicant ($schema, $connect_info)
 
 Given a schema object and a hashref of $connect_info, connect the replicant
 and return it.
@@ -235,7 +241,7 @@ sub connect_replicant {
   my $replicant = $self->create_replicant($schema);
   $replicant->connect_info($connect_info);
 
-## It is undesirable for catalyst to connect at ->conect_replicants time, as
+## It is undesirable for catalyst to connect at ->connect_replicants time, as
 ## connections should only happen on the first request that uses the database.
 ## So we try to set the driver without connecting, however this doesn't always
 ## work, as a driver may need to connect to determine the DB version, and this
@@ -258,7 +264,7 @@ sub connect_replicant {
   return $replicant;
 }
 
-=head2 _safely_ensure_connected ($replicant)
+=method _safely_ensure_connected ($replicant)
 
 The standard ensure_connected method with throw an exception should it fail to
 connect.  For the master database this is desirable, but since replicants are
@@ -277,7 +283,7 @@ sub _safely_ensure_connected {
   });
 }
 
-=head2 _safely ($replicant, $name, $code)
+=method _safely ($replicant, $name, $code)
 
 Execute C<$code> for operation C<$name> catching any exceptions and printing an
 error message to the C<<$replicant->debugobj>>.
@@ -301,7 +307,7 @@ sub _safely {
   };
 }
 
-=head2 connected_replicants
+=method connected_replicants
 
 Returns true if there are connected replicants.  Actually is overloaded to
 return the number of replicants.  So you can do stuff like:
@@ -324,7 +330,7 @@ sub connected_replicants {
   ;
 }
 
-=head2 active_replicants
+=method active_replicants
 
 This is an array of replicants that are considered to be active in the pool.
 This does not check to see if they are connected, but if they are not, DBIC
@@ -339,7 +345,7 @@ sub active_replicants {
   } $self->all_replicants );
 }
 
-=head2 all_replicants
+=method all_replicants
 
 Just a simple array of all the replicant storages.  No particular order to the
 array is given, nor should any meaning be derived.
@@ -351,14 +357,14 @@ sub all_replicants {
   return values %{$self->replicants};
 }
 
-=head2 validate_replicants
+=method validate_replicants
 
-This does a check to see if 1) each replicate is connected (or reconnectable),
+This does a check to see if 1) each replicant is connected (or reconnectable),
 2) that is ->is_replicating, and 3) that it is not exceeding the lag amount
 defined by L</maximum_lag>.  Replicants that fail any of these tests are set to
 inactive, and thus removed from the replication pool.
 
-This tests L</all_replicants>, since a replicant that has been previous marked
+This tests L</all_replicants>, since a replicant that has been previously marked
 as inactive can be reactivated should it start to pass the validation tests again.
 
 See L<DBIO::Storage::DBI> for more about checking if a replicating
@@ -379,13 +385,13 @@ sub validate_replicants {
     if($self->_safely_ensure_connected($replicant)) {
       my $is_replicating = $replicant->is_replicating;
       unless(defined $is_replicating) {
-        $replicant->debugobj->print("Storage Driver ".ref($self)." Does not support the 'is_replicating' method.  Assuming you are manually managing.\n");
+        $replicant->debugobj->print("Storage Driver ".ref($replicant)." does not support 'is_replicating'. Assuming manual management.\n");
         next;
       } else {
         if($is_replicating) {
           my $lag_behind_master = $replicant->lag_behind_master;
           unless(defined $lag_behind_master) {
-            $replicant->debugobj->print("Storage Driver ".ref($self)." Does not support the 'lag_behind_master' method.  Assuming you are manually managing.\n");
+            $replicant->debugobj->print("Storage Driver ".ref($replicant)." does not support 'lag_behind_master'. Assuming manual management.\n");
             next;
           } else {
             if($lag_behind_master <= $self->maximum_lag) {

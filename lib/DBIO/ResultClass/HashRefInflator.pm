@@ -87,7 +87,7 @@ $mk_hash = sub {
 
 =head1 METHODS
 
-=head2 inflate_result
+=method inflate_result
 
 Inflates the result and prefetched data into a hash-ref (invoked by L<DBIO::ResultSet>)
 

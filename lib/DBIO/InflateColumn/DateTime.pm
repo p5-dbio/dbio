@@ -84,7 +84,7 @@ For more help with using components, see L<DBIO::Manual::Component/USING>.
 
 __PACKAGE__->load_components(qw/InflateColumn/);
 
-=head2 register_column
+=method register_column
 
 Chains with the L<DBIO::Row/register_column> method, and sets
 up datetime columns appropriately.  This would not normally be

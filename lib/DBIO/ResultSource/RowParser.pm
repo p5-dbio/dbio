@@ -18,6 +18,10 @@ use namespace::clean;
 # array of column names for each of those relationships. Column names are
 # prefixed relative to the current source, in accordance with where they appear
 # in the supplied relationships.
+=method _resolve_prefetch
+
+=cut
+
 sub _resolve_prefetch {
   my ($self, $pre, $alias, $alias_map, $order, $pref_path) = @_;
   $pref_path ||= [];
@@ -89,6 +93,10 @@ sub _resolve_prefetch {
 # In any case - the output of this thing is meticulously micro-tested, so
 # any sort of adjustment/rewrite should be relatively easy (fsvo relatively)
 #
+=method _mk_row_parser
+
+=cut
+
 sub _mk_row_parser {
   # $args and $attrs are separated to delineate what is core collapser stuff and
   # what is dbic $rs specific
@@ -150,6 +158,10 @@ sub _mk_row_parser {
 # and the collapser will use this information to correctly distinguish
 # data of individual to-be-row-objects. See t/resultset/rowparser_internals.t
 # for extensive RV examples
+=method _resolve_collapse
+
+=cut
+
 sub _resolve_collapse {
   my ($self, $args, $common_args) = @_;
 
@@ -448,6 +460,10 @@ sub _resolve_collapse {
 }
 
 # adding a dep on MoreUtils *just* for this is retarded
+=method __unique_numlist
+
+=cut
+
 sub __unique_numlist {
   sort { $a <=> $b } keys %{ {map { $_ => 1 } @_ }}
 }

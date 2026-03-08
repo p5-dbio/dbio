@@ -7,6 +7,13 @@ use base 'DBIO::Row';
 use SQL::Abstract::Util 'is_literal_value';
 use namespace::clean;
 
+=method filter_column
+
+Registers filter callbacks for a column, enabling conversion between
+storage and in-memory representations.
+
+=cut
+
 sub filter_column {
   my ($self, $col, $attrs) = @_;
 
@@ -59,6 +66,13 @@ sub _column_to_storage {
 
   return defined $unfilter ? $self->$unfilter($value) : $value;
 }
+
+=method get_filtered_column
+
+Returns the in-memory filtered value for a column, computing and caching it
+from storage value when needed.
+
+=cut
 
 sub get_filtered_column {
   my ($self, $col) = @_;
@@ -134,6 +148,13 @@ sub has_column_loaded {
   return 1 if exists $self->{_filtered_column}{$col};
   return $self->next::method($col);
 }
+
+=method set_filtered_column
+
+Sets the in-memory filtered value for a column and marks the row dirty
+according to storage state.
+
+=cut
 
 sub set_filtered_column {
   my ($self, $col, $filtered) = @_;

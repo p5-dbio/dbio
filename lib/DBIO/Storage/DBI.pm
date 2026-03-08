@@ -1306,10 +1306,67 @@ my %_connector_registry = (
   'Firebird'             => 'DBIO::Firebird::Storage',
 );
 
+=head2 register_driver
+
+=over 4
+
+=item Arguments: $dbd_driver_name, $storage_class
+
+=item Return value: none
+
+=back
+
+Registers a mapping from a DBI driver name (for example C<Pg>, C<mysql>,
+C<SQLite>) to a DBIO storage class.
+
+This is primarily used by external DBIO driver distributions, so
+L<DBIO::Storage::DBI> can rebless itself into the correct storage subclass
+during driver detection.
+
+Example:
+
+  __PACKAGE__->register_driver('Pg' => 'DBIO::PostgreSQL::Storage');
+
+=cut
+
+=method register_driver
+
+Registers a DBD driver-name to DBIO storage-class mapping.
+
+=cut
+
 sub register_driver {
   my ($class, $driver_name, $storage_class) = @_;
   $_driver_registry{$driver_name} = $storage_class;
 }
+
+=head2 register_connector_driver
+
+=over 4
+
+=item Arguments: $sql_dbms_name, $storage_class
+
+=item Return value: none
+
+=back
+
+Registers a mapping from C<SQL_DBMS_NAME> values (as reported by ODBC/ADO
+connectors) to a DBIO storage class. This is used by connector-based
+secondary driver detection in L</_determine_connector_driver>.
+
+Example:
+
+  __PACKAGE__->register_connector_driver(
+    'Microsoft_SQL_Server' => 'DBIO::MSSQL::Storage::Sybase',
+  );
+
+=cut
+
+=method register_connector_driver
+
+Registers an ODBC/ADO C<SQL_DBMS_NAME> to DBIO storage-class mapping.
+
+=cut
 
 sub register_connector_driver {
   my ($class, $dbms_name, $storage_class) = @_;
@@ -2916,6 +2973,12 @@ sub _dbh_last_insert_id {
     my $class = ref $self;
     $self->throw_exception ("No storage specific _dbh_last_insert_id() method implemented in $class, and the generic DBI::last_insert_id() failed");
 }
+
+=method last_insert_id
+
+Returns autoincrement values for the columns requested by insert codepaths.
+
+=cut
 
 sub last_insert_id {
   my $self = shift;

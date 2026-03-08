@@ -16,9 +16,17 @@ our @EXPORT_OK = qw(
 # working title - we are hoping to extract this eventually...
 our $null_branch_class = 'DBIx::ResultParser::RelatedNullBranch';
 
+=method __wrap_in_strictured_scope
+
+=cut
+
 sub __wrap_in_strictured_scope {
   "  { use strict; use warnings; use warnings FATAL => 'uninitialized';\n$_[0]\n  }"
 }
+
+=method assemble_simple_parser
+
+=cut
 
 sub assemble_simple_parser {
   #my ($args) = @_;
@@ -41,6 +49,10 @@ sub assemble_simple_parser {
 }
 
 # the simple non-collapsing nested structure recursor
+=method __visit_infmap_simple
+
+=cut
+
 sub __visit_infmap_simple {
   my $args = shift;
 
@@ -108,6 +120,10 @@ sub __visit_infmap_simple {
     );
   }
 }
+
+=method assemble_collapsing_parser
+
+=cut
 
 sub assemble_collapsing_parser {
   my $args = shift;
@@ -225,6 +241,10 @@ EOS
 
 
 # the collapsing nested structure recursor
+=method __visit_infmap_collapse
+
+=cut
+
 sub __visit_infmap_collapse {
   my $args = {%{ shift() }};
 
@@ -356,6 +376,10 @@ sub __visit_infmap_collapse {
     }
   );
 }
+
+=method __result_struct_to_source
+
+=cut
 
 sub __result_struct_to_source {
   sprintf( '{ %s }', join (', ', map

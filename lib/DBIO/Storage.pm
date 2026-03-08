@@ -42,6 +42,10 @@ Instantiates the Storage object.
 
 =cut
 
+=method new
+
+=cut
+
 sub new {
   my ($self, $schema) = @_;
 
@@ -63,6 +67,10 @@ sub new {
 
 Used to reset the schema class or object which owns this
 storage object, such as during L<DBIO::Schema/clone>.
+
+=cut
+
+=method set_schema
 
 =cut
 
@@ -100,6 +108,10 @@ sub ensure_connected { die "Virtual method!" }
 =head2 throw_exception
 
 Throws an exception - croaks.
+
+=cut
+
+=method throw_exception
 
 =cut
 
@@ -170,6 +182,10 @@ transaction failure.
 
 =cut
 
+=method txn_do
+
+=cut
+
 sub txn_do {
   my $self = shift;
   $self->_throw_deferred_rollback if $self->deferred_rollback;
@@ -191,6 +207,10 @@ Starts a transaction.
 
 See the preferred L</txn_do> method, which allows for
 an entire code block to be executed transactionally.
+
+=cut
+
+=method txn_begin
 
 =cut
 
@@ -216,6 +236,10 @@ Issues a commit of the current transaction.
 
 It does I<not> perform an actual storage commit unless there's a DBIO
 transaction currently in effect (i.e. you called L</txn_begin>).
+
+=cut
+
+=method txn_commit
 
 =cut
 
@@ -253,6 +277,10 @@ or rollback a transaction.
 
 =cut
 
+=method txn_rollback
+
+=cut
+
 sub txn_rollback {
   my $self = shift;
 
@@ -282,6 +310,10 @@ sub txn_rollback {
   }
 }
 
+=method _throw_deferred_rollback
+
+=cut
+
 sub _throw_deferred_rollback {
   DBIO::Storage::NESTED_ROLLBACK_EXCEPTION->throw(
     "You are in the middle of a deferred rollback from a nested transaction."
@@ -295,6 +327,10 @@ Arguments: $savepoint_name?
 
 Created a new savepoint using the name provided as argument. If no name
 is provided, a random name will be used.
+
+=cut
+
+=method svp_begin
 
 =cut
 
@@ -320,6 +356,10 @@ sub svp_begin {
   $exec->($self, $name);
 }
 
+=method _svp_generate_name
+
+=cut
+
 sub _svp_generate_name {
   my ($self) = @_;
   return 'savepoint_'.scalar(@{ $self->{'savepoints'} });
@@ -333,6 +373,10 @@ Arguments: $savepoint_name?
 Release the savepoint provided as argument. If none is provided,
 release the savepoint created most recently. This will implicitly
 release all savepoints created after the one explicitly released as well.
+
+=cut
+
+=method svp_release
 
 =cut
 
@@ -379,6 +423,10 @@ Arguments: $savepoint_name?
 Rollback to the savepoint provided as argument. If none is provided,
 rollback to the savepoint created most recently. This will implicitly
 release all savepoints created after the savepoint we rollback to.
+
+=cut
+
+=method svp_rollback
 
 =cut
 
@@ -441,6 +489,10 @@ database disconnection. If you need such functionality see L</txn_do>.
 
 =cut
 
+=method txn_scope_guard
+
+=cut
+
 sub txn_scope_guard {
   return DBIO::Storage::TxnScopeGuard->new($_[0]);
 }
@@ -471,6 +523,10 @@ this is a no-op.
 
 =cut
 
+=method debugfh
+
+=cut
+
 sub debugfh {
     my $self = shift;
 
@@ -485,6 +541,10 @@ Sets or retrieves the object used for metric collection. Defaults to an instance
 of L<DBIO::Storage::Statistics> that is compatible with the original
 method of using a coderef as a callback.  See the aforementioned Statistics
 class for more information.
+
+=cut
+
+=method debugobj
 
 =cut
 
@@ -549,6 +609,10 @@ reference.  Callback is executed as $sub->($op, $info) where $op is
 SELECT/INSERT/UPDATE/DELETE and $info is what would normally be printed.
 
 See L</debugobj> for a better way.
+
+=cut
+
+=method debugcb
 
 =cut
 

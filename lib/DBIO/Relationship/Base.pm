@@ -32,7 +32,7 @@ methods, for predefined ones, look in L<DBIO::Relationship>.
 
 =head1 METHODS
 
-=head2 add_relationship
+=method add_relationship
 
 =over 4
 
@@ -438,7 +438,7 @@ L<DBIO::Schema/create_ddl_dir>. Default is on, set to 0 to disable.
 
 =back
 
-=head2 register_relationship
+=method register_relationship
 
 =over 4
 
@@ -453,7 +453,7 @@ DBIO::ResultSourceProxy to set up Accessors and Proxies.
 
 sub register_relationship { }
 
-=head2 related_resultset
+=method related_resultset
 
 =over 4
 
@@ -468,7 +468,7 @@ sub register_relationship { }
 Returns a L<DBIO::ResultSet> for the relationship named
 $rel_name.
 
-=head2 $relationship_accessor
+=method $relationship_accessor
 
 =over 4
 
@@ -599,7 +599,7 @@ sub related_resultset {
   };
 }
 
-=head2 search_related
+=method search_related
 
 =over 4
 
@@ -621,7 +621,7 @@ sub search_related {
   return shift->related_resultset(shift)->search(@_);
 }
 
-=head2 search_related_rs
+=method search_related_rs
 
 This method works exactly the same as search_related, except that
 it guarantees a resultset, even in list context.
@@ -632,7 +632,7 @@ sub search_related_rs {
   return shift->related_resultset(shift)->search_rs(@_);
 }
 
-=head2 count_related
+=method count_related
 
 =over 4
 
@@ -651,7 +651,7 @@ sub count_related {
   shift->search_related(@_)->count;
 }
 
-=head2 new_related
+=method new_related
 
 =over 4
 
@@ -680,7 +680,7 @@ sub new_related {
   )->{inferred_values} );
 }
 
-=head2 create_related
+=method create_related
 
 =over 4
 
@@ -706,7 +706,7 @@ sub create_related {
   return $obj;
 }
 
-=head2 find_related
+=method find_related
 
 =over 4
 
@@ -728,7 +728,7 @@ sub find_related {
   return shift->search_related(shift)->find(@_);
 }
 
-=head2 find_or_new_related
+=method find_or_new_related
 
 =over 4
 
@@ -749,7 +749,7 @@ sub find_or_new_related {
   return defined $obj ? $obj : $self->new_related(@_);
 }
 
-=head2 find_or_create_related
+=method find_or_create_related
 
 =over 4
 
@@ -770,7 +770,7 @@ sub find_or_create_related {
   return (defined($obj) ? $obj : $self->create_related(@_));
 }
 
-=head2 update_or_create_related
+=method update_or_create_related
 
 =over 4
 
@@ -790,7 +790,7 @@ sub update_or_create_related {
   shift->related_resultset(shift)->update_or_create(@_);
 }
 
-=head2 set_from_related
+=method set_from_related
 
 =over 4
 
@@ -830,7 +830,7 @@ sub set_from_related {
   return 1;
 }
 
-=head2 update_from_related
+=method update_from_related
 
 =over 4
 
@@ -853,7 +853,7 @@ sub update_from_related {
   $self->update;
 }
 
-=head2 delete_related
+=method delete_related
 
 =over 4
 
@@ -879,7 +879,7 @@ sub delete_related {
   return $obj;
 }
 
-=head2 add_to_$rel
+=method add_to_$rel
 
 B<Currently only available for C<has_many>, C<many_to_many> and 'multi' type
 relationships.>
@@ -926,7 +926,7 @@ C<\%link_col_data>.
 
 See L<DBIO::Relationship/many_to_many> for additional details.
 
-=head2 set_$rel
+=method set_$rel
 
 B<Currently only available for C<many_to_many> relationships.>
 
@@ -962,7 +962,7 @@ Due to a mistake in the original implementation of this method, it will also
 accept a list of objects or hash references. This is B<deprecated> and will be
 removed in a future version.
 
-=head2 remove_from_$rel
+=method remove_from_$rel
 
 B<Currently only available for C<many_to_many> relationships.>
 

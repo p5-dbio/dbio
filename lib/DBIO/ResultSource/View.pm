@@ -110,14 +110,14 @@ You could now say:
 
 =head1 METHODS
 
-=head2 is_virtual
+=method is_virtual
 
   __PACKAGE__->result_source_instance->is_virtual(1);
 
 Set to true for a virtual view, false or unset for a real
 database-based view.
 
-=head2 view_definition
+=method view_definition
 
   __PACKAGE__->result_source_instance->view_definition(
       "SELECT cdid, artist, title FROM cd WHERE year ='2000'"
@@ -126,7 +126,7 @@ database-based view.
 An SQL query for your view. Will not be translated across database
 syntaxes.
 
-=head2 deploy_depends_on
+=method deploy_depends_on
 
   __PACKAGE__->result_source_instance->deploy_depends_on(
       ["MyApp::Schema::Result::Year","MyApp::Schema::Result::CD"]
@@ -137,7 +137,7 @@ Pass this an array reference of fully qualified result classes.
 
 =head1 OVERRIDDEN METHODS
 
-=head2 from
+=method from
 
 Returns the FROM entry for the table (i.e. the view name)
 or the SQL as a subselect if this is a virtual view.
@@ -152,7 +152,7 @@ sub from {
 
 =head1 OTHER METHODS
 
-=head2 new
+=method new
 
 The constructor.
 

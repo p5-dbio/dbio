@@ -10,6 +10,12 @@ use namespace::clean;
 
 my $successfully_loaded_components;
 
+=method get_component_class
+
+Resolve and lazily load a configured component class.
+
+=cut
+
 sub get_component_class {
   my $class = $_[0]->get_inherited($_[1]);
 
@@ -28,6 +34,12 @@ sub get_component_class {
 
   $class;
 };
+
+=method set_component_class
+
+Set inherited component class configuration.
+
+=cut
 
 sub set_component_class {
   shift->set_inherited(@_);

@@ -19,7 +19,7 @@ L<auto_nextval|DBIO::ResultSource/auto_nextval> set.
 
 =head1 METHODS
 
-=head2 new_guid
+=attr new_guid
 
 The composing class must set C<new_guid> to the method used to generate a new
 GUID. It can also set it to C<undef>, in which case the user is required to set
@@ -47,11 +47,21 @@ For example:
 
 my $GUID_TYPE = qr/^(?:uniqueidentifier(?:str)?|guid)\z/i;
 
+=method _is_guid_type
+
+Internal helper returning true when a column C<data_type> matches a known GUID
+datatype.
+
 sub _is_guid_type {
   my ($self, $data_type) = @_;
 
   return $data_type =~ $GUID_TYPE;
 }
+
+=method _prefetch_autovalues
+
+Populate missing GUID values before insert for GUID PK columns and GUID
+C<auto_nextval> columns.
 
 sub _prefetch_autovalues  {
   my $self = shift;

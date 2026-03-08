@@ -13,6 +13,10 @@ __PACKAGE__->mk_group_accessors('inherited_ro_instance' => 'source_name');
 
 sub get_inherited_ro_instance {  shift->get_inherited(@_) }
 
+=method set_inherited_ro_instance
+
+=cut
+
 sub set_inherited_ro_instance {
   my $self = shift;
 
@@ -22,6 +26,10 @@ sub set_inherited_ro_instance {
   $self->set_inherited(@_);
 }
 
+
+=method add_columns
+
+=cut
 
 sub add_columns {
   my ($class, @cols) = @_;
@@ -37,6 +45,10 @@ sub add_columns {
 
 sub add_column { shift->add_columns(@_) }
 
+
+=method add_relationship
+
+=cut
 
 sub add_relationship {
   my ($class, $rel, @rest) = @_;

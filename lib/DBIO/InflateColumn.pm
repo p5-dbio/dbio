@@ -45,7 +45,7 @@ something else, see L<DBIO::FilterColumn>.
 
 =head1 METHODS
 
-=head2 inflate_column
+=method inflate_column
 
 Instruct L<DBIO> to inflate the given column.
 
@@ -142,7 +142,7 @@ sub _deflated_column {
   )->($value, $self);
 }
 
-=head2 get_inflated_column
+=method get_inflated_column
 
   my $val = $obj->get_inflated_column($col);
 
@@ -168,7 +168,7 @@ sub get_inflated_column {
   return $self->{_inflated_column}{$col} = $self->_inflated_column($col, $val);
 }
 
-=head2 set_inflated_column
+=method set_inflated_column
 
   my $copy = $obj->set_inflated_column($col => $val);
 
@@ -196,7 +196,7 @@ sub set_inflated_column {
   return $value;
 }
 
-=head2 store_inflated_column
+=method store_inflated_column
 
   my $copy = $obj->store_inflated_column($col => $val);
 

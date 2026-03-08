@@ -13,7 +13,7 @@ shouldn't need to create instances of this class.
 =head1 DESCRIPTION
 
 Given a pool (L<DBIO::Storage::DBI::Replicated::Pool>) of replicated
-database's (L<DBIO::Storage::DBI::Replicated::Replicant>), defines a
+databases (L<DBIO::Storage::DBI::Replicated::Replicant>), this class defines a
 method by which query load can be spread out across each replicant in the pool.
 
 This Balancer just gets whichever is the first replicant in the pool.
@@ -26,7 +26,7 @@ This class defines the following attributes.
 
 This class defines the following methods.
 
-=head2 next_storage
+=method next_storage
 
 Just get the first storage.  Probably only good when you have one replicant.
 

@@ -11,6 +11,10 @@ our %_pod_inherit_config =
    class_map => { 'DBIO::Relationship::Accessor' => 'DBIO::Relationship' }
   );
 
+=method register_relationship
+
+=cut
+
 sub register_relationship {
   my ($class, $rel, $info) = @_;
   if (my $acc_type = $info->{attrs}{accessor}) {
@@ -18,6 +22,10 @@ sub register_relationship {
   }
   $class->next::method($rel => $info);
 }
+
+=method add_relationship_accessor
+
+=cut
 
 sub add_relationship_accessor {
   my ($class, $rel, $acc_type) = @_;

@@ -1,11 +1,58 @@
 Revision history for DBIO
 
+    * Driver Split
+        - Remove all driver-specific Storage and SQLMaker classes from core
+          (27 files, ~5800 lines) — now in separate distributions:
+          DBIO-PostgreSQL, DBIO-MySQL, DBIO-SQLite, DBIO-Oracle, DBIO-MSSQL,
+          DBIO-Sybase, DBIO-DB2, DBIO-Informix, DBIO-Firebird
+        - Remove driver-specific test schema classes from core (EventTZ,
+          EventTZDeprecated, EventSmallDT, ArtistGUID, VaryingMAX,
+          ComputedColumn, Money, SequenceTest)
+        - Extract all database-specific tests to driver distributions
+          (37 files, ~8500 lines)
+        - Add driver registry and connector registry to Storage::DBI for
+          external driver auto-discovery
+        - Add DBIO::Test with hybrid storage support for offline SQL
+          generation tests
+
+    * Documentation
+        - Document driver/connector registry extension points in
+          DBIO::Storage::DBI (`register_driver`,
+          `register_connector_driver`)
+        - Clarify DBIO::Test `storage_type` behavior for offline SQL-generation
+          tests using hybrid fake storage + driver storage
+        - Update manual/docs to reflect the split driver distributions
+          (`DBIO-PostgreSQL`, `DBIO-MySQL`, `DBIO-SQLite`)
+        - Improve wording in replicated storage introduction without changing
+          behavior
+        - Normalize replicated-storage module POD to the =attr/=method
+          style used by PodWeaver and keep method docs close to code
+        - Normalize additional storage-module POD
+          (BlockRunner, Statistics, AutoCast, Cursor, NoBindVars, ODBC,
+          IdentityInsert, DBIHacks, UniqueIdentifier, Replicated::Types) for
+          consistent sectioning and clearer wording
+        - Add inline method-level POD in core helper modules
+          (AccessorGroup, Carp, ClassResolver::PassThrough, Cursor, Exception,
+          Optional::Dependencies) to improve local code/doc discoverability
+        - Normalize method-level POD in InflateColumn and Relationship component
+          modules, and improve serializer documentation wording/consistency
+        - Extend inline POD normalization across remaining non-test core modules
+          under lib/DBIO (Admin*, Compat, PK, UUIDColumns, ResultSource*,
+          ResultSourceProxy*, SQLMaker*, Storage, Ordered, Versioned, _Util)
+
     * Fixes
         - Adjust tests to account for DBD::SQLite's column_info() no longer
           being case-preserving in recent versions
         - Fix t/storage/replicated.t relying on no-longer-available module
         - Adjust t/53lean_startup.t to work around spurious changes in
           Perl5 core (GH#143)
+        - Fix option handling in DBIO::Storage::DBI::Replicated::connect_info
+          so pool_type/balancer_type updates are not ignored when
+          corresponding *_args are absent
+        - Fix `lag_behind_master` / `is_replicating` in replicated storage to
+          iterate over actual replicant storage objects instead of hashrefs
+        - Fix missing `Scalar::Util::blessed` import in replicated balancer
+          forced-pool routing
 
 0.082842 2020-06-16 20:10 (UTC)
     * New Features
@@ -2124,4 +2171,3 @@ Revision history for DBIO
 
 0.01    2005-08-08 17:10:00
         - initial release
-

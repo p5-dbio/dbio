@@ -33,10 +33,20 @@ use SQL::Abstract::Util qw(is_plain_value is_literal_value);
 use DBIO::Carp;
 use namespace::clean;
 
+=head1 DESCRIPTION
+
+Internal SQL analysis and rewrite helpers used by DBIO storage classes.
+
+=head1 METHODS
+
 #
 # This code will remove non-selecting/non-restricting joins from
 # {from} specs, aiding the RDBMS query optimizer
 #
+=method _prune_unused_joins
+
+=cut
+
 sub _prune_unused_joins {
   my ($self, $attrs) = @_;
 
@@ -106,6 +116,10 @@ sub _prune_unused_joins {
 # This is the code producing joined subqueries like:
 # SELECT me.*, other.* FROM ( SELECT me.* FROM ... ) JOIN other ON ...
 #
+=method _adjust_select_args_for_complex_prefetch
+
+=cut
+
 sub _adjust_select_args_for_complex_prefetch {
   my ($self, $attrs) = @_;
 
@@ -393,6 +407,10 @@ sub _adjust_select_args_for_complex_prefetch {
 # gets to fail, or if a user complains: you get to fix it. A stance amounting
 # to "this is crazy, nobody does that" is not acceptable going forward.
 #
+=method _resolve_aliastypes_from_select_args
+
+=cut
+
 sub _resolve_aliastypes_from_select_args {
   my ( $self, $attrs ) = @_;
 
@@ -581,6 +599,10 @@ sub _resolve_aliastypes_from_select_args {
 
 # This is the engine behind { distinct => 1 } and the general
 # complex prefetch grouper
+=method _group_over_selection
+
+=cut
+
 sub _group_over_selection {
   my ($self, $attrs) = @_;
 
@@ -712,11 +734,19 @@ sub _group_over_selection {
   );
 }
 
+=method _minmax_operator_for_datatype
+
+=cut
+
 sub _minmax_operator_for_datatype {
   #my ($self, $datatype, $want_max) = @_;
 
   $_[2] ? 'MAX' : 'MIN';
 }
+
+=method _resolve_ident_sources
+
+=cut
 
 sub _resolve_ident_sources {
   my ($self, $ident) = @_;
@@ -755,6 +785,10 @@ sub _resolve_ident_sources {
 #
 # If no columns_names are supplied returns info about *all* columns
 # for all sources
+=method _resolve_column_info
+
+=cut
+
 sub _resolve_column_info {
   my ($self, $ident, $colnames) = @_;
 
@@ -827,6 +861,10 @@ sub _resolve_column_info {
 # the top of the stack, and if not - make sure the chain is inner-joined down
 # to the root.
 #
+=method _inner_join_to_node
+
+=cut
+
 sub _inner_join_to_node {
   my ($self, $from, $alias) = @_;
 
@@ -860,6 +898,10 @@ sub _inner_join_to_node {
   return \@new_from;
 }
 
+=method _find_join_path_to_node
+
+=cut
+
 sub _find_join_path_to_node {
   my ($self, $from, $target_alias) = @_;
 
@@ -882,6 +924,10 @@ sub _find_join_path_to_node {
   # something else went quite wrong
   return undef;
 }
+
+=method _extract_order_criteria
+
+=cut
 
 sub _extract_order_criteria {
   my ($self, $order_by, $sql_maker) = @_;
@@ -928,6 +974,10 @@ sub _extract_order_criteria {
   }
 }
 
+=method _order_by_is_stable
+
+=cut
+
 sub _order_by_is_stable {
   my ($self, $ident, $order_by, $where) = @_;
 
@@ -943,6 +993,10 @@ sub _order_by_is_stable {
     : 0
   ;
 }
+
+=method _columns_comprise_identifying_set
+
+=cut
 
 sub _columns_comprise_identifying_set {
   my ($self, $colinfo, $columns) = @_;
@@ -963,6 +1017,10 @@ sub _columns_comprise_identifying_set {
 # a single rsrc, and will succeed only if the first portion of the order
 # by is stable.
 # returns that portion as a colinfo hashref on success
+=method _extract_colinfo_of_stable_main_source_order_by_portion
+
+=cut
+
 sub _extract_colinfo_of_stable_main_source_order_by_portion {
   my ($self, $attrs) = @_;
 
@@ -1031,6 +1089,10 @@ sub _extract_colinfo_of_stable_main_source_order_by_portion {
 # things to tackle when we get access to a formalized AST. Note that this code
 # is covered by a *ridiculous* amount of tests, so starting with porting this
 # code would be a rather good exercise
+=method _collapse_cond
+
+=cut
+
 sub _collapse_cond {
   my ($self, $where, $where_is_anded_array) = @_;
 
@@ -1256,6 +1318,10 @@ sub _collapse_cond {
   return keys %$fin ? $fin : ();
 }
 
+=method _collapse_cond_unroll_pairs
+
+=cut
+
 sub _collapse_cond_unroll_pairs {
   my ($self, $pairs) = @_;
 
@@ -1416,6 +1482,10 @@ sub _collapse_cond_unroll_pairs {
 # is instead used to infer inambiguous values from conditions
 # (e.g. the inheritance of resultset conditions on new_result)
 #
+=method _extract_fixed_condition_columns
+
+=cut
+
 sub _extract_fixed_condition_columns {
   my ($self, $where, $consider_nulls) = @_;
   my $where_hash = $self->_collapse_cond($_[1]);

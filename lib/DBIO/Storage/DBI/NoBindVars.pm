@@ -1,5 +1,5 @@
 package DBIO::Storage::DBI::NoBindVars;
-# ABSTRACT: Sometime DBDs have poor to no support for bind variables
+# ABSTRACT: Some DBDs have poor to no support for bind variables
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ well, as is the case with L<DBD::Sybase>
 
 =head1 METHODS
 
-=head2 connect_info
+=method connect_info
 
 We can't cache very effectively without bind variables, so force the C<disable_sth_caching> setting to be turned on when the connect info is set.
 
@@ -28,7 +28,7 @@ sub connect_info {
     $retval;
 }
 
-=head2 _prep_for_execute
+=method _prep_for_execute
 
 Manually subs in the values for the usual C<?> placeholders.
 
@@ -65,13 +65,13 @@ sub _prep_for_execute {
   return ($new_sql, []);
 }
 
-=head2 interpolate_unquoted
+=method interpolate_unquoted
 
 This method is called by L</_prep_for_execute> for every column in
 order to determine if its value should be quoted or not. The arguments
 are the current column data type and the actual bind value. The return
 value is interpreted as: true - do not quote, false - do quote. You should
-override this in you Storage::DBI::<database> subclass, if your RDBMS
+override this in your Storage::DBI::<database> subclass, if your RDBMS
 does not like quotes around certain datatypes (e.g. Sybase and integer
 columns). The default method returns false, except for integer datatypes
 paired with values containing nothing but digits.
@@ -99,7 +99,7 @@ sub interpolate_unquoted {
   return 0;
 }
 
-=head2 _prep_interpolated_value
+=method _prep_interpolated_value
 
 Given a datatype and the value to be inserted directly into a SQL query, returns
 the necessary string to represent that value (by e.g. adding a '$' sign)

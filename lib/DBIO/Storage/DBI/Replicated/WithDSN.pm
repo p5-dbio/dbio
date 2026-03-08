@@ -20,7 +20,7 @@ This role adds C<DSN: > info to storage debugging output.
 
 This class defines the following methods.
 
-=head2 around: _query_start
+=method around _query_start
 
 Add C<DSN: > to debugging output.
 

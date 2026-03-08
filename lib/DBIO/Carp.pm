@@ -8,6 +8,15 @@ use warnings;
 use Carp ();
 $Carp::Internal{ (__PACKAGE__) }++;
 
+=head1 METHODS
+
+=method __find_caller
+
+Internal helper returning callsite location and origin label after frame
+filtering.
+
+=cut
+
 sub __find_caller {
   my ($skip_pattern, $class) = @_;
 
@@ -73,6 +82,12 @@ my $warn = sub {
   );
 };
 
+=method import
+
+Install C<carp>, C<carp_once>, and C<carp_unique> into the caller namespace.
+
+=cut
+
 sub import {
   my (undef, $skip_pattern) = @_;
   my $into = caller;
@@ -119,6 +134,12 @@ sub import {
     );
   };
 }
+
+=method unimport
+
+Not implemented.
+
+=cut
 
 sub unimport {
   die (__PACKAGE__ . " does not implement unimport yet\n");

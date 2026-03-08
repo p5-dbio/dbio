@@ -11,6 +11,10 @@ our %_pod_inherit_config =
    class_map => { 'DBIO::Relationship::ProxyMethods' => 'DBIO::Relationship' }
   );
 
+=method register_relationship
+
+=cut
+
 sub register_relationship {
   my ($class, $rel, $info) = @_;
   if (my $proxy_args = $info->{attrs}{proxy}) {
@@ -18,6 +22,10 @@ sub register_relationship {
   }
   $class->next::method($rel, $info);
 }
+
+=method proxy_to_related
+
+=cut
 
 sub proxy_to_related {
   my ($class, $rel, $proxy_args) = @_;
@@ -34,6 +42,10 @@ sub proxy_to_related {
 EOC
     for keys %proxy_map
 }
+
+=method _build_proxy_map_from
+
+=cut
 
 sub _build_proxy_map_from {
   my ( $class, $proxy_arg ) = @_;

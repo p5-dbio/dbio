@@ -38,7 +38,19 @@ information.
 
 =head1 METHODS
 
-=head2 new
+=attr storage
+
+Storage handle used to execute underlying select statements.
+
+=attr args
+
+Arguments forwarded to C<< $storage->_select(...) >>.
+
+=attr attrs
+
+Cursor/resultset attributes affecting fetch behavior.
+
+=method new
 
 Returns a new L<DBIO::Storage::DBI::Cursor> object.
 
@@ -82,7 +94,7 @@ Returns a new L<DBIO::Storage::DBI::Cursor> object.
   }
 }
 
-=head2 next
+=method next
 
 =over 4
 
@@ -140,7 +152,7 @@ sub next {
 }
 
 
-=head2 all
+=method all
 
 =over 4
 
@@ -186,6 +198,11 @@ sub all {
   ;
 }
 
+=method sth
+
+Getter/setter for the underlying statement handle with process/thread safety
+checks.
+
 sub sth {
   my $self = shift;
 
@@ -218,7 +235,7 @@ sub sth {
   return $self->{sth};
 }
 
-=head2 reset
+=method reset
 
 Resets the cursor to the beginning of the L<DBIO::ResultSet>.
 
@@ -229,12 +246,20 @@ sub reset {
   $_[0]->sth(undef);
 }
 
+=method DESTROY
+
+Ensures active statement handles are finished during object destruction.
+
 
 sub DESTROY {
   return if &detected_reinvoked_destructor;
 
   $_[0]->__finish_sth if $_[0]->{sth};
 }
+
+=method __finish_sth
+
+Internal helper to safely finish a statement handle, suppressing warnings.
 
 sub __finish_sth {
   # It is (sadly) extremely important to finish() handles we are about

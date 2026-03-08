@@ -23,11 +23,11 @@ use namespace::clean -except => 'meta';
 
 =head1 SYNOPSIS
 
-The Following example shows how to change an existing $schema to a replicated
+The following example shows how to change an existing $schema to a replicated
 storage type, add some replicated (read-only) databases, and perform reporting
 tasks.
 
-You should set the 'storage_type attribute to a replicated type.  You should
+You should set the C<storage_type> attribute to a replicated type. You should
 also define your arguments, such as which balancer you want and any arguments
 that the Pool object should get.
 
@@ -74,13 +74,13 @@ a random server in the pool by:
 
 =head1 DESCRIPTION
 
-Warning: This class is marked BETA.  This has been running a production
+Warning: This class is marked BETA. This has been running a production
 website using MySQL native replication as its backend and we have some decent
 test coverage but the code hasn't yet been stressed by a variety of databases.
 Individual DBs may have quirks we are not aware of.  Please use this in first
 development and pass along your experiences/bug fixes.
 
-This class implements replicated data store for DBI. Currently you can define
+This class implements replicated storage for DBI. Currently you can define
 one master and numerous slave database connections. All write-type queries
 (INSERT, UPDATE, DELETE and even LAST_INSERT_ID) are routed to master
 database, all read-type queries (SELECTs) go to the slave database.
@@ -91,8 +91,8 @@ L</write_handler>.  Additionally, some methods need to be distributed
 to all existing storages.  This way our storage class is a drop in replacement
 for L<DBIO::Storage::DBI>.
 
-Read traffic is spread across the replicants (slaves) occurring to a user
-selected algorithm.  The default algorithm is random weighted.
+Read traffic is spread across replicants (slaves) according to a selected
+algorithm. The default algorithm is weighted-random.
 
 =head1 NOTES
 
@@ -110,7 +110,7 @@ L<DBIO>. See L<DBIO::Optional::Dependencies> for more details.
 
 This class defines the following attributes.
 
-=head2 schema
+=attr schema
 
 The underlying L<DBIO::Schema> object this storage is attaching
 
@@ -123,7 +123,7 @@ has 'schema' => (
     required=>1,
 );
 
-=head2 pool_type
+=attr pool_type
 
 Contains the classname which will instantiate the L</pool> object.  Defaults
 to: L<DBIO::Storage::DBI::Replicated::Pool>.
@@ -139,7 +139,7 @@ has 'pool_type' => (
   },
 );
 
-=head2 pool_args
+=attr pool_args
 
 Contains a hashref of initialized information to pass to the Balancer object.
 See L<DBIO::Storage::DBI::Replicated::Pool> for available arguments.
@@ -154,7 +154,7 @@ has 'pool_args' => (
 );
 
 
-=head2 balancer_type
+=attr balancer_type
 
 The replication pool requires a balance class to provider the methods for
 choose how to spread the query load across each replicant in the pool.
@@ -172,7 +172,7 @@ has 'balancer_type' => (
   },
 );
 
-=head2 balancer_args
+=attr balancer_args
 
 Contains a hashref of initialized information to pass to the Balancer object.
 See L<DBIO::Storage::DBI::Replicated::Balancer> for available arguments.
@@ -187,7 +187,7 @@ has 'balancer_args' => (
   default=>sub { {} },
 );
 
-=head2 pool
+=attr pool
 
 Is a L<DBIO::Storage::DBI::Replicated::Pool> or derived class.  This is a
 container class for one or more replicated databases.
@@ -205,7 +205,7 @@ has 'pool' => (
   /],
 );
 
-=head2 balancer
+=attr balancer
 
 Is a L<DBIO::Storage::DBI::Replicated::Balancer> or derived class.  This
 is a class that takes a pool (L<DBIO::Storage::DBI::Replicated::Pool>)
@@ -219,7 +219,7 @@ has 'balancer' => (
   handles=>[qw/auto_validate_every/],
 );
 
-=head2 master
+=attr master
 
 The master defines the canonical state for a pool of connected databases.  All
 the replicants are expected to match this databases state.  Thus, in a classic
@@ -235,9 +235,9 @@ has 'master' => (
   lazy_build=>1,
 );
 
-=head1 ATTRIBUTES IMPLEMENTING THE DBIx::Storage::DBI INTERFACE
+=head1 ATTRIBUTES IMPLEMENTING THE DBIO::Storage::DBI INTERFACE
 
-The following methods are delegated all the methods required for the
+The following attributes delegate all methods required for the
 L<DBIO::Storage::DBI> interface.
 
 =cut
@@ -404,7 +404,7 @@ for my $method (@{$method_dispatch->{unimplemented}}) {
   });
 }
 
-=head2 read_handler
+=attr read_handler
 
 Defines an object that implements the read side of L<DBIO::Storage::DBI>.
 
@@ -417,7 +417,7 @@ has 'read_handler' => (
   handles=>$method_dispatch->{reader},
 );
 
-=head2 write_handler
+=attr write_handler
 
 Defines an object that implements the write side of L<DBIO::Storage::DBI>,
 as well as methods that don't write or read that can be called on only one
@@ -438,7 +438,12 @@ has 'write_handler' => (
 has _master_connect_info_opts =>
   (is => 'rw', isa => HashRef, default => sub { {} });
 
-=head2 around: connect_info
+=attr _master_connect_info_opts
+
+Internal cache of normalized master connection options used while merging
+replicant C<connect_info> data.
+
+=method around connect_info
 
 Preserves master's C<connect_info> options (for merging with replicants.)
 Also sets any Replicated-related options from connect_info, such as
@@ -463,7 +468,7 @@ around connect_info => sub {
   }
   delete $opts{dsn};
 
-  if (@opts{qw/pool_type pool_args/}) {
+  if (exists $opts{pool_type} || exists $opts{pool_args}) {
     $self->pool_type(delete $opts{pool_type})
       if $opts{pool_type};
 
@@ -476,7 +481,7 @@ around connect_info => sub {
     $self->clear_pool;
   }
 
-  if (@opts{qw/balancer_type balancer_args/}) {
+  if (exists $opts{balancer_type} || exists $opts{balancer_args}) {
     $self->balancer_type(delete $opts{balancer_type})
       if $opts{balancer_type};
 
@@ -509,7 +514,7 @@ around connect_info => sub {
 
 This class defines the following methods.
 
-=head2 BUILDARGS
+=method BUILDARGS
 
 L<DBIO::Schema> when instantiating its storage passed itself as the
 first argument.  So we need to massage the arguments a bit so that all the
@@ -527,7 +532,7 @@ sub BUILDARGS {
   }
 }
 
-=head2 _build_master
+=method _build_master
 
 Lazy builder for the L</master> attribute.
 
@@ -539,7 +544,7 @@ sub _build_master {
   $master
 }
 
-=head2 _build_pool
+=method _build_pool
 
 Lazy builder for the L</pool> attribute.
 
@@ -550,7 +555,7 @@ sub _build_pool {
   $self->create_pool(%{$self->pool_args});
 }
 
-=head2 _build_balancer
+=method _build_balancer
 
 Lazy builder for the L</balancer> attribute.  This takes a Pool object so that
 the balancer knows which pool it's balancing.
@@ -566,7 +571,7 @@ sub _build_balancer {
   );
 }
 
-=head2 _build_write_handler
+=method _build_write_handler
 
 Lazy builder for the L</write_handler> attribute.  The default is to set this to
 the L</master>.
@@ -577,7 +582,7 @@ sub _build_write_handler {
   return shift->master;
 }
 
-=head2 _build_read_handler
+=method _build_read_handler
 
 Lazy builder for the L</read_handler> attribute.  The default is to set this to
 the L</balancer>.
@@ -588,7 +593,7 @@ sub _build_read_handler {
   return shift->balancer;
 }
 
-=head2 around: connect_replicants
+=method around connect_replicants
 
 All calls to connect_replicants needs to have an existing $schema tacked onto
 top of the args, since L<DBIO::Storage::DBI> needs it, and any
@@ -645,7 +650,7 @@ around connect_replicants => sub {
   $self->$next($self->schema, @args);
 };
 
-=head2 all_storages
+=method all_storages
 
 Returns an array of all the connected storage backends.  The first element
 in the returned array is the master, and the rest are each of the
@@ -661,7 +666,7 @@ sub all_storages {
   );
 }
 
-=head2 execute_reliably ($coderef, ?@args)
+=method execute_reliably ($coderef, ?@args)
 
 Given a coderef, saves the current state of the L</read_handler>, forces it to
 use reliable storage (e.g. sets it to the master), executes a coderef and then
@@ -696,10 +701,10 @@ sub execute_reliably {
   &$coderef;
 }
 
-=head2 set_reliable_storage
+=method set_reliable_storage
 
-Sets the current $schema to be 'reliable', that is all queries, both read and
-write are sent to the master
+Sets the current $schema to be "reliable", meaning all queries (read and write)
+are sent to the master.
 
 =cut
 
@@ -711,10 +716,10 @@ sub set_reliable_storage {
   $schema->storage->read_handler($write_handler);
 }
 
-=head2 set_balanced_storage
+=method set_balanced_storage
 
-Sets the current $schema to be use the </balancer> for all reads, while all
-writes are sent to the master only
+Sets the current $schema to use L</balancer> for reads, while writes are sent
+to the master.
 
 =cut
 
@@ -726,7 +731,7 @@ sub set_balanced_storage {
   $schema->storage->read_handler($balanced_handler);
 }
 
-=head2 connected
+=method connected
 
 Check that the master and at least one of the replicants is connected.
 
@@ -739,7 +744,7 @@ sub connected {
     $self->pool->connected_replicants;
 }
 
-=head2 ensure_connected
+=method ensure_connected
 
 Make sure all the storages are connected.
 
@@ -752,9 +757,9 @@ sub ensure_connected {
   }
 }
 
-=head2 limit_dialect
+=method limit_dialect
 
-Set the limit_dialect for all existing storages
+Set C<limit_dialect> for all existing storages.
 
 =cut
 
@@ -766,9 +771,9 @@ sub limit_dialect {
   return $self->master->limit_dialect;
 }
 
-=head2 quote_char
+=method quote_char
 
-Set the quote_char for all existing storages
+Set C<quote_char> for all existing storages.
 
 =cut
 
@@ -780,9 +785,9 @@ sub quote_char {
   return $self->master->quote_char;
 }
 
-=head2 name_sep
+=method name_sep
 
-Set the name_sep for all existing storages
+Set C<name_sep> for all existing storages.
 
 =cut
 
@@ -794,9 +799,9 @@ sub name_sep {
   return $self->master->name_sep;
 }
 
-=head2 set_schema
+=method set_schema
 
-Set the schema object for all existing storages
+Set the schema object for all existing storages.
 
 =cut
 
@@ -807,9 +812,9 @@ sub set_schema {
   }
 }
 
-=head2 debug
+=method debug
 
-set a debug flag across all storages
+Set a debug flag across all storages.
 
 =cut
 
@@ -823,9 +828,9 @@ sub debug {
   return $self->master->debug;
 }
 
-=head2 debugobj
+=method debugobj
 
-set a debug object
+Set or return the debug object on the master storage.
 
 =cut
 
@@ -834,9 +839,9 @@ sub debugobj {
   return $self->master->debugobj(@_);
 }
 
-=head2 debugfh
+=method debugfh
 
-set a debugfh object
+Set or return the debug filehandle on the master storage.
 
 =cut
 
@@ -845,9 +850,9 @@ sub debugfh {
   return $self->master->debugfh(@_);
 }
 
-=head2 debugcb
+=method debugcb
 
-set a debug callback
+Set or return the debug callback on the master storage.
 
 =cut
 
@@ -856,9 +861,9 @@ sub debugcb {
   return $self->master->debugcb(@_);
 }
 
-=head2 disconnect
+=method disconnect
 
-disconnect everything
+Disconnect all storages.
 
 =cut
 
@@ -869,9 +874,9 @@ sub disconnect {
   }
 }
 
-=head2 cursor_class
+=method cursor_class
 
-set cursor class on all storages, or return master's
+Set cursor class on all storages, or return master's class.
 
 =cut
 
@@ -884,10 +889,10 @@ sub cursor_class {
   $self->master->cursor_class;
 }
 
-=head2 cursor
+=method cursor
 
-set cursor class on all storages, or return master's, alias for L</cursor_class>
-above.
+Set cursor class on all storages, or return master's class. Alias for
+L</cursor_class>.
 
 =cut
 
@@ -900,10 +905,10 @@ sub cursor {
   $self->master->cursor;
 }
 
-=head2 unsafe
+=method unsafe
 
-sets the L<DBIO::Storage::DBI/unsafe> option on all storages or returns
-master's current setting
+Set the L<DBIO::Storage::DBI/unsafe> option on all storages, or return
+master's current setting.
 
 =cut
 
@@ -917,10 +922,10 @@ sub unsafe {
   return $self->master->unsafe;
 }
 
-=head2 disable_sth_caching
+=method disable_sth_caching
 
-sets the L<DBIO::Storage::DBI/disable_sth_caching> option on all storages
-or returns master's current setting
+Set the L<DBIO::Storage::DBI/disable_sth_caching> option on all storages,
+or return master's current setting.
 
 =cut
 
@@ -934,35 +939,41 @@ sub disable_sth_caching {
   return $self->master->disable_sth_caching;
 }
 
-=head2 lag_behind_master
+=method lag_behind_master
 
-returns the highest Replicant L<DBIO::Storage::DBI/lag_behind_master>
-setting
+Return the highest replicant
+L<DBIO::Storage::DBI/lag_behind_master> value.
 
 =cut
 
 sub lag_behind_master {
   my $self = shift;
+  my @replicants = $self->pool->all_replicants;
 
-  return List::Util::max( map { $_->lag_behind_master } $self->replicants );
+  return unless @replicants;
+
+  return List::Util::max(map { $_->lag_behind_master } @replicants);
 }
 
-=head2 is_replicating
+=method is_replicating
 
-returns true if all replicants return true for
+Returns true if all replicants return true for
 L<DBIO::Storage::DBI/is_replicating>
 
 =cut
 
 sub is_replicating {
   my $self = shift;
+  my @replicants = $self->pool->all_replicants;
 
-  return (grep $_->is_replicating, $self->replicants) == ($self->replicants);
+  return 0 unless @replicants;
+
+  return (grep $_->is_replicating, @replicants) == @replicants;
 }
 
-=head2 connect_call_datetime_setup
+=method connect_call_datetime_setup
 
-calls L<DBIO::Storage::DBI/connect_call_datetime_setup> for all storages
+Call L<DBIO::Storage::DBI/connect_call_datetime_setup> for all storages.
 
 =cut
 
@@ -971,9 +982,9 @@ sub connect_call_datetime_setup {
   $_->connect_call_datetime_setup for $self->all_storages;
 }
 
-=head2 connect_call_rebase_sqlmaker
+=method connect_call_rebase_sqlmaker
 
-calls L<DBIO::Storage::DBI/connect_call_rebase_sqlmaker> for all storages
+Call L<DBIO::Storage::DBI/connect_call_rebase_sqlmaker> for all storages.
 
 =cut
 

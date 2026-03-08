@@ -26,7 +26,7 @@ overload fallback to give natural boolean/numeric values.
 
 =head1 METHODS
 
-=head2 throw
+=method throw
 
 =over 4
 
@@ -74,7 +74,7 @@ sub throw {
     die $self;
 }
 
-=head2 rethrow
+=method rethrow
 
 This method provides some syntactic sugar in order to
 re-throw exceptions.

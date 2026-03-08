@@ -5,6 +5,13 @@ use strict;
 use warnings;
 use namespace::clean;
 
+=method register_column
+
+Attach serializer-based inflate/deflate handlers for columns using
+C<serializer_class>.
+
+=cut
+
 sub register_column {
     my $self = shift;
     my ($column, $info, $args) = @_;
@@ -87,10 +94,10 @@ serialization module separately — they are not hard dependencies of DBIO.
 
 1. Install the serialization module you want to use (e.g. L<JSON::MaybeXS> or L<YAML>)
 
-2. Add 'InflateColumn::Serializer' into the load_components of your table class
+2. Add C<InflateColumn::Serializer> to C<load_components> in your table class
 
-3. add 'serializer_class' => SERIALIZER to the properties of the column that you want to (de/i)nflate
-   with the SERIALIZER class.
+3. Add C<serializer_class =E<gt> SERIALIZER> to the column definition you want
+   to serialize/deserialize.
 
 =head1 NOTES
 

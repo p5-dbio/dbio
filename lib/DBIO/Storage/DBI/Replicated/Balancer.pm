@@ -4,6 +4,7 @@ package DBIO::Storage::DBI::Replicated::Balancer;
 use Moose::Role;
 requires 'next_storage';
 use MooseX::Types::Moose qw/Int/;
+use Scalar::Util qw/blessed/;
 use DBIO::Storage::DBI::Replicated::Pool;
 use DBIO::Storage::DBI::Replicated::Types qw/DBICStorageDBI/;
 use namespace::clean -except => 'meta';
@@ -15,14 +16,14 @@ This role is used internally by L<DBIO::Storage::DBI::Replicated>.
 =head1 DESCRIPTION
 
 Given a pool (L<DBIO::Storage::DBI::Replicated::Pool>) of replicated
-database's (L<DBIO::Storage::DBI::Replicated::Replicant>), defines a
+databases (L<DBIO::Storage::DBI::Replicated::Replicant>), this role defines a
 method by which query load can be spread out across each replicant in the pool.
 
 =head1 ATTRIBUTES
 
 This class defines the following attributes.
 
-=head2 auto_validate_every ($seconds)
+=attr auto_validate_every ($seconds)
 
 If auto_validate has some sort of value, run
 L<DBIO::Storage::DBI::Replicated::Pool/validate_replicants>
@@ -37,7 +38,7 @@ has 'auto_validate_every' => (
   predicate=>'has_auto_validate_every',
 );
 
-=head2 master
+=attr master
 
 The L<DBIO::Storage::DBI> object that is the master database all the
 replicants are trying to follow.  The balancer needs to know it since it's the
@@ -51,7 +52,7 @@ has 'master' => (
   required=>1,
 );
 
-=head2 pool
+=attr pool
 
 The L<DBIO::Storage::DBI::Replicated::Pool> object that we are trying to
 balance.
@@ -64,7 +65,7 @@ has 'pool' => (
   required=>1,
 );
 
-=head2 current_replicant
+=attr current_replicant
 
 Replicant storages (slaves) handle all read only traffic.  The assumption is
 that your database will become readbound well before it becomes write bound
@@ -92,7 +93,7 @@ has 'current_replicant' => (
 
 This class defines the following methods.
 
-=head2 _build_current_replicant
+=method _build_current_replicant
 
 Lazy builder for the L</current_replicant> attribute.
 
@@ -103,7 +104,7 @@ sub _build_current_replicant {
   $self->next_storage;
 }
 
-=head2 next_storage
+=method next_storage
 
 This method should be defined in the class which consumes this role.
 
@@ -115,7 +116,7 @@ support other balance systems.
 This returns from the pool of active replicants.  If there are no active
 replicants, then you should have it return the master as an ultimate fallback.
 
-=head2 around: next_storage
+=method around next_storage
 
 Advice on next storage to add the autovalidation.  We have this broken out so
 that it's easier to break out the auto validation into a role.
@@ -125,7 +126,11 @@ or just forgot to create them :)
 
 =cut
 
-my $on_master;
+has _on_master => (
+  is => 'rw',
+  isa => Int,
+  default => 0,
+);
 
 around 'next_storage' => sub {
   my ($next_storage, $self, @args) = @_;
@@ -141,18 +146,19 @@ around 'next_storage' => sub {
 
   ## Get a replicant, or the master if none
   if(my $next = $self->$next_storage(@args)) {
-    $self->master->debugobj->print("Moved back to slave\n") if $on_master;
-    $on_master = 0;
+    $self->master->debugobj->print("Moved back to slave\n") if $self->_on_master;
+    $self->_on_master(0);
     return $next;
   } else {
     $self->master->debugobj->print("No Replicants validate, falling back to master reads.\n")
-       unless $on_master++;
+      unless $self->_on_master;
+    $self->_on_master(1);
 
     return $self->master;
   }
 };
 
-=head2 increment_storage
+=method increment_storage
 
 Rolls the Storage to whatever is next in the queue, as defined by the Balancer.
 
@@ -164,7 +170,7 @@ sub increment_storage {
   $self->current_replicant($next_replicant);
 }
 
-=head2 around: select
+=method around select
 
 Advice on the select attribute.  Each time we use a replicant
 we need to change it via the storage pool algorithm.  That way we are spreading
@@ -175,7 +181,7 @@ the load evenly (hopefully) across existing capacity.
 around 'select' => sub {
   my ($select, $self, @args) = @_;
 
-  if (my $forced_pool = $args[-1]->{force_pool}) {
+  if (ref($args[-1]) eq 'HASH' && (my $forced_pool = $args[-1]->{force_pool})) {
     delete $args[-1]->{force_pool};
     return $self->_get_forced_pool($forced_pool)->select(@args);
   } elsif($self->master->{transaction_depth}) {
@@ -186,7 +192,7 @@ around 'select' => sub {
   }
 };
 
-=head2 around: select_single
+=method around select_single
 
 Advice on the select_single attribute.  Each time we use a replicant
 we need to change it via the storage pool algorithm.  That way we are spreading
@@ -197,7 +203,7 @@ the load evenly (hopefully) across existing capacity.
 around 'select_single' => sub {
   my ($select_single, $self, @args) = @_;
 
-  if (my $forced_pool = $args[-1]->{force_pool}) {
+  if (ref($args[-1]) eq 'HASH' && (my $forced_pool = $args[-1]->{force_pool})) {
     delete $args[-1]->{force_pool};
     return $self->_get_forced_pool($forced_pool)->select_single(@args);
   } elsif($self->master->{transaction_depth}) {
@@ -208,7 +214,7 @@ around 'select_single' => sub {
   }
 };
 
-=head2 before: columns_info_for
+=method before columns_info_for
 
 Advice on the current_replicant_storage attribute.  Each time we use a replicant
 we need to change it via the storage pool algorithm.  That way we are spreading
@@ -221,7 +227,7 @@ before 'columns_info_for' => sub {
   $self->increment_storage;
 };
 
-=head2 _get_forced_pool ($name)
+=method _get_forced_pool ($name)
 
 Given an identifier, find the most correct storage object to handle the query.
 

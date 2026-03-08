@@ -36,11 +36,19 @@ use namespace::clean;
 
 __PACKAGE__->mk_group_accessors (simple => qw/quote_char name_sep limit_dialect/);
 
+=method _quoting_enabled
+
+=cut
+
 sub _quoting_enabled {
   ( defined $_[0]->{quote_char} and length $_[0]->{quote_char} ) ? 1 : 0
 }
 
 # for when I need a normalized l/r pair
+=method _quote_chars
+
+=cut
+
 sub _quote_chars {
 
   # in case we are called in the old !!$sm->_quote_chars fashion
@@ -56,10 +64,18 @@ sub _quote_chars {
 # weaklink and channel through $schema->throw_exception
 sub throw_exception { DBIO::Exception->throw($_[1]) }
 
+=method belch
+
+=cut
+
 sub belch {
   shift;  # throw away $self
   carp( "Warning: ", @_ );
 };
+
+=method puke
+
+=cut
 
 sub puke {
   shift->throw_exception("Fatal: " . join ('',  @_));
@@ -94,12 +110,20 @@ sub __max_int () { 0x7FFFFFFF };
 sub _assert_bindval_matches_bindtype () { 1 };
 
 # poor man's de-qualifier
+=method _quote
+
+=cut
+
 sub _quote {
   $_[0]->next::method( ( $_[0]{_dequalify_idents} and ! ref $_[1] )
     ? $_[1] =~ / ([^\.]+) $ /x
     : $_[1]
   );
 }
+
+=method _where_op_NEST
+
+=cut
 
 sub _where_op_NEST {
   carp_unique ("-nest in search conditions is deprecated, you most probably wanted:\n"
@@ -110,6 +134,10 @@ sub _where_op_NEST {
 }
 
 # Handle limit-dialect selection
+=method select
+
+=cut
+
 sub select {
   my ($self, $table, $fields, $where, $rs_attrs, $limit, $offset) = @_;
 
@@ -180,6 +208,10 @@ sub select {
   return wantarray ? ($sql, @all_bind) : $sql;
 }
 
+=method _assemble_binds
+
+=cut
+
 sub _assemble_binds {
   my $self = shift;
   return map { @{ (delete $self->{"${_}_bind"}) || [] } } (qw/pre_select select from where group having order limit/);
@@ -189,6 +221,10 @@ my $for_syntax = {
   update => 'FOR UPDATE',
   shared => 'FOR SHARE',
 };
+=method _lock_select
+
+=cut
+
 sub _lock_select {
   my ($self, $type) = @_;
 
@@ -204,6 +240,10 @@ sub _lock_select {
 }
 
 # Handle default inserts
+=method insert
+
+=cut
+
 sub insert {
 # optimized due to hotttnesss
 #  my ($self, $table, $data, $options) = @_;
@@ -228,6 +268,10 @@ sub insert {
 
   next::method(@_);
 }
+
+=method _recurse_fields
+
+=cut
 
 sub _recurse_fields {
   my ($self, $fields) = @_;
@@ -295,6 +339,10 @@ sub _recurse_fields {
 #
 # FIXME - this will have to transition out to a subclass when the effort
 # of folding the SQL generating machinery into SQLMaker takes place
+=method _parse_rs_attrs
+
+=cut
+
 sub _parse_rs_attrs {
   my ($self, $arg) = @_;
 
@@ -320,6 +368,10 @@ sub _parse_rs_attrs {
   return $sql;
 }
 
+=method _order_by
+
+=cut
+
 sub _order_by {
   my ($self, $arg) = @_;
 
@@ -334,6 +386,10 @@ sub _order_by {
   }
 }
 
+=method _split_order_chunk
+
+=cut
+
 sub _split_order_chunk {
   my ($self, $chunk) = @_;
 
@@ -345,6 +401,10 @@ sub _split_order_chunk {
     ( $1 and uc($1) eq 'DESC' ) ? 1 : 0,
   );
 }
+
+=method _table
+
+=cut
 
 sub _table {
 # optimized due to hotttnesss
@@ -365,6 +425,10 @@ sub _table {
   return $_[0]->next::method ($_[1]);
 }
 
+=method _generate_join_clause
+
+=cut
+
 sub _generate_join_clause {
     my ($self, $join_type) = @_;
 
@@ -376,10 +440,18 @@ sub _generate_join_clause {
     );
 }
 
+=method _recurse_from
+
+=cut
+
 sub _recurse_from {
   my $self = shift;
   return join (' ', $self->_gen_from_blocks(@_) );
 }
+
+=method _gen_from_blocks
+
+=cut
 
 sub _gen_from_blocks {
   my ($self, $from, @joins) = @_;
@@ -416,6 +488,10 @@ sub _gen_from_blocks {
   return @fchunks;
 }
 
+=method _from_chunk_to_sql
+
+=cut
+
 sub _from_chunk_to_sql {
   my ($self, $fromspec) = @_;
 
@@ -446,6 +522,10 @@ sub _from_chunk_to_sql {
     }
   });
 }
+
+=method _join_condition
+
+=cut
 
 sub _join_condition {
   my ($self, $cond) = @_;
@@ -494,6 +574,10 @@ sub _join_condition {
 # - can binds reside on lhs?
 #
 # !!! EXPERIMENTAL API !!! WILL CHANGE !!!
+=method _where_op_multicolumn_in
+
+=cut
+
 sub _where_op_multicolumn_in {
   my ($self, $lhs, $rhs) = @_;
 
@@ -543,6 +627,10 @@ sub _where_op_multicolumn_in {
 ### Code that mostly used to be in DBIC::SQLMaker::LimitDialects
 ###
 
+=method _LimitOffset
+
+=cut
+
 sub _LimitOffset {
     my ( $self, $sql, $rs_attrs, $rows, $offset ) = @_;
     $sql .= $self->_parse_rs_attrs( $rs_attrs ) . " LIMIT ?";
@@ -553,6 +641,10 @@ sub _LimitOffset {
     }
     return $sql;
 }
+
+=method _LimitXY
+
+=cut
 
 sub _LimitXY {
     my ( $self, $sql, $rs_attrs, $rows, $offset ) = @_;
@@ -566,6 +658,10 @@ sub _LimitXY {
 
     return $sql;
 }
+
+=method _RowNumberOver
+
+=cut
 
 sub _RowNumberOver {
   my ($self, $sql, $rs_attrs, $rows, $offset ) = @_;
@@ -624,9 +720,17 @@ EOS
 }
 
 # some databases are happy with OVER (), some need OVER (ORDER BY (SELECT (1)) )
+=method _rno_default_order
+
+=cut
+
 sub _rno_default_order {
   return undef;
 }
+
+=method _SkipFirst
+
+=cut
 
 sub _SkipFirst {
   my ($self, $sql, $rs_attrs, $rows, $offset) = @_;
@@ -651,6 +755,10 @@ sub _SkipFirst {
   );
 }
 
+=method _FirstSkip
+
+=cut
+
 sub _FirstSkip {
   my ($self, $sql, $rs_attrs, $rows, $offset) = @_;
 
@@ -673,6 +781,10 @@ sub _FirstSkip {
     $self->_parse_rs_attrs ($rs_attrs),
   );
 }
+
+=method _RowNum
+
+=cut
 
 sub _RowNum {
   my ( $self, $sql, $rs_attrs, $rows, $offset ) = @_;
@@ -737,6 +849,10 @@ EOS
 }
 
 # used by _Top and _FetchFirst below
+=method _prep_for_skimming_limit
+
+=cut
+
 sub _prep_for_skimming_limit {
   my ( $self, $sql, $rs_attrs ) = @_;
 
@@ -830,6 +946,10 @@ sub _prep_for_skimming_limit {
   $sq_attrs;
 }
 
+=method _Top
+
+=cut
+
 sub _Top {
   my ( $self, $sql, $rs_attrs, $rows, $offset ) = @_;
 
@@ -862,6 +982,10 @@ sub _Top {
 
   return $sql;
 }
+
+=method _FetchFirst
+
+=cut
 
 sub _FetchFirst {
   my ( $self, $sql, $rs_attrs, $rows, $offset ) = @_;
@@ -896,6 +1020,10 @@ sub _FetchFirst {
 
   return $sql;
 }
+
+=method _GenericSubQ
+
+=cut
 
 sub _GenericSubQ {
   my ($self, $sql, $rs_attrs, $rows, $offset) = @_;
@@ -1083,6 +1211,10 @@ $inner_order_sql
 # also return a hashref (order doesn't matter) of QUOTED EXTRA-SEL =>
 # QUOTED ALIAS pairs, which is a list of extra selectors that do *not*
 # exist in the original select list
+=method _subqueried_limit_attrs
+
+=cut
+
 sub _subqueried_limit_attrs {
   my ($self, $proto_sql, $rs_attrs) = @_;
 
@@ -1190,6 +1322,10 @@ sub _subqueried_limit_attrs {
     order_supplement => $extra_order_sel,
   };
 }
+
+=method _unqualify_colname
+
+=cut
 
 sub _unqualify_colname {
   my ($self, $fqcn) = @_;

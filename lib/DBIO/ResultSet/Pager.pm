@@ -6,6 +6,13 @@ use strict;
 
 use DBIO::Exception;
 
+=method new
+
+Constructor for pager state. Accepts optional total entries, entries per
+page, and current page.
+
+=cut
+
 sub new {
   my( $proto, $total_entries, $entries_per_page, $current_page ) = @_;
 
@@ -19,6 +26,11 @@ sub new {
   return $self;
 }
 
+=method entries_per_page
+
+Getter/setter for entries per page.
+
+=cut
 
 sub entries_per_page {
   my $self = shift;
@@ -33,6 +45,12 @@ sub entries_per_page {
 
   $self;
 }
+
+=method current_page
+
+Getter/setter for current page with bounds clamped to valid page range.
+
+=cut
 
 sub current_page {
   my $self = shift;
@@ -54,6 +72,12 @@ sub current_page {
   $self->{current_page};
 }
 
+=method total_entries
+
+Getter/setter for total entries. Supports lazy code-ref evaluation.
+
+=cut
+
 sub total_entries {
   my $self = shift;
 
@@ -70,6 +94,11 @@ sub total_entries {
   $self->{total_entries};
 }
 
+=method entries_on_this_page
+
+Returns the number of entries visible on the current page.
+
+=cut
 
 sub entries_on_this_page {
   my $self = shift;
@@ -81,9 +110,21 @@ sub entries_on_this_page {
   }
 }
 
+=method first_page
+
+Returns the first page number.
+
+=cut
+
 sub first_page {
   return 1;
 }
+
+=method last_page
+
+Returns the last page number based on totals and page size.
+
+=cut
 
 sub last_page {
   my $self = shift;
@@ -101,6 +142,12 @@ sub last_page {
   return $last_page;
 }
 
+=method first
+
+Returns the first entry index on the current page.
+
+=cut
+
 sub first {
   my $self = shift;
 
@@ -110,6 +157,12 @@ sub first {
     return ( ( $self->current_page - 1 ) * $self->entries_per_page ) + 1;
   }
 }
+
+=method last
+
+Returns the last entry index on the current page.
+
+=cut
 
 sub last {
   my $self = shift;
@@ -121,6 +174,12 @@ sub last {
   }
 }
 
+=method previous_page
+
+Returns the previous page number, or undef when already at first page.
+
+=cut
+
 sub previous_page {
   my $self = shift;
 
@@ -131,6 +190,12 @@ sub previous_page {
   }
 }
 
+=method next_page
+
+Returns the next page number, or undef when already at last page.
+
+=cut
+
 sub next_page {
   my $self = shift;
 
@@ -140,12 +205,24 @@ sub next_page {
 # This method would probably be better named 'select' or 'slice' or
 # something, because it doesn't modify the array the way
 # CORE::splice() does.
+=method splice
+
+Returns the slice of array values visible on the current page.
+
+=cut
+
 sub splice {
   my ( $self, $array ) = @_;
   my $top = @$array > $self->last ? $self->last : @$array;
   return () if $top == 0;    # empty
   return @{$array}[ $self->first - 1 .. $top - 1 ];
 }
+
+=method skipped
+
+Returns the number of entries skipped before the current page.
+
+=cut
 
 sub skipped {
   my $self = shift;
@@ -154,6 +231,13 @@ sub skipped {
   return 0 if $skipped < 0;
   return $skipped;
 }
+
+=method change_entries_per_page
+
+Changes page size and adjusts current page so the previous first item remains
+visible.
+
+=cut
 
 sub change_entries_per_page {
   my ( $self, $new_epp ) = @_;

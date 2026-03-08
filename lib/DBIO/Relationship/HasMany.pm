@@ -10,6 +10,10 @@ our %_pod_inherit_config =
    class_map => { 'DBIO::Relationship::HasMany' => 'DBIO::Relationship' }
   );
 
+=method has_many
+
+=cut
+
 sub has_many {
   my ($class, $rel, $f_class, $cond, $attrs) = @_;
 

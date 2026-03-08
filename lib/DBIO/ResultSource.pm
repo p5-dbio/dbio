@@ -325,6 +325,15 @@ info keys as L</add_columns>.
 
 =cut
 
+=method add_columns
+
+Adds one or more columns (and optional column metadata) to the result source.
+
+See the C<add_column>/C<add_columns> documentation above for supported
+metadata keys and merge behavior.
+
+=cut
+
 sub add_columns {
   my ($self, @cols) = @_;
   $self->_ordered_columns(\@cols) unless $self->_ordered_columns;
@@ -349,6 +358,12 @@ sub add_columns {
   push @{ $self->_ordered_columns }, @added;
   return $self;
 }
+
+=method add_column
+
+Convenience wrapper for adding a single column definition via L</add_columns>.
+
+=cut
 
 sub add_column { shift->add_columns(@_); } # DO NOT CHANGE THIS TO GLOB
 
@@ -574,6 +589,12 @@ sub remove_columns {
 
   $self->_ordered_columns([ grep { not $to_remove{$_} } @{$self->_ordered_columns} ]);
 }
+
+=method remove_column
+
+Convenience wrapper for removing a single column via L</remove_columns>.
+
+=cut
 
 sub remove_column { shift->remove_columns(@_); } # DO NOT CHANGE THIS TO GLOB
 
@@ -1113,6 +1134,13 @@ This gives you the flexibility of not using it when you don't need it.
 
 For more complex situations, another solution would be to use a virtual view
 via L<DBIO::ResultSource::View>.
+
+=cut
+
+=method resultset
+
+Returns a new resultset instance for this source, seeded with schema defaults
+and source-level C<resultset_attributes>.
 
 =cut
 

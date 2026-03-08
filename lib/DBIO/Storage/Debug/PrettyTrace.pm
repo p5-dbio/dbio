@@ -15,6 +15,12 @@ __PACKAGE__->mk_group_accessors( simple => '_show_progress' );
 __PACKAGE__->mk_group_accessors( simple => '_last_sql' );
 __PACKAGE__->mk_group_accessors( simple => 'squash_repeats' );
 
+=method new
+
+Constructs a pretty-trace statistics/debug object.
+
+=cut
+
 sub new {
    my $class = shift;
    my $args  = shift;
@@ -42,6 +48,12 @@ sub new {
 
    return $self
 }
+
+=method print
+
+Formats SQL and bind values into a readable trace output line.
+
+=cut
 
 sub print {
   my $self = shift;
@@ -71,6 +83,12 @@ sub print {
   $self->next::method("$lw$formatted$lr", @_);
 }
 
+=method query_start
+
+Emits a formatted trace line when SQL execution starts.
+
+=cut
+
 sub query_start {
   my ($self, $string, @bind) = @_;
 
@@ -86,6 +104,12 @@ sub query_start {
 
   $self->debugfh->print($self->_executing_str) if $self->_show_progress
 }
+
+=method query_end
+
+Cleans up progress marker output after SQL execution finishes.
+
+=cut
 
 sub query_end {
   $_[0]->debugfh->print($_[0]->_clear_line_str) if $_[0]->_show_progress

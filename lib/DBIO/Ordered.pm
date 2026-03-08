@@ -144,6 +144,10 @@ The ordering is a backwards-compatibility artifact - if you need
 a resultset with no ordering applied use C<_siblings>
 
 =cut
+=method siblings
+
+=cut
+
 sub siblings {
     my $self = shift;
     return $self->_siblings->search ({}, { order_by => $self->position_column } );
@@ -158,6 +162,10 @@ Returns a resultset of all objects in the same group
 positioned before the object on which this method was called.
 
 =cut
+=method previous_siblings
+
+=cut
+
 sub previous_siblings {
     my $self = shift;
     my $position_column = $self->position_column;
@@ -177,6 +185,10 @@ Returns a resultset of all objects in the same group
 positioned after the object on which this method was called.
 
 =cut
+=method next_siblings
+
+=cut
+
 sub next_siblings {
     my $self = shift;
     my $position_column = $self->position_column;
@@ -193,6 +205,10 @@ sub next_siblings {
 
 Returns the sibling that resides one position back.  Returns 0
 if the current object is the first one.
+
+=cut
+
+=method previous_sibling
 
 =cut
 
@@ -217,6 +233,10 @@ is this sibling.
 
 =cut
 
+=method first_sibling
+
+=cut
+
 sub first_sibling {
     my $self = shift;
     my $position_column = $self->position_column;
@@ -235,6 +255,10 @@ sub first_sibling {
 
 Returns the sibling that resides one position forward. Returns 0
 if the current object is the last one.
+
+=cut
+
+=method next_sibling
 
 =cut
 
@@ -258,6 +282,10 @@ sibling.
 
 =cut
 
+=method last_sibling
+
+=cut
+
 sub last_sibling {
     my $self = shift;
     my $position_column = $self->position_column;
@@ -270,6 +298,10 @@ sub last_sibling {
 }
 
 # an optimized method to get the last sibling position value without inflating a result object
+=method _last_sibling_posval
+
+=cut
+
 sub _last_sibling_posval {
     my $self = shift;
     my $position_column = $self->position_column;
@@ -293,6 +325,10 @@ already the first one.
 
 =cut
 
+=method move_previous
+
+=cut
+
 sub move_previous {
     my $self = shift;
     return $self->move_to ($self->_position - 1);
@@ -305,6 +341,10 @@ sub move_previous {
 Swaps position with the sibling in the next position in the
 list.  Returns 1 on success, and 0 if the object is already
 the last in the list.
+
+=cut
+
+=method move_next
 
 =cut
 
@@ -323,6 +363,10 @@ on success, and 0 if the object is already the first.
 
 =cut
 
+=method move_first
+
+=cut
+
 sub move_first {
     return shift->move_to( 1 );
 }
@@ -333,6 +377,10 @@ sub move_first {
 
 Moves the object to the last position in the list.  Returns 1
 on success, and 0 if the object is already the last one.
+
+=cut
+
+=method move_last
 
 =cut
 
@@ -352,6 +400,10 @@ sub move_last {
 Moves the object to the specified position.  Returns 1 on
 success, and 0 if the object is already at the specified
 position.
+
+=cut
+
+=method move_to
 
 =cut
 
@@ -438,6 +490,10 @@ if multiple grouping columns are in use.
 
 =cut
 
+=method move_to_group
+
+=cut
+
 sub move_to_group {
     my( $self, $to_group, $to_position ) = @_;
 
@@ -512,6 +568,10 @@ the table +1, thus positioning the new record at the last position.
 
 =cut
 
+=method insert
+
+=cut
+
 sub insert {
     my $self = shift;
     my $position_column = $self->position_column;
@@ -536,6 +596,10 @@ to the position and/or group columns.  Movement within a
 group or to another group is handled by repositioning
 the appropriate siblings.  Position defaults to the end
 of a new group if it has been changed to undef.
+
+=cut
+
+=method update
 
 =cut
 
@@ -591,6 +655,10 @@ integrity of the positions.
 
 =cut
 
+=method delete
+
+=cut
+
 sub delete {
     my $self = shift;
 
@@ -606,6 +674,10 @@ sub delete {
 }
 
 # add the current position/group to the things we track old values for
+=method _track_storage_value
+
+=cut
+
 sub _track_storage_value {
   my ($self, $col) = @_;
   return (
@@ -630,6 +702,10 @@ Returns the B<absolute numeric position> of an object with a B<position
 value> set to C<$pos_value>. By default simply returns C<$pos_value>.
 
 =cut
+=method _position_from_value
+
+=cut
+
 sub _position_from_value {
     my ($self, $val) = @_;
 
@@ -651,6 +727,10 @@ Returns the B<value> of L</position_column> of the object at numeric
 position C<$pos>. By default simply returns C<$pos>.
 
 =cut
+=method _position_value
+
+=cut
+
 sub _position_value {
     my ($self, $pos) = @_;
 
@@ -690,6 +770,10 @@ default method expects C<$position_value> to be numeric, and
 returns C<$position_value + 1>
 
 =cut
+=method _next_position_value
+
+=cut
+
 sub _next_position_value {
     return $_[1] + 1;
 }
@@ -710,6 +794,10 @@ Refer to the implementation source of the default method for more
 information.
 
 =cut
+=method _shift_siblings
+
+=cut
+
 sub _shift_siblings {
     my ($self, $direction, @between) = @_;
     return 0 unless $direction;
@@ -757,6 +845,10 @@ sub _shift_siblings {
 
 # This method returns a resultset containing all members of the row
 # group (including the row itself).
+=method _group_rs
+
+=cut
+
 sub _group_rs {
     my $self = shift;
     return $self->result_source->resultset->search({$self->_grouping_clause()});
@@ -764,6 +856,10 @@ sub _group_rs {
 
 # Returns an unordered resultset of all objects in the same group
 # excluding the object you called this method on.
+=method _siblings
+
+=cut
+
 sub _siblings {
     my $self = shift;
     my $position_column = $self->position_column;
@@ -778,6 +874,10 @@ sub _siblings {
 
 # Returns the B<absolute numeric position> of the current object, with the
 # first object being at position 1, its sibling at position 2 and so on.
+=method _position
+
+=cut
+
 sub _position {
     my $self = shift;
     return $self->_position_from_value ($self->get_column ($self->position_column) );
@@ -786,6 +886,10 @@ sub _position {
 # This method returns one or more name=>value pairs for limiting a search
 # by the grouping column(s).  If the grouping column is not defined then
 # this will return an empty list.
+=method _grouping_clause
+
+=cut
+
 sub _grouping_clause {
     my( $self ) = @_;
     return map {  $_ => $self->get_column($_)  } $self->_grouping_columns();
@@ -794,6 +898,10 @@ sub _grouping_clause {
 # Returns a list of the column names used for grouping, regardless of whether
 # they were specified as an arrayref or a single string, and returns ()
 # if there is no grouping.
+=method _grouping_columns
+
+=cut
+
 sub _grouping_columns {
     my( $self ) = @_;
     my $col = $self->grouping_column();
@@ -807,6 +915,10 @@ sub _grouping_columns {
 }
 
 # Returns true if the object is in the group represented by hashref $other
+=method _is_in_group
+
+=cut
+
 sub _is_in_group {
     my ($self, $other) = @_;
     my $current = {$self->_grouping_clause};
@@ -836,6 +948,10 @@ sub _is_in_group {
 # having a chance to update the ill-defined row. If you really know what
 # you are doing use this method which bypasses any hooks introduced by
 # this module.
+=method _ordered_internal_update
+
+=cut
+
 sub _ordered_internal_update {
     my $self = shift;
     local $self->result_source->schema->{_ORDERED_INTERNAL_UPDATE} = 1;

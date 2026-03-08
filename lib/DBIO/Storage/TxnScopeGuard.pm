@@ -10,6 +10,12 @@ use DBIO::_Util qw(is_exception detected_reinvoked_destructor);
 use DBIO::Carp;
 use namespace::clean;
 
+=method new
+
+Begins a transaction and returns a scope guard bound to the supplied storage.
+
+=cut
+
 sub new {
   my ($class, $storage) = @_;
 
@@ -40,6 +46,12 @@ sub new {
   $guard;
 }
 
+=method commit
+
+Commits the transaction and inactivates the guard.
+
+=cut
+
 sub commit {
   my $self = shift;
 
@@ -54,6 +66,12 @@ sub commit {
   $self->{inactivated} = 1;
   $self->{storage}->txn_commit;
 }
+
+=method rollback
+
+Rolls back the transaction and inactivates the guard.
+
+=cut
 
 sub rollback {
   my $self = shift;

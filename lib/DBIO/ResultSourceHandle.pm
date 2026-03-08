@@ -34,7 +34,7 @@ contract between a C<Schema> instance and its C<ResultSource> registrants.
 
 =head1 METHODS
 
-=head2 new
+=method new
 
 =cut
 
@@ -52,7 +52,7 @@ sub new {
   $self;
 }
 
-=head2 resolve
+=method resolve
 
 Resolve the moniker into the actual ResultSource object
 
@@ -69,7 +69,7 @@ sub resolve {
   ), 'full_stacktrace');
 }
 
-=head2 STORABLE_freeze
+=method STORABLE_freeze
 
 Freezes a handle.
 
@@ -90,7 +90,7 @@ sub STORABLE_freeze {
   Storable::nfreeze($to_serialize);
 }
 
-=head2 STORABLE_thaw
+=method STORABLE_thaw
 
 Thaws frozen handle. Resets the internal schema reference to the package
 variable C<$thaw_schema>. The recommended way of setting this is to use

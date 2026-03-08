@@ -83,7 +83,20 @@ Return the schema class without connecting.
 
 =item storage_type
 
-Override the storage type (e.g. C<::DBI::Replicated>).
+Override the storage class used by the schema.
+
+When used together with C<dsn>/C<connect_info>, this behaves like
+L<DBIO::Schema/storage_type>.
+
+When used without a real C<dsn>, C<init_schema()> creates a hybrid storage
+class combining L<DBIO::Test::Storage> (fake execution) and the requested
+driver storage class. This allows offline SQL-generation tests with
+driver-specific SQLMaker behavior, for example:
+
+  my $schema = DBIO::Test->init_schema(
+    no_deploy    => 1,
+    storage_type => 'DBIO::MySQL::Storage',
+  );
 
 =item connect_opts
 

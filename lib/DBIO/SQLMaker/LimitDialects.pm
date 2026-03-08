@@ -24,8 +24,28 @@ my $sigh = sub {
   DBIO::SQLMaker::ClassicExtensions->$meth;
 };
 
+=method __rows_bindtype
+
+Compatibility shim forwarding to C<DBIO::SQLMaker::ClassicExtensions>.
+
+=cut
+
 sub __rows_bindtype { $sigh->() }
+
+=method __offset_bindtype
+
+Compatibility shim forwarding to C<DBIO::SQLMaker::ClassicExtensions>.
+
+=cut
+
 sub __offset_bindtype { $sigh->() }
+
+=method __total_bindtype
+
+Compatibility shim forwarding to C<DBIO::SQLMaker::ClassicExtensions>.
+
+=cut
+
 sub __total_bindtype { $sigh->() }
 
 1;

@@ -26,6 +26,24 @@
 
 =back
 
+=head1 Driver distributions
+
+Database-specific storage implementations are split into dedicated
+distributions. Install the driver distribution that matches your backend:
+
+=over 4
+
+=item L<DBIO::PostgreSQL> (distribution: C<DBIO-PostgreSQL>)
+
+=item L<DBIO::MySQL> (distribution: C<DBIO-MySQL>)
+
+=item L<DBIO::SQLite> (distribution: C<DBIO-SQLite>)
+
+=back
+
+Additional DBIO driver distributions exist for other databases; some are still
+in migration from the historical monolithic DBIx::Class test setup.
+
 =head1 Some essential reference documentation
 
 The first two list items are the most important.
@@ -69,4 +87,3 @@ This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
 by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.
-

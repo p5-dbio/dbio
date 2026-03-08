@@ -11,13 +11,25 @@ our %_pod_inherit_config =
    class_map => { 'DBIO::Relationship::HasOne' => 'DBIO::Relationship' }
   );
 
+=method might_have
+
+=cut
+
 sub might_have {
   shift->_has_one('LEFT' => @_);
 }
 
+=method has_one
+
+=cut
+
 sub has_one {
   shift->_has_one(undef() => @_);
 }
+
+=method _has_one
+
+=cut
 
 sub _has_one {
   my ($class, $join_type, $rel, $f_class, $cond, $attrs) = @_;
@@ -81,6 +93,10 @@ sub _has_one {
      %{$attrs || {}} });
   1;
 }
+
+=method _validate_has_one_condition
+
+=cut
 
 sub _validate_has_one_condition {
   my ($class, $cond )  = @_;

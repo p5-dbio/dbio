@@ -58,6 +58,12 @@ Values starting with C<!> are processed by inflator plugins:
 
 my $MATCH_CONDITION = qr/^!(\w+:.+)$/;
 
+=method populate_more
+
+Populate multiple sources with optional cross-source references and inflators.
+
+=cut
+
 sub populate_more {
   my ($self, $arg, @rest) = @_;
 

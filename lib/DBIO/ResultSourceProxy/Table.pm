@@ -57,7 +57,7 @@ sub _init_result_source_instance {
 
 =head1 METHODS
 
-=head2 add_columns
+=method add_columns
 
   __PACKAGE__->add_columns(qw/cdid artist title year/);
 
@@ -65,7 +65,7 @@ Adds columns to the current class and creates accessors for them.
 
 =cut
 
-=head2 table
+=method table
 
   __PACKAGE__->table('tbl_name');
 
@@ -100,19 +100,19 @@ sub table {
   return $class->result_source_instance->name;
 }
 
-=head2 table_class
+=method table_class
 
   __PACKAGE__->table_class('DBIO::ResultSource::Table');
 
 Gets or sets the table class used for construction and validation.
 
-=head2 has_column
+=method has_column
 
   if ($obj->has_column($col)) { ... }
 
 Returns 1 if the class has a column of this name, 0 otherwise.
 
-=head2 column_info
+=method column_info
 
   my $info = $obj->column_info($col);
 
@@ -120,7 +120,7 @@ Returns the column metadata hashref for a column. For a description of
 the various types of column data in this hashref, see
 L<DBIO::ResultSource/add_column>
 
-=head2 columns
+=method columns
 
   my @column_names = $obj->columns;
 

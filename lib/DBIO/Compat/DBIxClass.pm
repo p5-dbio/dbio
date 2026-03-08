@@ -7,17 +7,37 @@ use warnings;
 my $hook_installed;
 my $isa_patched;
 
+=head1 METHODS
+
+=method import
+
+Install compatibility hooks and aliases.
+
+=cut
+
 sub import {
   _install_hook();
   _install_isa_patch();
   _setup_existing_modules();
 }
 
+=method _install_hook
+
+Install the C<@INC> hook once.
+
+=cut
+
 sub _install_hook {
   return if $hook_installed;
   $hook_installed = 1;
   unshift @INC, \&_dbic_inc_hook;
 }
+
+=method _install_isa_patch
+
+Patch C<DBIO::isa> to acknowledge C<DBIx::Class::*> package names.
+
+=cut
 
 sub _install_isa_patch {
   return if $isa_patched;
@@ -38,6 +58,12 @@ sub _install_isa_patch {
 }
 
 # For a given DBIO package, set up the DBIx::Class equivalent
+=method _setup_dbix_package
+
+Create and initialize a DBIx::Class alias package for a DBIO package.
+
+=cut
+
 sub _setup_dbix_package {
   my ($dbix_pkg, $dbic_pkg) = @_;
 
@@ -52,6 +78,12 @@ sub _setup_dbix_package {
 # Scan %INC for all loaded DBIO modules and ensure their
 # DBIx::Class aliases exist. Called at import time and
 # every time the hook intercepts a DBIx::Class require.
+=method _setup_existing_modules
+
+Synchronize aliases for already-loaded DBIO modules.
+
+=cut
+
 sub _setup_existing_modules {
   for my $file (keys %INC) {
     next unless $file =~ m{^DBIO(/|\.pm$)};
@@ -69,6 +101,12 @@ sub _setup_existing_modules {
 
   _install_isa_patch();
 }
+
+=method _dbic_inc_hook
+
+C<@INC> hook that maps DBIx::Class module requests to DBIO modules.
+
+=cut
 
 sub _dbic_inc_hook {
   my (undef, $file) = @_;

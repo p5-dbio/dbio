@@ -5,24 +5,25 @@
 This is an introductory document for L<DBIO::Storage::DBI::Replicated>.
 
 This document is not an overview of what replication is or why you should be
-using it. It is not a document explaining how to setup MySQL native replication
+using it. It is not a document explaining how to set up MySQL native replication
 either. Copious external resources are available for both. This document
 presumes you have the basics down.
 
 =head1 DESCRIPTION
 
 L<DBIO> supports a framework for using database replication. This system
-is integrated completely, which means once it's setup you should be able to
-automatically just start using a replication cluster without additional work or
+is fully integrated, which means once it is set up you should be able to
+start using a replication cluster automatically, without additional work or
 changes to your code. Some caveats apply, primarily related to the proper use
 of transactions (you are wrapping all your database modifying statements inside
-a transaction, right ;) ) however in our experience properly written DBIC will
+a transaction, right?) however in our experience properly written DBIO code will
 work transparently with Replicated storage.
 
-Currently we have support for MySQL native replication, which is relatively
-easy to install and configure.  We also currently support single master to one
-or more replicants (also called 'slaves' in some documentation).  However the
-framework is not specifically tied to the MySQL framework and supporting other
+Currently we support MySQL native replication, which is relatively
+easy to install and configure. We currently support a single master and one
+or more replicants (also called replicas, and historically called
+'slaves' in some documentation). However the framework is not specifically tied
+to MySQL, and supporting other
 replication systems or topographies should be possible.  Please bring your
 patches and ideas to the #dbix-class IRC channel or the mailing list.
 
@@ -39,7 +40,7 @@ By default, when you start L<DBIO>, your Schema (L<DBIO::Schema>)
 is assigned a storage_type, which when fully connected will reflect your
 underlying storage engine as defined by your chosen database driver.  For
 example, if you connect to a MySQL database, your storage_type will be
-L<DBIO::MySQL::Storage>  Your storage type class will contain
+L<DBIO::MySQL::Storage>. Your storage type class will contain
 database specific code to help smooth over the differences between databases
 and let L<DBIO> do its thing.
 
@@ -54,7 +55,7 @@ one exceed configurable parameters.  Later, it can automatically restore a
 replicant when its health is restored.
 
 This gives you a very robust system, since you can add or drop replicants
-and DBIC will automatically adjust itself accordingly.
+and DBIO will automatically adjust itself accordingly.
 
 Additionally, if you need high data integrity, such as when you are executing
 a transaction, replicated storage will automatically delegate all database
@@ -77,12 +78,12 @@ only of value when you have a single replicant).
 =head1 REPLICATED STORAGE CONFIGURATION
 
 All the parts of replication can be altered dynamically at runtime, which makes
-it possibly to create a system that automatically scales under load by creating
+it possible to create a system that automatically scales under load by creating
 more replicants as needed, perhaps using a cloud system such as Amazon EC2.
-However, for common use you can setup your replicated storage to be enabled at
+However, for common use you can set up your replicated storage to be enabled at
 the time you connect the databases.  The following is a breakdown of how you
 may wish to do this.  Again, if you are using L<Catalyst>, I strongly recommend
-you use (or upgrade to) the latest L<Catalyst::Model::DBIC::Schema>, which makes
+using (or upgrading to) the latest L<Catalyst::Model::DBIC::Schema>, which makes
 this job even easier.
 
 First, you need to get a C<$schema> object and set the storage_type:
@@ -161,8 +162,9 @@ information for the replicants:
     [$dsn3, $user, $pass, \%opts],
   );
 
-These replicants should be configured as slaves to the master using the
-instructions for MySQL native replication, or if you are just learning, you
+These replicants should be configured as replicas (historically called
+slaves) to the master using the instructions for MySQL native replication,
+or if you are just learning, you
 will find L<MySQL::Sandbox> an easy way to set up a replication cluster.
 
 And now your $schema object is properly configured!  Enjoy!
@@ -177,4 +179,3 @@ This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
 by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.
-

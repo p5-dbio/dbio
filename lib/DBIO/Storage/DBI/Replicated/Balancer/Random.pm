@@ -14,14 +14,14 @@ shouldn't need to create instances of this class.
 =head1 DESCRIPTION
 
 Given a pool (L<DBIO::Storage::DBI::Replicated::Pool>) of replicated
-database's (L<DBIO::Storage::DBI::Replicated::Replicant>), defines a
+databases (L<DBIO::Storage::DBI::Replicated::Replicant>), this class defines a
 method by which query load can be spread out across each replicant in the pool.
 
 =head1 ATTRIBUTES
 
 This class defines the following attributes.
 
-=head2 master_read_weight
+=attr master_read_weight
 
 A number greater than 0 that specifies what weight to give the master when
 choosing which backend to execute a read query on. A value of 0, which is the
@@ -42,7 +42,7 @@ has master_read_weight => (is => 'rw', isa => Weight, default => sub { 0 });
 
 This class defines the following methods.
 
-=head2 next_storage
+=method next_storage
 
 Returns an active replicant at random.  Please note that due to the nature of
 the word 'random' this means it's possible for a particular active replicant to

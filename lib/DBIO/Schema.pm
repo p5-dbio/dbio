@@ -196,6 +196,16 @@ sub _ns_get_rsrc_instance {
   };
 }
 
+=method load_namespaces
+
+Loads result and resultset classes from the configured namespaces and
+registers them on the schema class.
+
+The complete option semantics are documented in the C<load_namespaces>
+reference section above.
+
+=cut
+
 sub load_namespaces {
   my ($class, %args) = @_;
 
@@ -411,6 +421,12 @@ assumed by L</connect>.
 
 You want to use this to set subclasses of L<DBIO::Storage::DBI>
 in cases where the appropriate subclass is not autodetected.
+
+Most database-specific storage classes now ship in separate DBIO driver
+distributions (for example L<DBIO::PostgreSQL::Storage>,
+L<DBIO::MySQL::Storage>, L<DBIO::SQLite::Storage>). If these distributions
+are installed, L<DBIO::Storage::DBI> will usually autodetect and load the
+correct storage based on your DSN.
 
 If your storage type requires instantiation arguments, those are
 defined as a second argument in the form of a hashref and the entire

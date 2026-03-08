@@ -1,4 +1,5 @@
 package DBIO::Admin::Usage;
+# ABSTRACT: POD-aware usage renderer for DBIO admin commands
 
 use warnings;
 use strict;
@@ -9,9 +10,23 @@ use base 'Class::Accessor::Grouped';
 
 __PACKAGE__->mk_group_accessors('simple', 'synopsis', 'short_description');
 
+=head1 METHODS
+
+=method prog_name
+
+Return the invoked program name.
+
+=cut
+
 sub prog_name {
     Getopt::Long::Descriptive::prog_name();
 }
+
+=method set_simple
+
+Store usage text with C<%c> placeholder expanded to program name.
+
+=cut
 
 sub set_simple {
     my ($self,$field, $value) = @_;
@@ -23,10 +38,22 @@ sub set_simple {
 
 
 # This returns the usage formatted as a pod document
+=method pod
+
+Return full usage output formatted as POD text.
+
+=cut
+
 sub pod {
   my ($self) = @_;
   return join qq{\n}, $self->pod_leader_text, $self->pod_option_text, $self->pod_authorlic_text;
 }
+
+=method pod_leader_text
+
+Render NAME/SYNOPSIS sections for generated POD.
+
+=cut
 
 sub pod_leader_text {
   my ($self) = @_;
@@ -35,6 +62,12 @@ sub pod_leader_text {
          qq{=head1 SYNOPSIS\n\n}.$self->leader_text().qq{\n}.$self->synopsis().qq{\n\n};
 
 }
+
+=method pod_authorlic_text
+
+Render AUTHORS/LICENSE sections for generated POD.
+
+=cut
 
 sub pod_authorlic_text {
 
@@ -47,6 +80,12 @@ sub pod_authorlic_text {
   );
 }
 
+
+=method pod_option_text
+
+Render OPTIONS section for generated POD from Getopt descriptors.
+
+=cut
 
 sub pod_option_text {
   my ($self) = @_;

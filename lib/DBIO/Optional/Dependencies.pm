@@ -494,6 +494,12 @@ my $reqs = {
 
 our %req_availability_cache;
 
+=method req_list_for
+
+Return the dependency hash for a requirement group.
+
+=cut
+
 sub req_list_for {
   my ($class, $group) = @_;
 
@@ -507,6 +513,12 @@ sub req_list_for {
 }
 
 
+=method die_unless_req_ok_for
+
+Die with a formatted message unless dependencies for a group are available.
+
+=cut
+
 sub die_unless_req_ok_for {
   my ($class, $group) = @_;
 
@@ -517,6 +529,12 @@ sub die_unless_req_ok_for {
     or die sprintf( "Required modules missing, unable to continue: %s\n", $class->_check_deps($group)->{missing} );
 }
 
+=method req_ok_for
+
+Return true when dependencies for a group are all available.
+
+=cut
+
 sub req_ok_for {
   my ($class, $group) = @_;
 
@@ -525,6 +543,12 @@ sub req_ok_for {
 
   return $class->_check_deps($group)->{status};
 }
+
+=method req_missing_for
+
+Return a one-line description of missing dependencies for a group.
+
+=cut
 
 sub req_missing_for {
   my ($class, $group) = @_;
@@ -535,6 +559,12 @@ sub req_missing_for {
   return $class->_check_deps($group)->{missing};
 }
 
+=method req_errorlist_for
+
+Return raw module-load errors for a requirement group.
+
+=cut
+
 sub req_errorlist_for {
   my ($class, $group) = @_;
 
@@ -543,6 +573,12 @@ sub req_errorlist_for {
 
   return $class->_check_deps($group)->{errorlist};
 }
+
+=method _check_deps
+
+Internal dependency checker with memoized results.
+
+=cut
 
 sub _check_deps {
   my ($class, $group) = @_;
@@ -586,11 +622,23 @@ sub _check_deps {
   };
 }
 
+=method req_group_list
+
+Return a hashref containing all requirement groups and their dependencies.
+
+=cut
+
 sub req_group_list {
   return { map { $_ => { %{ $reqs->{$_}{req} || {} } } } (keys %$reqs) };
 }
 
 # This is to be called by the author only (automatically in Makefile.PL)
+=method _gen_pod
+
+Author-only helper generating optional dependency POD documentation.
+
+=cut
+
 sub _gen_pod {
   my ($class, $distver, $pod_dir) = @_;
 

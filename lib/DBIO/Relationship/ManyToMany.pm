@@ -14,6 +14,10 @@ our %_pod_inherit_config =
    class_map => { 'DBIO::Relationship::ManyToMany' => 'DBIO::Relationship' }
   );
 
+=method many_to_many
+
+=cut
+
 sub many_to_many {
   my ($class, $meth, $rel, $f_rel, $rel_attrs) = @_;
 

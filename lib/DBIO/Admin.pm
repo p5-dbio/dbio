@@ -82,6 +82,10 @@ has 'schema' => (
   lazy_build  => 1,
 );
 
+=method _build_schema
+
+=cut
+
 sub _build_schema {
   my ($self)  = @_;
 
@@ -153,6 +157,10 @@ has 'connect_info' => (
   coerce      => 1,
 );
 
+=method _build_connect_info
+
+=cut
+
 sub _build_connect_info {
   my ($self) = @_;
   return $self->_find_stanza($self->config, $self->config_stanza);
@@ -199,6 +207,10 @@ has config => (
   isa         => DBICHashRef,
   lazy_build  => 1,
 );
+
+=method _build_config
+
+=cut
 
 sub _build_config {
   my ($self) = @_;
@@ -303,6 +315,10 @@ has trace => (
     trigger => \&_trigger_trace,
 );
 
+=method _trigger_trace
+
+=cut
+
 sub _trigger_trace {
     my ($self, $new, $old) = @_;
     $self->schema->storage->debug($new);
@@ -326,6 +342,10 @@ should be a L<SQL::Translator> name.
 Arguments for L<SQL::Translator> can be supplied in the sqlt_args hashref.
 
 Optional preversion can be supplied to generate a diff to be used by upgrade.
+
+=cut
+
+=method create
 
 =cut
 
@@ -356,6 +376,10 @@ B<MAKE SURE YOU BACKUP YOUR DB FIRST>
 
 =cut
 
+=method upgrade
+
+=cut
+
 sub upgrade {
   my ($self) = @_;
   my $schema = $self->schema();
@@ -383,6 +407,10 @@ install is here to help when you want to move to L<DBIO::Schema::Versioned> and 
 database.  install will take a version and add the version tracking tables and 'install' the version.  No
 further ddl modification takes place.  Setting the force attribute to a true value will allow overriding of
 already versioned databases.
+
+=cut
+
+=method install
 
 =cut
 
@@ -423,6 +451,10 @@ L<DBIO::Schema/deploy>.
 
 =cut
 
+=method deploy
+
+=cut
+
 sub deploy {
   my ($self, $args) = @_;
   my $schema = $self->schema();
@@ -439,6 +471,10 @@ sub deploy {
 
 insert takes the name of a resultset from the schema_class and a hashref of data to insert
 into that resultset
+
+=cut
+
+=method insert
 
 =cut
 
@@ -463,6 +499,10 @@ sub insert {
 
 update takes the name of a resultset from the schema_class, a hashref of data to update and
 a where hash used to form the search for the rows to update.
+
+=cut
+
+=method update
 
 =cut
 
@@ -497,6 +537,10 @@ The found data is deleted and cannot be recovered.
 
 =cut
 
+=method delete
+
+=cut
+
 sub delete {
   my ($self, $rs, $where, $attrs) = @_;
 
@@ -528,6 +572,10 @@ The found data is returned in a array ref where the first row will be the column
 
 =cut
 
+=method select
+
+=cut
+
 sub select {
   my ($self, $rs, $where, $attrs) = @_;
 
@@ -552,6 +600,10 @@ sub select {
   return \@data;
 }
 
+=method _confirm
+
+=cut
+
 sub _confirm {
   my ($self) = @_;
 
@@ -563,6 +615,10 @@ sub _confirm {
 
   return ($response=~/^YES/);
 }
+
+=method _find_stanza
+
+=cut
 
 sub _find_stanza {
   my ($self, $cfg, $stanza) = @_;
