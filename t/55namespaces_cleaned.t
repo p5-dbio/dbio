@@ -95,9 +95,6 @@ my @modules = grep {
 my $skip_idx = { map { $_ => 1 } (
   'SQL::Translator::Producer::DBIO::File', # ditto
 
-  # not sure how to handle type libraries
-  'DBIO::Storage::DBI::Replicated::Types',
-
   # utility classes, not part of the inheritance chain
   'DBIO::ResultSource::RowParser::Util',
   'DBIO::Util',

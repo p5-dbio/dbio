@@ -99,11 +99,12 @@ my $rdbms_firebird_odbc = {
   'DBD::ODBC'                     => '0',
 };
 my $reqs = {
+  # Replicated storage is now in the separate DBIO-Replicated distribution
   replicated => {
     req => $replicated,
     pod => {
       title => 'Storage::Replicated',
-      desc => 'Modules required for L<DBIO::Storage::DBI::Replicated>',
+      desc => 'Modules required for L<DBIO::Storage::DBI::Replicated> (from the DBIO-Replicated distribution)',
     },
   },
 

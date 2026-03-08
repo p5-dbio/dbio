@@ -13,6 +13,12 @@ Revision history for DBIO
         - Driver loading now throws an error instead of silently falling
           back to generic Storage::DBI when driver distribution is missing
 
+    * Replicated Storage Extraction
+        - Extract DBIO::Storage::DBI::Replicated and all sub-modules to
+          separate distribution DBIO-Replicated (9 lib files, 1 test)
+        - Update POD references in Schema.pm, Row.pm, Optional::Dependencies.pm
+          to note the separate distribution
+
     * Driver Split
         - Remove all driver-specific Storage and SQLMaker classes from core
           (27 files, ~5800 lines) — now in separate distributions:

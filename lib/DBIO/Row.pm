@@ -1538,10 +1538,9 @@ changes made since the row was last read from storage.
 $attrs, if supplied, is expected to be a hashref of attributes suitable for passing as the
 second argument to C<< $resultset->search($cond, $attrs) >>;
 
-Note: If you are using L<DBIO::Storage::DBI::Replicated> as your
-storage, a default of
-L<< C<< { force_pool => 'master' } >>
-|DBIO::Storage::DBI::Replicated/SYNOPSIS >>  is automatically set for
+Note: If you are using L<DBIO::Storage::DBI::Replicated> (from the
+DBIO-Replicated distribution) as your storage, a default of
+C<< { force_pool => 'master' } >> is automatically set for
 you. Prior to C<< DBIO 0.08109 >> (before 2010) one would have been
 required to explicitly wrap the entire operation in a transaction to guarantee
 that up-to-date results are read from the master database.

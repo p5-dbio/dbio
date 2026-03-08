@@ -433,7 +433,7 @@ defined as a second argument in the form of a hashref and the entire
 value needs to be wrapped into an arrayref or a hashref.  We support
 both types of refs here in order to play nice with your
 Config::[class] or your choice. See
-L<DBIO::Storage::DBI::Replicated> for an example of this.
+L<DBIO::Storage::DBI::Replicated> (from the DBIO-Replicated distribution) for an example of this.
 
 =head2 exception_action
 
