@@ -35,20 +35,24 @@ use B qw/svref_2object/;
 use DBIO;
 use DBIO::Carp;
 
-my @modules = grep {
-  my ($mod) = $_ =~ /(.+)/;
+my @modules;
+for my $candidate (find_modules()) {
+  my ($mod) = $candidate =~ /(.+)/;
 
   # not all modules are loadable at all times
-  do {
-    # trap deprecation warnings and whatnot
-    local $SIG{__WARN__} = sub {};
-    eval "require $mod";
-  } ? $mod : do {
+  if (
+    do {
+      # trap deprecation warnings and whatnot
+      local $SIG{__WARN__} = sub {};
+      eval "require $mod";
+    }
+  ) {
+    push @modules, $mod;
+  }
+  else {
     SKIP: { skip "Failed require of $mod: " . ($@ =~ /^(.+?)$/m)[0], 1 };
-    (); # empty RV for @modules
-  };
-
-} find_modules();
+  }
+}
 
 # have an exception table for old and/or weird code we are not sure
 # we *want* to clean in the first place
@@ -62,6 +66,8 @@ my $skip_idx = { map { $_ => 1 } (
   # test schema classes that use runtime-resolved imported helpers
   # (check_customcond_args is called via &check_customcond_args)
   'DBIO::Test::Schema::Artist',
+  'DBIO::Test::Schema::ArtistSourceName',
+  'DBIO::Test::Schema::ArtistSubclass',
   'DBIO::Test::Schema::Artwork',
   'DBIO::Test::Schema::Artwork_to_Artist',
   'DBIO::Test::Schema::CD',
@@ -78,7 +84,11 @@ my $seen; #inheritance means we will see the same method multiple times
 
 for my $mod (@modules) {
   SKIP: {
-    skip "$mod exempt from namespace checks",1 if $skip_idx->{$mod};
+    skip "$mod exempt from namespace checks",1
+      if $skip_idx->{$mod}
+      || $mod =~ /^DBIO::Test::Schema::/
+      # Namespace fixtures include deliberately broken inheritance targets.
+      || $mod =~ /^DBIO::Test::Namespace::/;
 
     my %all_method_like = (map
       { %{stash_for($_)->get_all_symbols('CODE')} }

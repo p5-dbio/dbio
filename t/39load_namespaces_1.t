@@ -8,27 +8,27 @@ use DBIO::Test;
 my $warnings;
 eval {
     local $SIG{__WARN__} = sub { $warnings .= shift };
-    package DBICNSTest;
+    package DBIO::Test::Namespace;
     use base qw/DBIO::Schema/;
     __PACKAGE__->load_namespaces;
 };
 ok(!$@, 'load_namespaces doesnt die') or diag $@;
-like($warnings, qr/load_namespaces found ResultSet class 'DBICNSTest::ResultSet::C' with no corresponding Result class/, 'Found warning about extra ResultSet classes');
+like($warnings, qr/load_namespaces found ResultSet class 'DBIO::Test::Namespace::ResultSet::C' with no corresponding Result class/, 'Found warning about extra ResultSet classes');
 
-like($warnings, qr/load_namespaces found ResultSet class 'DBICNSTest::ResultSet::D' that does not subclass DBIO::ResultSet/, 'Found warning about ResultSets with incorrect subclass');
+like($warnings, qr/load_namespaces found ResultSet class 'DBIO::Test::Namespace::ResultSet::D' that does not subclass DBIO::ResultSet/, 'Found warning about ResultSets with incorrect subclass');
 
-my $source_a = DBICNSTest->source('A');
+my $source_a = DBIO::Test::Namespace->source('A');
 isa_ok($source_a, 'DBIO::ResultSource::Table');
-my $rset_a   = DBICNSTest->resultset('A');
-isa_ok($rset_a, 'DBICNSTest::ResultSet::A');
+my $rset_a   = DBIO::Test::Namespace->resultset('A');
+isa_ok($rset_a, 'DBIO::Test::Namespace::ResultSet::A');
 
-my $source_b = DBICNSTest->source('B');
+my $source_b = DBIO::Test::Namespace->source('B');
 isa_ok($source_b, 'DBIO::ResultSource::Table');
-my $rset_b   = DBICNSTest->resultset('B');
+my $rset_b   = DBIO::Test::Namespace->resultset('B');
 isa_ok($rset_b, 'DBIO::ResultSet');
 
 for my $moniker (qw/A B/) {
-  my $class = "DBICNSTest::Result::$moniker";
+  my $class = "DBIO::Test::Namespace::Result::$moniker";
   ok(!defined($class->result_source_instance->source_name), "Source name of $moniker not defined");
 }
 

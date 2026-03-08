@@ -8,16 +8,16 @@ use lib 't/lib';
 use DBIO::Test;
 
 is(DBIO::Test::Schema->source('Artist')->resultset_class, 'DBIO::Test::BaseResultSet', 'default resultset class');
-ok(!Class::Inspector->loaded('DBICNSTest::ResultSet::A'), 'custom resultset class not loaded');
+ok(!Class::Inspector->loaded('DBIO::Test::Namespace::ResultSet::A'), 'custom resultset class not loaded');
 
-DBIO::Test::Schema->source('Artist')->resultset_class('DBICNSTest::ResultSet::A');
+DBIO::Test::Schema->source('Artist')->resultset_class('DBIO::Test::Namespace::ResultSet::A');
 
-ok(!Class::Inspector->loaded('DBICNSTest::ResultSet::A'), 'custom resultset class not loaded on SET');
-is(DBIO::Test::Schema->source('Artist')->resultset_class, 'DBICNSTest::ResultSet::A', 'custom resultset class set');
-ok(Class::Inspector->loaded('DBICNSTest::ResultSet::A'), 'custom resultset class loaded on GET');
+ok(!Class::Inspector->loaded('DBIO::Test::Namespace::ResultSet::A'), 'custom resultset class not loaded on SET');
+is(DBIO::Test::Schema->source('Artist')->resultset_class, 'DBIO::Test::Namespace::ResultSet::A', 'custom resultset class set');
+ok(Class::Inspector->loaded('DBIO::Test::Namespace::ResultSet::A'), 'custom resultset class loaded on GET');
 
 my $schema = DBIO::Test->init_schema(no_deploy => 1);
 my $resultset = $schema->resultset('Artist')->search;
-isa_ok($resultset, 'DBICNSTest::ResultSet::A', 'resultset is custom class');
+isa_ok($resultset, 'DBIO::Test::Namespace::ResultSet::A', 'resultset is custom class');
 
 done_testing;

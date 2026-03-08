@@ -19,7 +19,7 @@ sub _chk_extra_sources_warning {
 sub _verify_sources {
   my @monikers = @_;
   is_deeply (
-    [ sort DBICNSTest::RtBug41083->sources ],
+    [ sort DBIO::Test::Namespace::RtBug41083->sources ],
     \@monikers,
     'List of resultsource registrations',
   );
@@ -29,7 +29,7 @@ sub _verify_sources {
   my $warnings;
   eval {
     local $SIG{__WARN__} = sub { $warnings .= shift };
-    package DBICNSTest::RtBug41083;
+    package DBIO::Test::Namespace::RtBug41083;
     use base 'DBIO::Schema';
     __PACKAGE__->load_namespaces(
       result_namespace => 'Result_A',
@@ -49,7 +49,7 @@ sub _verify_sources {
   my $warnings;
   eval {
     local $SIG{__WARN__} = sub { $warnings .= shift };
-    package DBICNSTest::RtBug41083;
+    package DBIO::Test::Namespace::RtBug41083;
     use base 'DBIO::Schema';
     __PACKAGE__->load_namespaces(
       default_resultset_class => 'ResultSet'

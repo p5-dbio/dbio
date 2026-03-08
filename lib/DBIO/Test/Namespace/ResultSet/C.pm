@@ -1,0 +1,7 @@
+package DBIO::Test::Namespace::ResultSet::C;
+
+use warnings;
+use strict;
+
+use base qw/DBIO::ResultSet/;
+1;

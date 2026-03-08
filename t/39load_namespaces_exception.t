@@ -8,7 +8,7 @@ use DBIO::Test;
 plan tests => 1;
 
 eval {
-    package DBICNSTest;
+    package DBIO::Test::Namespace;
     use base qw/DBIO::Schema/;
     __PACKAGE__->load_namespaces(
         result_namespace => 'Bogus',
