@@ -1,0 +1,156 @@
+#!/usr/bin/env perl
+# PODNAME: dbioadmin
+# ABSTRACT: CLI for DBIO schema administration
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config no_ignore_case bundling);
+use JSON::MaybeXS;
+use DBIO::Admin;
+
+sub usage {
+  my ($exit_code) = @_;
+  $exit_code = 1 unless defined $exit_code;
+
+  print <<'USAGE';
+Usage: dbioadmin [OPTIONS]
+
+Actions (pick one):
+  --create            Create version diffs (needs preversion)
+  --upgrade           Upgrade the database to the current schema
+  --install           Install the schema version tables to an existing database
+  --deploy            Deploy the schema to the database
+  --select            Select data from the schema
+  --insert            Insert data into the schema
+  --update            Update data in the schema
+  --delete            Delete data from the schema
+  --op=ACTION         Compatibility option (same as above actions)
+
+Arguments:
+  --schema-class=CLASS  The class of the schema to load (required)
+  --connect=JSON        Supply connect info as JSON, e.g. --connect='["dsn","user","pass"]'
+  --connect-info        Supply connect info as key=value pairs (dsn=X user=Y password=Z)
+  --config=FILE         Supply a config file for parsing by Config::Any
+  --config-stanza=PATH  Where in the config to find connection_info (e.g. MyApp::Model::DB)
+  --resultset=CLASS     The resultset to operate on for data manipulation
+  --class=CLASS         Alias for --resultset
+  --sql-dir=DIR         The directory where sql diffs will be created
+  --sql-type=TYPE       The RDBMs flavour you wish to use
+  --version=VERSION     Supply a version to install
+  --preversion=VERSION  The previous version to diff against
+  --set=JSON            JSON data used to perform data operations
+  --attrs=JSON          JSON string for the second argument of search
+  --where=JSON          JSON string for the where clause of search
+  --force               Be forceful with some operations
+  --trace               Turn on DBIO trace output
+  --quiet               Be less verbose
+  -I PATH               Prepend to @INC (like perl's -I)
+  --help                Display this help
+
+USAGE
+
+  exit $exit_code;
+}
+
+my %opts;
+my @include_paths;
+
+GetOptions(
+  'create'          => \$opts{create},
+  'upgrade'         => \$opts{upgrade},
+  'install'         => \$opts{install},
+  'deploy'          => \$opts{deploy},
+  'select'          => \$opts{select},
+  'insert'          => \$opts{insert},
+  'update'          => \$opts{update},
+  'delete'          => \$opts{delete},
+  'op=s'            => \$opts{op},
+  'schema-class=s'  => \$opts{schema_class},
+  'connect=s'       => \$opts{connect},
+  'connect-info=s%' => \$opts{connect_info_hash},
+  'config|config-file=s' => \$opts{config_file},
+  'config-stanza=s' => \$opts{config_stanza},
+  'resultset|resultset-class|class=s' => \$opts{resultset},
+  'sql-dir=s'       => \$opts{sql_dir},
+  'sql-type=s'      => \$opts{sql_type},
+  'version=i'       => \$opts{version},
+  'preversion=s'    => \$opts{preversion},
+  'set=s'           => \$opts{set},
+  'attrs=s'         => \$opts{attrs},
+  'where=s'         => \$opts{where},
+  'force'           => \$opts{force},
+  'trace'           => \$opts{trace},
+  'quiet'           => \$opts{quiet},
+  'I=s@'            => \@include_paths,
+  'help'            => \$opts{help},
+) or usage(1);
+
+if ($opts{help}) {
+  usage(0);
+}
+
+# Handle -I paths
+if (@include_paths) {
+  require lib;
+  lib->import(@include_paths);
+}
+
+# Determine the action
+my $action;
+for my $act (qw(create upgrade install deploy select insert update delete)) {
+  if ($opts{$act}) {
+    die "Multiple actions specified\n" if $action;
+    $action = $act;
+  }
+}
+if ($opts{op}) {
+  die "Multiple actions specified\n" if $action;
+  $action = $opts{op};
+}
+
+die "No action specified. Use --help for usage.\n" unless $action;
+die "No --schema-class specified. Use --help for usage.\n" unless $opts{schema_class};
+
+# Build admin args
+my %admin_args;
+$admin_args{schema_class} = $opts{schema_class};
+
+# Handle connect info
+if ($opts{connect}) {
+  $admin_args{connect_info} = $opts{connect};
+}
+elsif ($opts{connect_info_hash}) {
+  $admin_args{connect_info} = $opts{connect_info_hash};
+}
+
+for my $key (qw(config_file config_stanza resultset sql_dir sql_type
+                version preversion set attrs where force trace quiet)) {
+  $admin_args{$key} = $opts{$key} if defined $opts{$key};
+}
+
+my $admin = DBIO::Admin->new(%admin_args);
+
+print "Performing action $action...\n";
+
+my $res = $admin->$action();
+
+if ($action eq 'select') {
+  my $format = $opts{format} || 'tsv';
+  die('Invalid format') if ($format !~ /^tsv|csv$/s);
+
+  require Text::CSV;
+
+  my $csv = Text::CSV->new({
+    sep_char => ( $format eq 'tsv' ? "\t" : ',' ),
+  });
+
+  foreach my $row (@$res) {
+    $csv->combine(@$row);
+    print $csv->string() . "\n";
+  }
+}
+
+1;
+
+__END__

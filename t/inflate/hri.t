@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-use DBIO::_Util 'modver_gt_or_eq_and_lt';
+use DBIO::Util 'modver_gt_or_eq_and_lt';
 use base();
 BEGIN {
   plan skip_all => 'base.pm 2.20 (only present in perl 5.19.7) is known to break this test'

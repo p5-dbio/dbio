@@ -11,12 +11,12 @@ use strict;
 ##
 
 my $sigh = sub {
-  require DBIO::_Util;
+  require DBIO::Util;
   require DBIO::SQLMaker;
 
   my( $meth ) = (caller(1))[3] =~ /([^:]+)$/;
 
-  DBIO::_Util::emit_loud_diag(
+  DBIO::Util::emit_loud_diag(
     skip_frames => 1,
     msg => "The $meth() constant is now provided by DBIO::SQLMaker::ClassicExtensions: please adjust your code"
   );

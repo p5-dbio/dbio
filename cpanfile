@@ -16,25 +16,14 @@ requires 'Sub::Name', '0.04';
 # pure-perl (FatPack-able) libs
 requires 'Class::Accessor::Grouped', '0.10012';
 requires 'Class::C3::Componentised', '1.0009';
-requires 'Class::Inspector', '1.24';
-requires 'Config::Any', '0.20';
 requires 'Context::Preserve', '0.01';
-requires 'Data::Dumper::Concise', '2.020';
 requires 'Devel::GlobalDestruction', '0.09';
 requires 'Hash::Merge', '0.12';
-requires 'Moo', '2.000';
 requires 'MRO::Compat', '0.12';
 requires 'Module::Find', '0.07';
 requires 'namespace::clean', '0.24';
-requires 'Path::Class', '0.18';
-requires 'Scope::Guard', '0.03';
 requires 'SQL::Abstract', '2.000001';
 requires 'Try::Tiny', '0.07';
-
-# Technically this is not a core dependency - it is only required
-# by the MySQL codepath. However this particular version is bundled
-# since 5.10.0 and is a pure-perl module anyway - let it slide
-requires 'Text::Balanced', '2.00';
 
 on 'test' => sub {
   requires 'File::Temp', '0.22';

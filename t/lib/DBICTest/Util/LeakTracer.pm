@@ -5,7 +5,7 @@ use strict;
 
 use Carp;
 use Scalar::Util qw(isweak weaken blessed reftype);
-use DBIO::_Util qw(refcount hrefaddr refdesc);
+use DBIO::Util qw(refcount hrefaddr refdesc);
 use DBIO::Optional::Dependencies;
 use Data::Dumper::Concise;
 use DBICTest::Util qw( stacktrace visit_namespaces );

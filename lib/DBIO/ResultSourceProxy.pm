@@ -6,7 +6,7 @@ use warnings;
 use base 'DBIO';
 
 use Scalar::Util 'blessed';
-use DBIO::_Util 'quote_sub';
+use DBIO::Util 'quote_sub';
 use namespace::clean;
 
 __PACKAGE__->mk_group_accessors('inherited_ro_instance' => 'source_name');
@@ -93,7 +93,7 @@ for my $method_to_proxy (qw/
   has_relationship
 /) {
   quote_sub __PACKAGE__."::$method_to_proxy", sprintf( <<'EOC', $method_to_proxy );
-    DBIO::_ENV_::ASSERT_NO_INTERNAL_INDIRECT_CALLS and DBIO::_Util::fail_on_internal_call;
+    DBIO::_ENV_::ASSERT_NO_INTERNAL_INDIRECT_CALLS and DBIO::Util::fail_on_internal_call;
     shift->result_source_instance->%s (@_);
 EOC
 

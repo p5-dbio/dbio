@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use DBIO::Optional::Dependencies;
-use DBIO::_Util qw(sigwarn_silencer scope_guard);
+use DBIO::Util qw(sigwarn_silencer scope_guard);
 use Scalar::Util 'weaken';
 
 use lib qw(t/lib);

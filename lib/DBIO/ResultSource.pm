@@ -10,7 +10,7 @@ use DBIO::ResultSet;
 use DBIO::ResultSourceHandle;
 
 use DBIO::Carp;
-use DBIO::_Util 'UNRESOLVABLE_CONDITION';
+use DBIO::Util 'UNRESOLVABLE_CONDITION';
 use SQL::Abstract::Util 'is_literal_value';
 use Devel::GlobalDestruction;
 use Try::Tiny;

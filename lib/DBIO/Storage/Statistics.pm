@@ -4,11 +4,16 @@ package DBIO::Storage::Statistics;
 use strict;
 use warnings;
 
-use DBIO::_Util qw(sigwarn_silencer qsub);
+use DBIO::Util qw(sigwarn_silencer qsub);
 use IO::Handle ();
-use Moo;
-extends 'DBIO';
-use namespace::clean;
+
+use base 'DBIO';
+
+__PACKAGE__->mk_group_accessors(simple => qw(
+  _defaulted_to_stderr
+  silence
+  callback
+));
 
 =head1 SYNOPSIS
 
@@ -42,6 +47,15 @@ already set).
 
 =cut
 
+sub new {
+  my $class = shift;
+  my %args = @_ == 1 && ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
+  my $self = bless {}, ref $class || $class;
+  $self->{$_} = $args{$_} for grep { exists $args{$_} }
+    qw(_debugfh _defaulted_to_stderr silence callback);
+  return $self;
+}
+
 # FIXME - there ought to be a way to fold this into _debugfh itself
 # having the undef re-trigger the builder (or better yet a default
 # which can be folded in as a qsub)
@@ -52,12 +66,15 @@ sub debugfh {
   $self->_debugfh || $self->_build_debugfh;
 }
 
-has _debugfh => (
-  is => 'rw',
-  lazy => 1,
-  trigger => qsub '$_[0]->_defaulted_to_stderr(undef)',
-  builder => '_build_debugfh',
-);
+sub _debugfh {
+  my $self = shift;
+  if (@_) {
+    $self->{_debugfh} = $_[0];
+    $self->_defaulted_to_stderr(undef);
+    return $_[0];
+  }
+  return $self->{_debugfh};
+}
 
 sub _build_debugfh {
   my $fh;
@@ -79,9 +96,6 @@ sub _build_debugfh {
   $fh;
 }
 
-has [qw(_defaulted_to_stderr silence callback)] => (
-  is => 'rw',
-);
 
 =attr _defaulted_to_stderr
 

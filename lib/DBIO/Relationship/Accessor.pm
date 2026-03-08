@@ -3,7 +3,7 @@ package DBIO::Relationship::Accessor;
 use strict;
 use warnings;
 use DBIO::Carp;
-use DBIO::_Util qw(quote_sub perlstring);
+use DBIO::Util qw(quote_sub perlstring);
 use namespace::clean;
 
 our %_pod_inherit_config =
@@ -52,7 +52,7 @@ sub add_relationship_accessor {
         return undef if (
           $relcond->{join_free_condition}
             and
-          $relcond->{join_free_condition} ne DBIO::_Util::UNRESOLVABLE_CONDITION
+          $relcond->{join_free_condition} ne DBIO::Util::UNRESOLVABLE_CONDITION
             and
           scalar grep { not defined $_ } values %%{ $relcond->{join_free_condition} || {} }
             and
@@ -106,7 +106,7 @@ EOC
     quote_sub "${class}::${rel}_rs", "shift->search_related_rs( $rel => \@_ )";
     quote_sub "${class}::add_to_${rel}", "shift->create_related( $rel => \@_ )";
     quote_sub "${class}::${rel}", sprintf( <<'EOC', perlstring $rel );
-      DBIO::_ENV_::ASSERT_NO_INTERNAL_WANTARRAY and my $sog = DBIO::_Util::fail_on_internal_wantarray;
+      DBIO::_ENV_::ASSERT_NO_INTERNAL_WANTARRAY and my $sog = DBIO::Util::fail_on_internal_wantarray;
       shift->search_related( %s => @_ )
 EOC
   }

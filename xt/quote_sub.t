@@ -4,7 +4,7 @@ use strict;
 use Test::More;
 use Test::Warn;
 
-use DBIO::_Util 'quote_sub';
+use DBIO::Util 'quote_sub';
 
 my $q = do {
   no strict 'vars';

@@ -8,7 +8,7 @@ use base qw/DBIO/;
 
 use Scalar::Util qw/weaken blessed/;
 use Try::Tiny;
-use DBIO::_Util 'UNRESOLVABLE_CONDITION';
+use DBIO::Util 'UNRESOLVABLE_CONDITION';
 use namespace::clean;
 
 =head1 SYNOPSIS

@@ -5,9 +5,9 @@ use strict;
 
 use Carp;
 use Scalar::Util qw(isweak weaken blessed reftype);
-use DBIO::_Util qw(refcount hrefaddr refdesc);
+use DBIO::Util qw(refcount hrefaddr refdesc);
 use DBIO::Optional::Dependencies;
-use Data::Dumper::Concise;
+use Data::Dumper 'Dumper';
 use DBIO::Test::Util qw( stacktrace visit_namespaces );
 use constant {
   CV_TRACING => (
@@ -269,6 +269,9 @@ sub assert_empty_weakregistry {
     $tb->ok (0, "Expected garbage collection of $weak_registry->{$addr}{display_name}");
 
     my $diag = do {
+      local $Data::Dumper::Indent = 1;
+      local $Data::Dumper::Terse = 1;
+      local $Data::Dumper::Sortkeys = 1;
       local $Data::Dumper::Maxdepth = 1;
       sprintf "\n%s (refcnt %d) => %s\n",
         $weak_registry->{$addr}{display_name},

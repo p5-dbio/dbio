@@ -5,7 +5,7 @@ use warnings;
 use base qw/DBIO::Storage::DBI/;
 use mro 'c3';
 
-use DBIO::_Util 'modver_gt_or_eq';
+use DBIO::Util 'modver_gt_or_eq';
 use namespace::clean;
 
 =head1 METHODS

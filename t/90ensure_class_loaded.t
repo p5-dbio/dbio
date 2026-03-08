@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use lib qw(t/lib);
 use DBICTest;
-use DBIO::_Util 'sigwarn_silencer';
+use DBIO::Util 'sigwarn_silencer';
 use Class::Inspector;
 
 BEGIN {

@@ -7,7 +7,7 @@ use base qw/DBIO/;
 use DBIO::Carp;
 use DBIO::ResultSetColumn;
 use Scalar::Util qw/blessed weaken reftype/;
-use DBIO::_Util qw(
+use DBIO::Util qw(
   fail_on_internal_wantarray fail_on_internal_call UNRESOLVABLE_CONDITION
 );
 use Try::Tiny;
@@ -612,8 +612,8 @@ sub _normalize_selection {
             $attrs->{_dark_selector} = {
               plus_stage => $pref,
               string => ($dark_sel_dumper ||= do {
-                  require Data::Dumper::Concise;
-                  Data::Dumper::Concise::DumperObject()->Indent(0);
+                  require Data::Dumper;
+                  Data::Dumper->new([])->Indent(0)->Terse(1)->Sortkeys(1);
                 })->Values([$_])->Dump
               ,
             };

@@ -6,7 +6,7 @@ use warnings;
 use Try::Tiny;
 use Scalar::Util qw(weaken blessed refaddr);
 use DBIO;
-use DBIO::_Util qw(is_exception detected_reinvoked_destructor);
+use DBIO::Util qw(is_exception detected_reinvoked_destructor);
 use DBIO::Carp;
 use namespace::clean;
 

@@ -8,7 +8,7 @@ use base 'DBIO::Cursor';
 
 use Try::Tiny;
 use Scalar::Util qw(refaddr weaken);
-use DBIO::_Util 'detected_reinvoked_destructor';
+use DBIO::Util 'detected_reinvoked_destructor';
 use namespace::clean;
 
 __PACKAGE__->mk_group_accessors('simple' =>

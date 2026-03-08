@@ -3,7 +3,7 @@ package DBIO::Relationship::ProxyMethods;
 use strict;
 use warnings;
 use base 'DBIO';
-use DBIO::_Util 'quote_sub';
+use DBIO::Util 'quote_sub';
 use namespace::clean;
 
 our %_pod_inherit_config =

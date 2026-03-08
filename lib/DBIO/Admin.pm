@@ -1,32 +1,22 @@
 package DBIO::Admin;
 # ABSTRACT: Administration object for schemas
 
-# check deps
-BEGIN {
-  use DBIO;
-  die('The following modules are required for DBIO::Admin ' . DBIO::Optional::Dependencies->req_missing_for ('admin') )
-    unless DBIO::Optional::Dependencies->req_ok_for ('admin');
-}
+use strict;
+use warnings;
 
-use JSON::Any qw(DWIW PP JSON CPANEL XS);
-use Moose;
-use MooseX::Types::Moose qw/Int Str Any Bool/;
-use DBIO::Admin::Types qw/DBICConnectInfo DBICHashRef/;
-use MooseX::Types::JSON qw(JSON);
-use MooseX::Types::Path::Class qw(Dir File);
-use MooseX::Types::LoadableClass qw(LoadableClass);
+use JSON::MaybeXS ();
 use Try::Tiny;
-use namespace::clean;
+use Scalar::Util 'blessed';
 
 =head1 SYNOPSIS
 
-  $ dbicadmin --help
+  $ dbioadmin --help
 
-  $ dbicadmin --schema=MyApp::Schema \
+  $ dbioadmin --schema=MyApp::Schema \
     --connect='["dbi:SQLite:my.db", "", ""]' \
     --deploy
 
-  $ dbicadmin --schema=MyApp::Schema --class=Employee \
+  $ dbioadmin --schema=MyApp::Schema --class=Employee \
     --connect='["dbi:SQLite:my.db", "", ""]' \
     --op=update --set='{ "name": "New_Employee" }'
 
@@ -64,23 +54,212 @@ the class of the schema to load
 
 =cut
 
-has 'schema_class' => (
-  is  => 'ro',
-  isa => LoadableClass,
-);
-
-
 =head2 schema
 
 A pre-connected schema object can be provided for manipulation
 
 =cut
 
-has 'schema' => (
-  is          => 'ro',
-  isa         => 'DBIO::Schema',
-  lazy_build  => 1,
-);
+=head2 resultset
+
+a resultset from the schema to operate on
+
+=cut
+
+=head2 where
+
+a hash ref or json string to be used for identifying data to manipulate
+
+=cut
+
+=head2 set
+
+a hash ref or json string to be used for inserting or updating data
+
+=cut
+
+=head2 attrs
+
+a hash ref or json string to be used for passing additional info to the ->search call
+
+=cut
+
+=head2 connect_info
+
+connect_info the arguments to provide to the connect call of the schema_class
+
+=cut
+
+=head2 config_file
+
+config_file provide a config_file to read connect_info from, if this is provided
+config_stanze should also be provided to locate where the connect_info is in the config
+The config file should be in a format readable by Config::Any.
+
+=cut
+
+=head2 config_stanza
+
+config_stanza for use with config_file should be a '::' delimited 'path' to the connection information
+designed for use with catalyst config files
+
+=cut
+
+=head2 config
+
+Instead of loading from a file the configuration can be provided directly as a hash ref.  Please note
+config_stanza will still be required.
+
+=cut
+
+=head2 sql_dir
+
+The location where sql ddl files should be created or found for an upgrade.
+
+=cut
+
+=head2 sql_type
+
+The type of sql dialect to use for creating sql files from schema
+
+=cut
+
+=head2 version
+
+Used for install, the version which will be 'installed' in the schema
+
+=cut
+
+=head2 preversion
+
+Previous version of the schema to create an upgrade diff for, the full sql for that version of the sql must be in the sql_dir
+
+=cut
+
+=head2 force
+
+Try and force certain operations.
+
+=cut
+
+=head2 quiet
+
+Be less verbose about actions
+
+=cut
+
+=head2 trace
+
+Toggle DBIO debug output
+
+=cut
+
+sub new {
+  my ($class, %args) = @_;
+
+  my $self = bless {}, $class;
+
+  # Simple string/scalar attributes
+  for my $attr (qw(schema_class resultset config_stanza sql_dir sql_type
+                    version preversion config_file)) {
+    $self->{$attr} = $args{$attr} if exists $args{$attr};
+  }
+
+  # Boolean attributes
+  for my $attr (qw(force quiet _confirm)) {
+    $self->{$attr} = $args{$attr} ? 1 : 0 if exists $args{$attr};
+  }
+
+  # Coercible hash attributes (accept JSON strings)
+  for my $attr (qw(where set attrs)) {
+    if (exists $args{$attr}) {
+      $self->{$attr} = _coerce_hashref($args{$attr});
+    }
+  }
+
+  # connect_info: accept JSON string, hashref, or arrayref
+  if (exists $args{connect_info}) {
+    $self->{connect_info} = _coerce_connect_info($args{connect_info});
+  }
+
+  # config: accept JSON string or hashref
+  if (exists $args{config}) {
+    $self->{config} = _coerce_hashref($args{config});
+  }
+
+  # schema: accept a pre-connected schema object
+  if (exists $args{schema}) {
+    $self->{schema} = $args{schema};
+  }
+
+  # Load the schema class if provided
+  if ($self->{schema_class}) {
+    my $schema_class = $self->{schema_class};
+    (my $file = "$schema_class.pm") =~ s{::}{/}g;
+    require $file;
+  }
+
+  # Set trace if requested
+  if ($args{trace}) {
+    $self->{trace} = 1;
+  }
+
+  return $self;
+}
+
+# Read-only accessors
+for my $attr (qw(schema_class config_stanza sql_dir sql_type config_file)) {
+  no strict 'refs';
+  *{$attr} = sub { $_[0]->{$attr} };
+}
+
+# Read-write accessors
+for my $attr (qw(resultset version preversion force quiet)) {
+  no strict 'refs';
+  *{$attr} = sub {
+    if (@_ > 1) {
+      $_[0]->{$attr} = $_[1];
+      return $_[0];
+    }
+    return $_[0]->{$attr};
+  };
+}
+
+# Read-write accessors with JSON coercion
+for my $attr (qw(where set attrs)) {
+  no strict 'refs';
+  *{$attr} = sub {
+    if (@_ > 1) {
+      $_[0]->{$attr} = _coerce_hashref($_[1]);
+      return $_[0];
+    }
+    return $_[0]->{$attr};
+  };
+}
+
+=method trace
+
+=cut
+
+sub trace {
+  my ($self, @args) = @_;
+  if (@args) {
+    $self->{trace} = $args[0];
+    $self->schema->storage->debug($args[0]);
+    return $self;
+  }
+  return $self->{trace};
+}
+
+=method schema
+
+=cut
+
+sub schema {
+  my ($self) = @_;
+  $self->{schema} ||= $self->_build_schema;
+  return $self->{schema};
+}
 
 =method _build_schema
 
@@ -93,69 +272,15 @@ sub _build_schema {
   return $self->schema_class->connect(@{$self->connect_info});
 }
 
-=head2 resultset
-
-a resultset from the schema to operate on
+=method connect_info
 
 =cut
 
-has 'resultset' => (
-  is  => 'rw',
-  isa => Str,
-);
-
-
-=head2 where
-
-a hash ref or json string to be used for identifying data to manipulate
-
-=cut
-
-has 'where' => (
-  is      => 'rw',
-  isa     => DBICHashRef,
-  coerce  => 1,
-);
-
-
-=head2 set
-
-a hash ref or json string to be used for inserting or updating data
-
-=cut
-
-has 'set' => (
-  is      => 'rw',
-  isa     => DBICHashRef,
-  coerce  => 1,
-);
-
-
-=head2 attrs
-
-a hash ref or json string to be used for passing additional info to the ->search call
-
-=cut
-
-has 'attrs' => (
-  is      => 'rw',
-  isa     => DBICHashRef,
-  coerce  => 1,
-);
-
-
-=head2 connect_info
-
-connect_info the arguments to provide to the connect call of the schema_class
-
-=cut
-
-has 'connect_info' => (
-  is          => 'ro',
-  isa         => DBICConnectInfo,
-  lazy_build  => 1,
-  coerce      => 1,
-);
+sub connect_info {
+  my ($self) = @_;
+  $self->{connect_info} ||= $self->_build_connect_info;
+  return $self->{connect_info};
+}
 
 =method _build_connect_info
 
@@ -166,47 +291,15 @@ sub _build_connect_info {
   return $self->_find_stanza($self->config, $self->config_stanza);
 }
 
-
-=head2 config_file
-
-config_file provide a config_file to read connect_info from, if this is provided
-config_stanze should also be provided to locate where the connect_info is in the config
-The config file should be in a format readable by Config::Any.
+=method config
 
 =cut
 
-has config_file => (
-  is      => 'ro',
-  isa     => File,
-  coerce  => 1,
-);
-
-
-=head2 config_stanza
-
-config_stanza for use with config_file should be a '::' delimited 'path' to the connection information
-designed for use with catalyst config files
-
-=cut
-
-has 'config_stanza' => (
-  is  => 'ro',
-  isa => Str,
-);
-
-
-=head2 config
-
-Instead of loading from a file the configuration can be provided directly as a hash ref.  Please note
-config_stanza will still be required.
-
-=cut
-
-has config => (
-  is          => 'ro',
-  isa         => DBICHashRef,
-  lazy_build  => 1,
-);
+sub config {
+  my ($self) = @_;
+  $self->{config} ||= $self->_build_config;
+  return $self->{config};
+}
 
 =method _build_config
 
@@ -223,105 +316,6 @@ sub _build_config {
   # just grab the config from the config file
   $cfg = $cfg->{$self->config_file};
   return $cfg;
-}
-
-
-=head2 sql_dir
-
-The location where sql ddl files should be created or found for an upgrade.
-
-=cut
-
-has 'sql_dir' => (
-  is      => 'ro',
-  isa     => Dir,
-  coerce  => 1,
-);
-
-
-=head2 sql_type
-
-The type of sql dialect to use for creating sql files from schema
-
-=cut
-
-has 'sql_type' => (
-  is     => 'ro',
-  isa    => Str,
-);
-
-=head2 version
-
-Used for install, the version which will be 'installed' in the schema
-
-=cut
-
-has version => (
-  is  => 'rw',
-  isa => Str,
-);
-
-
-=head2 preversion
-
-Previous version of the schema to create an upgrade diff for, the full sql for that version of the sql must be in the sql_dir
-
-=cut
-
-has preversion => (
-  is  => 'rw',
-  isa => Str,
-);
-
-
-=head2 force
-
-Try and force certain operations.
-
-=cut
-
-has force => (
-  is  => 'rw',
-  isa => Bool,
-);
-
-
-=head2 quiet
-
-Be less verbose about actions
-
-=cut
-
-has quiet => (
-  is  => 'rw',
-  isa => Bool,
-);
-
-has '_confirm' => (
-  is  => 'bare',
-  isa => Bool,
-);
-
-
-=head2 trace
-
-Toggle DBIO debug output
-
-=cut
-
-has trace => (
-    is => 'rw',
-    isa => Bool,
-    trigger => \&_trigger_trace,
-);
-
-=method _trigger_trace
-
-=cut
-
-sub _trigger_trace {
-    my ($self, $new, $old) = @_;
-    $self->schema->storage->debug($new);
 }
 
 
@@ -357,9 +351,12 @@ sub create {
 
   my $schema = $self->schema();
   # create the dir if does not exist
-  $self->sql_dir->mkpath() if ( ! -d $self->sql_dir);
+  if ( ! -d $self->sql_dir) {
+    require File::Path;
+    File::Path::mkpath($self->sql_dir);
+  }
 
-  $schema->create_ddl_dir( $sqlt_type, (defined $schema->schema_version ? $schema->schema_version : ""), $self->sql_dir->stringify, $preversion, $sqlt_args );
+  $schema->create_ddl_dir( $sqlt_type, (defined $schema->schema_version ? $schema->schema_version : ""), $self->sql_dir, $preversion, $sqlt_args );
 }
 
 
@@ -608,7 +605,7 @@ sub _confirm {
   my ($self) = @_;
 
   # mainly here for testing
-  return 1 if ($self->meta->get_attribute('_confirm')->get_value($self));
+  return 1 if $self->{_confirm};
 
   print "Are you sure you want to do this? (type YES to confirm) \n";
   my $response = <STDIN>;
@@ -633,6 +630,34 @@ sub _find_stanza {
   }
   $cfg = $cfg->{connect_info} if exists $cfg->{connect_info};
   return $cfg;
+}
+
+# Private helper: coerce a value to a hashref (from JSON string or passthrough)
+sub _coerce_hashref {
+  my ($val) = @_;
+  return $val if ref $val;
+  return _json_to_data($val) if defined $val;
+  return $val;
+}
+
+# Private helper: coerce connect_info to arrayref
+sub _coerce_connect_info {
+  my ($val) = @_;
+  return [$val] if ref $val eq 'HASH';
+  return $val if ref $val eq 'ARRAY';
+  return _json_to_data($val) if defined $val;
+  return $val;
+}
+
+# Private helper: decode JSON string to Perl data
+sub _json_to_data {
+  my ($json_str) = @_;
+  my $json = eval { JSON::MaybeXS->new(
+    allow_barekey     => 1,
+    allow_singlequote => 1,
+    relaxed           => 1,
+  ) } || JSON::MaybeXS->new(relaxed => 1);
+  return $json->decode($json_str);
 }
 
 =head1 FURTHER QUESTIONS?

@@ -5,7 +5,7 @@ use Test::More;
 use lib qw(t/lib);
 use DBICTest;
 use B::Deparse;
-use DBIO::_Util 'perlstring';
+use DBIO::Util 'perlstring';
 
 # globally set for the rest of test
 # the rowparser maker does not order its hashes by default for the miniscule

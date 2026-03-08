@@ -11,7 +11,7 @@ BEGIN {
 }
 
 use File::Temp ();
-use DBIO::_Util 'scope_guard';
+use DBIO::Util 'scope_guard';
 use DBIO::Schema;
 
 # Do not use T::B - the test is hard enough not to segfault as it is

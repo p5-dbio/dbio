@@ -7,7 +7,7 @@ use warnings;
 use DBICTest::Util qw( local_umask await_flock dbg DEBUG_TEST_CONCURRENCY_LOCKS );
 use DBICTest::Schema;
 use DBICTest::Util::LeakTracer qw/populate_weakregistry assert_empty_weakregistry/;
-use DBIO::_Util 'detected_reinvoked_destructor';
+use DBIO::Util 'detected_reinvoked_destructor';
 use Carp;
 use Path::Class::File ();
 use File::Spec;

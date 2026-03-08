@@ -6,7 +6,7 @@ use Test::Deep;
 use Test::Exception;
 use lib qw(t/lib);
 use DBICTest;
-use DBIO::_Util 'sigwarn_silencer';
+use DBIO::Util 'sigwarn_silencer';
 
 my $schema = DBICTest->init_schema();
 

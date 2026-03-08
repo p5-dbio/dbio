@@ -6,11 +6,9 @@ use strict;
 use DBIO::Exception;
 use DBIO::Carp;
 use Context::Preserve 'preserve_context';
-use DBIO::_Util qw(is_exception qsub);
+use DBIO::Util qw(is_exception qsub);
 use Scalar::Util qw(weaken blessed reftype);
 use Try::Tiny;
-use Moo;
-use namespace::clean;
 
 =head1 DESCRIPTION
 
@@ -67,59 +65,79 @@ Internal recursive worker for C<run>.
 
 =cut
 
-has storage => (
-  is => 'ro',
-  required => 1,
-);
+sub new {
+  my $class = shift;
+  my %args = @_ == 1 && ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
 
-has wrap_txn => (
-  is => 'ro',
-  required => 1,
-);
+  for my $required (qw(storage wrap_txn retry_handler)) {
+    DBIO::Exception->throw("Missing required attribute '$required'")
+      unless exists $args{$required};
+  }
+
+  # isa check for retry_handler
+  (Scalar::Util::reftype($args{retry_handler})||'') eq 'CODE'
+    or DBIO::Exception->throw('retry_handler must be a CODE reference');
+
+  my $self = bless {
+    storage       => $args{storage},
+    wrap_txn      => $args{wrap_txn},
+    retry_handler => $args{retry_handler},
+    max_attempts  => exists $args{max_attempts} ? $args{max_attempts} : 20,
+    ( exists $args{retry_debug} ? ( retry_debug => $args{retry_debug} ) : () ),
+    # failed_attempt_count and exception_stack have init_arg => undef
+    # so they are never accepted from constructor args
+  }, ref $class || $class;
+
+  return $self;
+}
+
+sub storage { $_[0]->{storage} }
+
+sub wrap_txn { $_[0]->{wrap_txn} }
 
 # true - retry, false - rethrow, or you can throw your own (not catching)
-has retry_handler => (
-  is => 'ro',
-  required => 1,
-  isa => qsub q{
-    (Scalar::Util::reftype($_[0])||'') eq 'CODE'
-      or DBIO::Exception->throw('retry_handler must be a CODE reference')
-  },
-);
+sub retry_handler { $_[0]->{retry_handler} }
 
-has retry_debug => (
-  is => 'rw',
-  # use a sub - to be evaluated on the spot lazily
-  default => qsub '$ENV{DBIC_STORAGE_RETRY_DEBUG}',
-  lazy => 1,
-);
+sub retry_debug {
+  if (@_ > 1) {
+    $_[0]->{retry_debug} = $_[1];
+    return $_[1];
+  }
+  # lazy default
+  $_[0]->{retry_debug} = $ENV{DBIC_STORAGE_RETRY_DEBUG}
+    unless exists $_[0]->{retry_debug};
+  return $_[0]->{retry_debug};
+}
 
-has max_attempts => (
-  is => 'ro',
-  default => 20,
-);
+sub max_attempts { $_[0]->{max_attempts} }
 
-has failed_attempt_count => (
-  is => 'ro',
-  init_arg => undef,  # ensures one can't pass the value in
-  writer => '_set_failed_attempt_count',
-  default => 0,
-  lazy => 1,
-  trigger => qsub q{
-    $_[0]->throw_exception( sprintf (
-      'Reached max_attempts amount of %d, latest exception: %s',
-      $_[0]->max_attempts, $_[0]->last_exception
-    )) if $_[0]->max_attempts <= ($_[1]||0);
-  },
-);
+sub failed_attempt_count {
+  # lazy default
+  $_[0]->{failed_attempt_count} = 0
+    unless exists $_[0]->{failed_attempt_count};
+  return $_[0]->{failed_attempt_count};
+}
 
-has exception_stack => (
-  is => 'ro',
-  init_arg => undef,
-  clearer => '_reset_exception_stack',
-  default => qsub q{ [] },
-  lazy => 1,
-);
+sub _set_failed_attempt_count {
+  $_[0]->{failed_attempt_count} = $_[1];
+  # trigger
+  $_[0]->throw_exception( sprintf (
+    'Reached max_attempts amount of %d, latest exception: %s',
+    $_[0]->max_attempts, $_[0]->last_exception
+  )) if $_[0]->max_attempts <= ($_[1]||0);
+  return $_[1];
+}
+
+sub exception_stack {
+  # lazy default
+  $_[0]->{exception_stack} = []
+    unless exists $_[0]->{exception_stack};
+  return $_[0]->{exception_stack};
+}
+
+sub _reset_exception_stack {
+  delete $_[0]->{exception_stack};
+}
 
 sub last_exception { shift->exception_stack->[-1] }
 

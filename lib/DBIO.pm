@@ -24,7 +24,7 @@ $VERSION = '0.100';
 
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
-use DBIO::_Util;
+use DBIO::Util;
 use mro 'c3';
 
 use DBIO::Optional::Dependencies;
@@ -41,7 +41,7 @@ __PACKAGE__->_skip_namespace_frames('^DBIO|^SQL::Abstract|^Try::Tiny|^Class::Acc
 # However it is the right thing to do in order to get
 # various install bases to highlight their brokenness
 # Remove at some unknown point in the future
-sub DESTROY { &DBIO::_Util::detected_reinvoked_destructor }
+sub DESTROY { &DBIO::Util::detected_reinvoked_destructor }
 
 sub mk_classdata {
   shift->mk_classaccessor(@_);

@@ -97,15 +97,10 @@ my $skip_idx = { map { $_ => 1 } (
 
   # not sure how to handle type libraries
   'DBIO::Storage::DBI::Replicated::Types',
-  'DBIO::Admin::Types',
-
-  # G::L::D is unclean, but we never inherit from it
-  'DBIO::Admin::Descriptive',
-  'DBIO::Admin::Usage',
 
   # utility classes, not part of the inheritance chain
   'DBIO::ResultSource::RowParser::Util',
-  'DBIO::_Util',
+  'DBIO::Util',
 ) };
 
 my $has_moose = eval { require Moose::Util };

@@ -13,7 +13,7 @@ use Scalar::Util qw/refaddr weaken reftype blessed/;
 use Context::Preserve 'preserve_context';
 use Try::Tiny;
 use SQL::Abstract::Util qw(is_plain_value is_literal_value);
-use DBIO::_Util qw(quote_sub perlstring serialize detected_reinvoked_destructor sigwarn_silencer);
+use DBIO::Util qw(quote_sub perlstring serialize dump_value detected_reinvoked_destructor sigwarn_silencer);
 use namespace::clean;
 
 # default cursor class, overridable in connect_info attributes
@@ -1399,13 +1399,13 @@ sub _determine_driver {
           $self->_rebless();
         }
         elsif ($storage_class) {
-          $self->_warn_undetermined_driver(
-            "DBIO driver '$storage_class' for DBD driver '$driver' could not be loaded. "
-          . "Make sure the corresponding distribution is installed."
+          $self->throw_exception(
+            "The DBIO driver '$storage_class' for DBD driver '$driver' could not be loaded. "
+          . "Install the corresponding distribution (e.g. cpanm DBIO::PostgreSQL for dbi:Pg)."
           );
         }
         else {
-          $self->_warn_undetermined_driver(
+          $self->throw_exception(
             "No DBIO driver registered for DBD driver '$driver'. "
           . "Install the appropriate DBIO::* distribution for your database, "
           . "or register a custom driver via DBIO::Storage::DBI->register_driver."
@@ -1489,14 +1489,14 @@ sub _determine_connector_driver {
       $self->_rebless;
     }
     else {
-      $self->_warn_undetermined_driver(
-        "DBIO driver '$subclass' for $conn/$dbtype could not be loaded. "
-      . "Make sure the corresponding distribution is installed."
+      $self->throw_exception(
+        "The DBIO driver '$subclass' for $conn/$dbtype could not be loaded. "
+      . "Install the corresponding distribution."
       );
     }
   }
   else {
-    $self->_warn_undetermined_driver(
+    $self->throw_exception(
       "No DBIO driver registered for connector '$conn/$dbtype'. "
     . "Install the appropriate DBIO::* distribution for your database, "
     . "or register via DBIO::Storage::DBI->register_connector_driver."
@@ -1507,12 +1507,10 @@ sub _determine_connector_driver {
 sub _warn_undetermined_driver {
   my ($self, $msg) = @_;
 
-  require Data::Dumper::Concise;
-
   carp_once ($msg . ' While we will attempt to continue anyway, the results '
   . 'are likely to be underwhelming. Please upgrade DBIC, and if this message '
   . "does not go away, file a bugreport including the following info:\n"
-  . Data::Dumper::Concise::Dumper($self->_describe_connection)
+  . dump_value($self->_describe_connection)
   );
 }
 
@@ -2443,9 +2441,12 @@ sub _insert_bulk {
       $msg,
       $cols->[$c_idx],
       do {
-        require Data::Dumper::Concise;
+        require Data::Dumper;
+        local $Data::Dumper::Indent = 1;
+        local $Data::Dumper::Terse = 1;
+        local $Data::Dumper::Sortkeys = 1;
         local $Data::Dumper::Maxdepth = 5;
-        Data::Dumper::Concise::Dumper ({
+        Data::Dumper::Dumper ({
           map { $cols->[$_] =>
             $data->[$r_idx][$_]
           } 0..$#$cols
@@ -2644,10 +2645,9 @@ sub _dbh_execute_for_fetch {
     $self->throw_exception("Unexpected populate error: $err")
       if ($i > $#$tuple_status);
 
-    require Data::Dumper::Concise;
     $self->throw_exception(sprintf "execute_for_fetch() aborted with '%s' at populate slice:\n%s",
       ($tuple_status->[$i][1] || $err),
-      Data::Dumper::Concise::Dumper( { map { $cols->[$_] => $data->[$i][$_] } (0 .. $#$cols) } ),
+      dump_value( { map { $cols->[$_] => $data->[$i][$_] } (0 .. $#$cols) } ),
     );
   }
 

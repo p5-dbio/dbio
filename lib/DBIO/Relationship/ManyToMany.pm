@@ -6,7 +6,7 @@ use warnings;
 use DBIO::Carp;
 use Sub::Name 'subname';
 use Scalar::Util 'blessed';
-use DBIO::_Util 'fail_on_internal_wantarray';
+use DBIO::Util 'fail_on_internal_wantarray';
 use namespace::clean;
 
 our %_pod_inherit_config =

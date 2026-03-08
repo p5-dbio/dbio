@@ -25,7 +25,7 @@ use lib qw(t/lib);
 use DBICTest::RunMode;
 use DBICTest::Util::LeakTracer qw(populate_weakregistry assert_empty_weakregistry visit_refs);
 use Scalar::Util qw(weaken blessed reftype);
-use DBIO::_Util qw(hrefaddr sigwarn_silencer modver_gt_or_eq modver_gt_or_eq_and_lt);
+use DBIO::Util qw(hrefaddr sigwarn_silencer modver_gt_or_eq modver_gt_or_eq_and_lt);
 BEGIN {
   plan skip_all => "Your perl version $] appears to leak like a sieve - skipping test"
     if DBIO::_ENV_::PEEPEENESS;

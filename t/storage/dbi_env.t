@@ -4,7 +4,7 @@ use lib qw(t/lib);
 use DBICTest;
 use Test::More;
 use Test::Exception;
-use DBIO::_Util 'sigwarn_silencer';
+use DBIO::Util 'sigwarn_silencer';
 
 BEGIN { delete @ENV{qw(DBI_DSN DBI_DRIVER)} }
 

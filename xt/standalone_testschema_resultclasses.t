@@ -3,7 +3,7 @@ use strict;
 
 BEGIN { delete $ENV{DBICTEST_VERSION_WARNS_INDISCRIMINATELY} }
 
-use DBIO::_Util 'sigwarn_silencer';
+use DBIO::Util 'sigwarn_silencer';
 use if DBIO::_ENV_::BROKEN_FORK, 'threads';
 
 use Test::More;

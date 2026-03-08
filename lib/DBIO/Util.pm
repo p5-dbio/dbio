@@ -1,4 +1,4 @@
-package DBIO::_Util;
+package DBIO::Util;
 
 use warnings;
 use strict;
@@ -71,7 +71,7 @@ our @EXPORT_OK = qw(
   fail_on_internal_wantarray fail_on_internal_call
   refdesc refcount hrefaddr
   scope_guard is_exception detected_reinvoked_destructor emit_loud_diag
-  quote_sub qsub perlstring serialize
+  quote_sub qsub perlstring serialize dump_value
   UNRESOLVABLE_CONDITION
 );
 
@@ -116,6 +116,13 @@ sub serialize ($) {
   nfreeze($_[0]);
 }
 
+sub dump_value ($) {
+  require Data::Dumper;
+  local $Data::Dumper::Indent = 1;
+  local $Data::Dumper::Terse = 1;
+  local $Data::Dumper::Sortkeys = 1;
+  Data::Dumper::Dumper($_[0]);
+}
 
 my $seen_loud_screams;
 sub emit_loud_diag {
@@ -179,14 +186,14 @@ sub scope_guard (&) {
     if ! defined wantarray;
 
   # no direct blessing of coderefs - DESTROY is buggy on those
-  bless [ $_[0] ], 'DBIO::_Util::ScopeGuard';
+  bless [ $_[0] ], 'DBIO::Util::ScopeGuard';
 }
 {
   package #
-    DBIO::_Util::ScopeGuard;
+    DBIO::Util::ScopeGuard;
 
   sub DESTROY {
-    &DBIO::_Util::detected_reinvoked_destructor;
+    &DBIO::Util::detected_reinvoked_destructor;
 
     local $@ if DBIO::_ENV_::UNSTABLE_DOLLARAT;
 
@@ -359,7 +366,7 @@ sub modver_gt_or_eq_and_lt ($$$) {
       $fr = [ caller($cf) ];
       $want = ( caller($cf-1) )[5];
       $argdesc = ref $DB::args[0]
-        ? DBIO::_Util::refdesc($DB::args[0])
+        ? DBIO::Util::refdesc($DB::args[0])
         : 'non '
       ;
     };
@@ -385,7 +392,7 @@ sub fail_on_internal_call {
     package DB;
     $fr = [ caller(1) ];
     $argdesc = ref $DB::args[0]
-      ? DBIO::_Util::refdesc($DB::args[0])
+      ? DBIO::Util::refdesc($DB::args[0])
       : undef
     ;
   };

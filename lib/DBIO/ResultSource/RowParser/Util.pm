@@ -3,7 +3,7 @@ package DBIO::ResultSource::RowParser::Util;
 use strict;
 use warnings;
 
-use DBIO::_Util 'perlstring';
+use DBIO::Util 'perlstring';
 
 use constant HAS_DOR => ( $] < 5.010 ? 0 : 1 );
 

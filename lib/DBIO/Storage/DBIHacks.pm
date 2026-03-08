@@ -28,7 +28,7 @@ use base 'DBIO::Storage';
 use mro 'c3';
 
 use Scalar::Util 'blessed';
-use DBIO::_Util qw(UNRESOLVABLE_CONDITION serialize);
+use DBIO::Util qw(UNRESOLVABLE_CONDITION serialize dump_value);
 use SQL::Abstract::Util qw(is_plain_value is_literal_value);
 use DBIO::Carp;
 use namespace::clean;
@@ -514,8 +514,7 @@ sub _resolve_aliastypes_from_select_args {
       );
 
       if (ref $_) {
-        require Data::Dumper::Concise;
-        $self->throw_exception("Unexpected ref in scan-plan: " . Data::Dumper::Concise::Dumper($v) );
+        $self->throw_exception("Unexpected ref in scan-plan: " . dump_value($v) );
       }
 
       push @nv, $_;
@@ -1379,11 +1378,14 @@ sub _collapse_cond_unroll_pairs {
 
             # extra sanity check
             if (keys %$p > 1) {
-              require Data::Dumper::Concise;
+              require Data::Dumper;
+              local $Data::Dumper::Indent = 1;
+              local $Data::Dumper::Terse = 1;
+              local $Data::Dumper::Sortkeys = 1;
               local $Data::Dumper::Deepcopy = 1;
               $self->throw_exception(
                 "Internal error: unexpected collapse unroll:"
-              . Data::Dumper::Concise::Dumper { in => { $lhs => $rhs }, out => $p }
+              . Data::Dumper::Dumper { in => { $lhs => $rhs }, out => $p }
               );
             }
 
