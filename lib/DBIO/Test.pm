@@ -6,6 +6,7 @@ use warnings;
 
 use DBIO::Test::Schema;
 use Carp;
+use namespace::clean;
 
 =head1 DESCRIPTION
 

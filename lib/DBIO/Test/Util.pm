@@ -28,6 +28,7 @@ use Carp 'confess';
 use Fcntl ':flock';
 use Scalar::Util qw(blessed refaddr);
 use DBIO::Util;
+use namespace::clean;
 
 use base 'Exporter';
 our @EXPORT_OK = qw(

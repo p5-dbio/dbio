@@ -2,15 +2,11 @@ package DBIO::Test::Util::OverrideRequire;
 
 # no use/require of any kind - work bare
 
-BEGIN {
-  # Neat STDERR require call tracer
-  #
+use constant TRACE => 0;
   # 0 - no trace
   # 1 - just requires and return values
   # 2 - neat stacktrace (assumes that the supplied $override_cref does *not* (ab)use goto)
   # 3 - full stacktrace
-  *TRACE = sub () { 0 };
-}
 
 # Takes a single coderef and replaces CORE::GLOBAL::require with it.
 #

@@ -6,6 +6,7 @@ use strict;
 use warnings;
 
 use Scalar::Util qw(refaddr weaken);
+use namespace::clean;
 
 =head1 SYNOPSIS
 

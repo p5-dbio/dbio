@@ -8,6 +8,7 @@ use DBIO::Util qw(sigwarn_silencer qsub);
 use IO::Handle ();
 
 use base 'DBIO';
+use namespace::clean;
 
 __PACKAGE__->mk_group_accessors(simple => qw(
   _defaulted_to_stderr

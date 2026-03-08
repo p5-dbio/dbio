@@ -9,6 +9,7 @@ use DBIO::Util qw(refcount hrefaddr refdesc);
 use DBIO::Optional::Dependencies;
 use Data::Dumper 'Dumper';
 use DBIO::Test::Util qw( stacktrace visit_namespaces );
+use namespace::clean;
 use constant {
   CV_TRACING => (
     !( !$ENV{AUTOMATED_TESTING} && !$ENV{RELEASE_TESTING} )

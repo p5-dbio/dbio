@@ -5,13 +5,15 @@ use strict;
 use warnings;
 
 use base 'DBIO::Storage::Statistics';
+use Sub::Util 'set_subname';
+use namespace::clean;
 
 sub query_start { push @{$_[0]{sqlbinds}}, [ ($_[1] =~ /^\s*(\S+)/)[0], [ $_[1], @{ $_[2]||[] } ] ] }
 
 # who the hell came up with this API >:(
 for my $txn (qw(begin rollback commit)) {
   no strict 'refs';
-  *{"txn_$txn"} = sub { push @{$_[0]{sqlbinds}}, [ uc $txn => [ uc $txn ] ] };
+  *{"txn_$txn"} = set_subname "txn_$txn" => sub { push @{$_[0]{sqlbinds}}, [ uc $txn => [ uc $txn ] ] };
 }
 
 sub svp_begin { push @{$_[0]{sqlbinds}}, [ SAVEPOINT => [ "SAVEPOINT $_[1]" ] ] }

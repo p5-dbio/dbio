@@ -9,6 +9,7 @@ use Context::Preserve 'preserve_context';
 use DBIO::Util qw(is_exception qsub);
 use Scalar::Util qw(weaken blessed reftype);
 use Try::Tiny;
+use namespace::clean;
 
 =head1 DESCRIPTION
 
