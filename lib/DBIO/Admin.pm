@@ -96,34 +96,82 @@ sub new {
   return $self;
 }
 
-# read-only accessors
-for my $attr (qw/schema_class config_stanza sql_dir sql_type config_file/) {
-  no strict 'refs';
-  *{$attr} = sub { $_[0]->{$attr} };
+sub schema_class { $_[0]->{schema_class} }
+sub config_stanza { $_[0]->{config_stanza} }
+sub sql_dir { $_[0]->{sql_dir} }
+sub sql_type { $_[0]->{sql_type} }
+sub config_file { $_[0]->{config_file} }
+
+sub resultset {
+  if (@_ > 1) {
+    $_[0]->{resultset} = $_[1];
+    return $_[0];
+  }
+  return $_[0]->{resultset};
 }
 
-# read-write accessors
-for my $attr (qw/resultset version preversion force quiet mode/) {
-  no strict 'refs';
-  *{$attr} = sub {
-    if (@_ > 1) {
-      $_[0]->{$attr} = $_[1];
-      return $_[0];
-    }
-    return $_[0]->{$attr};
-  };
+sub version {
+  if (@_ > 1) {
+    $_[0]->{version} = $_[1];
+    return $_[0];
+  }
+  return $_[0]->{version};
 }
 
-# read-write accessors with JSON coercion
-for my $attr (qw/where set attrs/) {
-  no strict 'refs';
-  *{$attr} = sub {
-    if (@_ > 1) {
-      $_[0]->{$attr} = _coerce_hashref($_[1]);
-      return $_[0];
-    }
-    return $_[0]->{$attr};
-  };
+sub preversion {
+  if (@_ > 1) {
+    $_[0]->{preversion} = $_[1];
+    return $_[0];
+  }
+  return $_[0]->{preversion};
+}
+
+sub force {
+  if (@_ > 1) {
+    $_[0]->{force} = $_[1];
+    return $_[0];
+  }
+  return $_[0]->{force};
+}
+
+sub quiet {
+  if (@_ > 1) {
+    $_[0]->{quiet} = $_[1];
+    return $_[0];
+  }
+  return $_[0]->{quiet};
+}
+
+sub mode {
+  if (@_ > 1) {
+    $_[0]->{mode} = $_[1];
+    return $_[0];
+  }
+  return $_[0]->{mode};
+}
+
+sub where {
+  if (@_ > 1) {
+    $_[0]->{where} = _coerce_hashref($_[1]);
+    return $_[0];
+  }
+  return $_[0]->{where};
+}
+
+sub set {
+  if (@_ > 1) {
+    $_[0]->{set} = _coerce_hashref($_[1]);
+    return $_[0];
+  }
+  return $_[0]->{set};
+}
+
+sub attrs {
+  if (@_ > 1) {
+    $_[0]->{attrs} = _coerce_hashref($_[1]);
+    return $_[0];
+  }
+  return $_[0]->{attrs};
 }
 
 sub trace {
