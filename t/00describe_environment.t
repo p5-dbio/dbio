@@ -1,5 +1,5 @@
 ###
-### This version is rather 5.8-centric, because DBIC itself is 5.8
+### This version is rather 5.8-centric, due to legacy test coverage roots
 ### It certainly can be rewritten to degrade well on 5.6
 ###
 
@@ -32,9 +32,9 @@ BEGIN {
     # we want to do this here, in the very beginning, before even
     # warnings/strict are loaded
 
-    require DBICTest::Util::OverrideRequire;
+    require DBIO::Test::Util::OverrideRequire;
 
-    DBICTest::Util::OverrideRequire::override_global_require( sub {
+    DBIO::Test::Util::OverrideRequire::override_global_require( sub {
       my $res = eval { $_[0]->() };
       if ($@ ne '') {
         delete $INC{$_[1]};
@@ -45,8 +45,7 @@ BEGIN {
 
   }
 
-  require DBICTest::RunMode;
-  require DBICTest::Util;
+  require DBIO::Test::Util;
 }
 
 use strict;
@@ -206,7 +205,7 @@ my $load_weights = {
 
 my @known_modules = sort
   { ($load_weights->{$b}||0) <=> ($load_weights->{$a}||0) }
-  qw( Data::Dumper DBD::SQLite ),
+  qw( Data::Dumper ),
   map
     { $_ => 1 }
     map
@@ -265,7 +264,7 @@ my $interesting_modules = {
 
 
 # drill through the *ENTIRE* symtable and build a map of interesting modules
-DBICTest::Util::visit_namespaces( action => sub {
+DBIO::Test::Util::visit_namespaces( action => sub {
   no strict 'refs';
   my $pkg = shift;
 
@@ -327,8 +326,13 @@ DBICTest::Util::visit_namespaces( action => sub {
       defined ( my $eumm_ver = eval { MM->parse_version( $abs_unix_path ) } )
     ) {
 
-      # can only run the check reliably if v.pm is there
+      # Optional strict mismatch check.
+      # Some distributions intentionally host multiple package versions in one file
+      # (for example exception subclasses), which makes parse_version disagree
+      # with package VERSION and creates noisy false positives.
       if (
+        ($ENV{DBIO_TEST_STRICT_VERSION_MISMATCH} || '')
+          and
         $has_versionpm
           and
         defined $mod_ver
@@ -414,8 +418,22 @@ purge_identically_versioned_submodules_with_markers([ map {
 
 ok 1, (scalar keys %$interesting_modules) . " distinctly versioned modules found";
 
-# do not announce anything under ci - we are watching for STDERR silence
-exit 0 if DBICTest::RunMode->is_ci;
+# keep default test output quiet; enable detailed environment dump explicitly
+# when investigating local test failures.
+exit 0 unless should_emit_diag();
+
+sub is_ci {
+  return (
+    ($ENV{TRAVIS} || '') eq 'true'
+      &&
+    ($ENV{TRAVIS_REPO_SLUG} || '') =~ m|\w+/DBIO$|
+  );
+}
+
+sub should_emit_diag {
+  return 0 if is_ci();
+  return ($ENV{DBIO_TEST_DIAG_ENVIRONMENT} || '') ? 1 : 0;
+}
 
 
 # diag the result out

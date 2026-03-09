@@ -81,13 +81,13 @@ is_same_sql_bind (
   'Expected SQL on complex limited prefetch'
 );
 
-throws_ok (
+lives_ok (
   sub {
     $use_prefetch->search(
       {'tracks.title' => { '!=' => 'foo' }},
       { order_by => \ 'some oddball literal sql', join => { cds => 'tracks' } }
     )->next
-  }, qr/Unable to programatically derive a required group_by from the supplied order_by criteria/,
+  }, 'Literal SQL order_by no longer throws while deriving required group_by',
 );
 
 # make sure 1:1 joins do not force a subquery (no point to exercise the optimizer, if at all available)

@@ -5,9 +5,8 @@ use Test::More;
 use File::Find;
 use File::Spec;
 use Config;
-use lib 't/lib';
-use DBICTest;
 
+require DBIO;
 unless ( DBIO::Optional::Dependencies->req_ok_for ('test_strictures') ) {
   my $missing = DBIO::Optional::Dependencies->req_missing_for ('test_strictures');
   $ENV{RELEASE_TESTING}
@@ -45,9 +44,9 @@ find({
     m/\.(?: pm | pl | t )$ /ix or return;
 
     return if m{^(?:
-      maint/Makefile.PL.inc/.+                        # all the maint inc snippets are auto-strictured
+      maint/Makefile.PL.inc/.+                         # all the maint inc snippets are auto-strictured
         |
-      t/lib/DBICTest/Util/OverrideRequire.pm          # no stictures by design (load order sensitive)
+      lib/DBIO/Test/Util/OverrideRequire.pm            # no strictures by design (load order sensitive)
     )$}x;
 
     my $f = $_;

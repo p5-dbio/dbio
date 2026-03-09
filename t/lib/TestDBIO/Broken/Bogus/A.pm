@@ -1,4 +1,4 @@
-package DBIO::Test::Namespace::Bogus::A;
+package TestDBIO::Broken::Bogus::A;
 
 use warnings;
 use strict;

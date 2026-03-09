@@ -135,7 +135,7 @@ is_same_sql_bind(
   ],
 );
 
-$schema->storage->mock(qr/SELECT.*owner_name/i, [['Newton'], ['Newton']]);
+$schema->storage->mock(qr/SELECT.*owner.*name.*FROM.*books/is, [['Newton'], ['Newton']]);
 is_deeply (
   [ $rs->get_column ('owner_name')->all ],
   [ ('Newton') x 2 ],

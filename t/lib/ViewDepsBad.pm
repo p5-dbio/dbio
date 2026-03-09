@@ -4,7 +4,7 @@ package    # hide from PAUSE
 
 use strict;
 use warnings;
-use base 'DBICTest::BaseSchema';
+use base 'DBIO::Schema';
 
 __PACKAGE__->load_namespaces;
 

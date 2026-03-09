@@ -2,8 +2,6 @@ use warnings;
 use strict;
 
 use Test::More;
-use lib qw(t/lib);
-use DBICTest;
 
 require DBIO;
 unless ( DBIO::Optional::Dependencies->req_ok_for ('test_pod') ) {

@@ -68,7 +68,7 @@ my $sql_maker = $schema->storage->sql_maker;
 
 # Tests base class for => \'FOO' actually generates proper query. for =>
 # 'READ'|'SHARE' is tested in db-specific subclasses
-# we have to instantiate base because SQLMaker::SQLite disables _lock_select
+# we have to instantiate base because some driver SQLMakers override _lock_select
 {
   require DBIO::SQLMaker;
   my $sa = DBIO::SQLMaker->new;

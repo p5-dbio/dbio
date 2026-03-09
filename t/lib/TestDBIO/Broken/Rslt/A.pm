@@ -1,4 +1,4 @@
-package DBIO::Test::Namespace::Rslt::A;
+package TestDBIO::Broken::Rslt::A;
 
 use warnings;
 use strict;

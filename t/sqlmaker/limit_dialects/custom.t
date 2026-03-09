@@ -10,7 +10,7 @@ use DBIO::Test ':DiffSQL';
 # Keep it around just in case someone is using it
 
 {
-  package DBICTest::SQLMaker::CustomDialect;
+  package DBIOTest::SQLMaker::CustomDialect;
   use base qw/DBIO::SQLMaker/;
   sub emulate_limit {
     my ($self, $sql, $rs_attrs, $limit, $offset) = @_;
@@ -22,7 +22,7 @@ use DBIO::Test ':DiffSQL';
   }
 }
 my $s = DBIO::Test->init_schema(no_deploy => 1);
-$s->storage->sql_maker_class ('DBICTest::SQLMaker::CustomDialect');
+$s->storage->sql_maker_class ('DBIOTest::SQLMaker::CustomDialect');
 
 my $rs = $s->resultset ('CD');
 
