@@ -97,7 +97,7 @@ For a more involved explanation, see L<DBIO::ResultSet/create>.
 
 Please note that if a value is not passed to new, no value will be sent
 in the SQL INSERT call, and the column will therefore assume whatever
-default value was specified in your database. While DBIC will retrieve the
+default value was specified in your database. While DBIO will retrieve the
 value of autoincrement columns, it will never make an explicit database
 trip to retrieve default values assigned by the RDBMS. You can explicitly
 request that all values be fetched back from the database by calling
@@ -108,14 +108,14 @@ with NULL as the default, and save yourself a SELECT.
 
  The behavior described above will backfire if you use a foreign key column
  with a database-defined default. If you call the relationship accessor on
- an object that doesn't have a set value for the FK column, DBIC will throw
+ an object that doesn't have a set value for the FK column, DBIO will throw
  an exception, as it has no way of knowing the PK of the related object (if
  there is one).
 
 =cut
 
 ## It needs to store the new objects somewhere, and call insert on that list later when insert is called on this object. We may need an accessor for these so the user can retrieve them, if just doing ->new().
-## This only works because DBIC doesn't yet care to check whether the new_related objects have been passed all their mandatory columns
+## This only works because DBIO doesn't yet care to check whether the new_related objects have been passed all their mandatory columns
 ## When doing the later insert, we need to make sure the PKs are set.
 ## using _relationship_data in new and funky ways..
 ## check Relationship::CascadeActions and Relationship::Accessor for compat
@@ -1688,12 +1688,12 @@ Actually implemented in L<DBIO::PK>
 
 =head1 FURTHER QUESTIONS?
 
-Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.
+Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
 
 =head1 COPYRIGHT AND LICENSE
 
 This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+by the L<DBIO authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.
 

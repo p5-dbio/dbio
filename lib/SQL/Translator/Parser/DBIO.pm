@@ -115,7 +115,7 @@ sub parse {
         # support quoting properly to be signaled about this
         $table_name = $$table_name if ref $table_name eq 'SCALAR';
 
-        # It's possible to have multiple DBIC sources using the same table
+        # It's possible to have multiple DBIO sources using the same table
         next if $tables{$table_name};
 
         $tables{$table_name}{source} = $source;
@@ -360,7 +360,7 @@ EOW
         # Skip custom query sources
         next if ref $view_name;
 
-        # Its possible to have multiple DBIC source using same table
+        # Its possible to have multiple DBIO source using same table
         next if $views{$view_name}++;
 
         $dbicschema->throw_exception ("view $view_name is missing a view_definition")
@@ -526,11 +526,11 @@ L<SQL::Translator>, L<DBIO::Schema>
 
 =head1 FURTHER QUESTIONS?
 
-Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.
+Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
 
 =head1 COPYRIGHT AND LICENSE
 
 This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+by the L<DBIO authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.

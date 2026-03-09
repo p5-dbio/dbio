@@ -323,7 +323,7 @@ are in any way unsure about the use of the attributes above (C< join
 
 =head2 Subqueries
 
-You can write subqueries relatively easily in DBIC.
+You can write subqueries relatively easily in DBIO.
 
   my $inside_rs = $schema->resultset('Artist')->search({
     name => [ 'Billy Joel', 'Brittany Spears' ],
@@ -374,7 +374,7 @@ That creates the following SQL:
 You can define frequently used searches as methods by subclassing
 L<DBIO::ResultSet>:
 
-  package My::DBIC::ResultSet::CD;
+  package My::DBIO::ResultSet::CD;
   use strict;
   use warnings;
   use base 'DBIO::ResultSet';
@@ -396,14 +396,14 @@ be automatically loaded.
 
 If however you are still using L<DBIO::Schema/load_classes>, first tell
 DBIO to create an instance of the ResultSet class for you, in your
-My::DBIC::Schema::CD class:
+My::DBIO::Schema::CD class:
 
   # class definition as normal
   use base 'DBIO::Core';
   __PACKAGE__->table('cd');
 
-  # tell DBIC to use the custom ResultSet class
-  __PACKAGE__->resultset_class('My::DBIC::ResultSet::CD');
+  # tell DBIO to use the custom ResultSet class
+  __PACKAGE__->resultset_class('My::DBIO::ResultSet::CD');
 
 Note that C<resultset_class> must be called after C<load_components> and C<table>, or you will get errors about missing methods.
 
@@ -439,7 +439,7 @@ to collect the search conditions:
   # SELECT * FROM employee WHERE name = ? AND YEAR(date_of_birth) = ?
 
 Note: the syntax for specifying the bind value's datatype and value is
-explained in L<DBIO::ResultSet/DBIC BIND VALUES>.
+explained in L<DBIO::ResultSet/DBIO BIND VALUES>.
 
 See also L<SQL::Abstract/Literal SQL with placeholders and bind values
 (subqueries)>.
@@ -1995,7 +1995,7 @@ B<Solution:>
 In your database schema, define a description field in the "Camera" table that
 can contain text and null values.
 
-In DBIC, we'll overload the column accessor to provide a sane default if no
+In DBIO, we'll overload the column accessor to provide a sane default if no
 custom description is defined. The accessor will either return or generate the
 description, depending on whether the field is null or not.
 
@@ -2267,11 +2267,11 @@ You can accomplish this with L<Tie::Cache> or L<Tie::Cache::LRU>:
 
 =head1 FURTHER QUESTIONS?
 
-Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.
+Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
 
 =head1 COPYRIGHT AND LICENSE
 
 This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+by the L<DBIO authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.

@@ -4,7 +4,7 @@
 
 =head2 Large Community
 
-There are L<hundres of DBIC contributors|DBIO/AUTHORS> listed in
+There are L<hundres of DBIx::Class contributors|DBIO/AUTHORS> listed in
 F<AUTHORS>. That ranges from documentation help, to test help, to added
 features, to entire database support.
 
@@ -28,7 +28,7 @@ L<ebbs and flows|https://metacpan.org/changes/distribution/DBIO>.)
 =head1 General ORM
 
 These are things that are in most other ORMs, but are still reasons to use
-DBIC over raw SQL.
+DBIO over raw SQL.
 
 =head2 Cross DB
 
@@ -58,7 +58,7 @@ The vast majority of code should run on all databases without needing tweaking
 
  $sth->execute( 'A book title', $author_id );
 
-=head2 DBIC: Create
+=head2 DBIO: Create
 
  my $book = $book_rs->create({
     title     => 'A book title',
@@ -90,7 +90,7 @@ See L<DBIO::ResultSet/create>
    say "Author of $book->{title} is $book->{author_name}";
  }
 
-=head2 DBIC: Read
+=head2 DBIO: Read
 
  my $book = $book_rs->find($book_id);
 
@@ -122,7 +122,7 @@ B<TMTOWTDI!>
 
  $update->execute( 'New title', $book_id );
 
-=head2 DBIC: Update
+=head2 DBIO: Update
 
  $book->update({ title => 'New title' });
 
@@ -136,7 +136,7 @@ Will not update unless value changes
 
  $delete->execute($book_id);
 
-=head2 DBIC: Delete
+=head2 DBIO: Delete
 
  $book->delete
 
@@ -152,7 +152,7 @@ See L<DBIO::Row/delete>
    books.topic = "jailbreak"
  ');
 
-=head2 DBIC: Search
+=head2 DBIO: Search
 
  my $book = $book_rs->search({
     'me.name'  => { -like => '%monte cristo%' },
@@ -665,11 +665,11 @@ See L<SQL::Abstract/Literal SQL with placeholders and bind values (subqueries)>
 
 =head1 FURTHER QUESTIONS?
 
-Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.
+Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
 
 =head1 COPYRIGHT AND LICENSE
 
 This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+by the L<DBIO authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.

@@ -120,7 +120,7 @@ __PACKAGE__->belongs_to('genre_inefficient', 'DBIO::Test::Schema::Genre',
 # This is insane. Don't ever do anything like that
 # This is for testing purposes only!
 
-# mst: mo: DBIC is an "object relational mapper"
+# mst: mo: DBIO is an "object relational mapper"
 # mst: mo: not an "object relational hider-because-mo-doesn't-understand-databases
 # ribasushi: mo: try it with a subselect nevertheless, I'd love to be proven wrong
 # ribasushi: mo: does sqlite actually take this?

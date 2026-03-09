@@ -165,23 +165,23 @@ more info see L<DBIO::Relationship::Base/condition>.
 =back
 
   # in a Book class (where Author has many Books)
-  My::DBIC::Schema::Book->belongs_to(
+  My::DBIO::Schema::Book->belongs_to(
     author =>
-    'My::DBIC::Schema::Author',
+    'My::DBIO::Schema::Author',
     'author_id'
   );
 
   # OR (same result)
-  My::DBIC::Schema::Book->belongs_to(
+  My::DBIO::Schema::Book->belongs_to(
     author =>
-    'My::DBIC::Schema::Author',
+    'My::DBIO::Schema::Author',
     { 'foreign.author_id' => 'self.author_id' }
   );
 
   # OR (similar result but uglier accessor name)
-  My::DBIC::Schema::Book->belongs_to(
+  My::DBIO::Schema::Book->belongs_to(
     author_id =>
-    'My::DBIC::Schema::Author'
+    'My::DBIO::Schema::Author'
   );
 
   # Usage
@@ -206,7 +206,7 @@ The modified declaration is shown below:
   # in a Book class (where Author has_many Books)
   __PACKAGE__->belongs_to(
     author =>
-    'My::DBIC::Schema::Author',
+    'My::DBIO::Schema::Author',
     'author',
     { join_type => 'left' }
   );
@@ -215,7 +215,7 @@ Cascading deletes are off by default on a C<belongs_to>
 relationship. To turn them on, pass C<< cascade_delete => 1 >>
 in the $attr hashref.
 
-By default, DBIC will return undef and avoid querying the database if a
+By default, DBIO will return undef and avoid querying the database if a
 C<belongs_to> accessor is called when any part of the foreign key IS NULL. To
 disable this behavior, pass C<< undef_on_null_fk => 0 >> in the C<\%attrs>
 hashref.
@@ -278,24 +278,24 @@ more info see L<DBIO::Relationship::Base/condition>.
 
   # in an Author class (where Author has_many Books)
   # assuming related class is storing our PK in "author_id"
-  My::DBIC::Schema::Author->has_many(
+  My::DBIO::Schema::Author->has_many(
     books =>
-    'My::DBIC::Schema::Book',
+    'My::DBIO::Schema::Book',
     'author_id'
   );
 
   # OR (same result)
-  My::DBIC::Schema::Author->has_many(
+  My::DBIO::Schema::Author->has_many(
     books =>
-    'My::DBIC::Schema::Book',
+    'My::DBIO::Schema::Book',
     { 'foreign.author_id' => 'self.id' },
   );
 
   # OR (similar result, assuming related_class is storing our PK, in "author")
   # (the "author" is guessed at from "Author" in the class namespace)
-  My::DBIC::Schema::Author->has_many(
+  My::DBIO::Schema::Author->has_many(
     books =>
-    'My::DBIC::Schema::Book',
+    'My::DBIO::Schema::Book',
   );
 
 
@@ -398,22 +398,22 @@ more info see L<DBIO::Relationship::Base/condition>.
 =back
 
   # Author may have an entry in the pseudonym table
-  My::DBIC::Schema::Author->might_have(
+  My::DBIO::Schema::Author->might_have(
     pseudonym =>
-    'My::DBIC::Schema::Pseudonym',
+    'My::DBIO::Schema::Pseudonym',
     'author_id',
   );
 
   # OR (same result, assuming the related_class stores our PK)
-  My::DBIC::Schema::Author->might_have(
+  My::DBIO::Schema::Author->might_have(
     pseudonym =>
-    'My::DBIC::Schema::Pseudonym',
+    'My::DBIO::Schema::Pseudonym',
   );
 
   # OR (same result)
-  My::DBIC::Schema::Author->might_have(
+  My::DBIO::Schema::Author->might_have(
     pseudonym =>
-    'My::DBIC::Schema::Pseudonym',
+    'My::DBIO::Schema::Pseudonym',
     { 'foreign.author_id' => 'self.id' },
   );
 
@@ -494,22 +494,22 @@ more info see L<DBIO::Relationship::Base/condition>.
 =back
 
   # Every book has exactly one ISBN
-  My::DBIC::Schema::Book->has_one(
+  My::DBIO::Schema::Book->has_one(
     isbn =>
-    'My::DBIC::Schema::ISBN',
+    'My::DBIO::Schema::ISBN',
     'book_id',
   );
 
   # OR (same result, assuming related_class stores our PK)
-  My::DBIC::Schema::Book->has_one(
+  My::DBIO::Schema::Book->has_one(
     isbn =>
-    'My::DBIC::Schema::ISBN',
+    'My::DBIO::Schema::ISBN',
   );
 
   # OR (same result)
-  My::DBIC::Schema::Book->has_one(
+  My::DBIO::Schema::Book->has_one(
     isbn =>
-    'My::DBIC::Schema::ISBN',
+    'My::DBIO::Schema::ISBN',
     { 'foreign.book_id' => 'self.id' },
   );
 
@@ -586,24 +586,24 @@ bridging to).
 
 To create a many_to_many relationship from Actor to Role:
 
-  My::DBIC::Schema::Actor->has_many( actor_roles =>
-                                     'My::DBIC::Schema::ActorRoles',
+  My::DBIO::Schema::Actor->has_many( actor_roles =>
+                                     'My::DBIO::Schema::ActorRoles',
                                      'actor' );
-  My::DBIC::Schema::ActorRoles->belongs_to( role =>
-                                            'My::DBIC::Schema::Role' );
-  My::DBIC::Schema::ActorRoles->belongs_to( actor =>
-                                            'My::DBIC::Schema::Actor' );
+  My::DBIO::Schema::ActorRoles->belongs_to( role =>
+                                            'My::DBIO::Schema::Role' );
+  My::DBIO::Schema::ActorRoles->belongs_to( actor =>
+                                            'My::DBIO::Schema::Actor' );
 
-  My::DBIC::Schema::Actor->many_to_many( roles => 'actor_roles',
+  My::DBIO::Schema::Actor->many_to_many( roles => 'actor_roles',
                                          'role' );
 
 And, for the reverse relationship, from Role to Actor:
 
-  My::DBIC::Schema::Role->has_many( actor_roles =>
-                                    'My::DBIC::Schema::ActorRoles',
+  My::DBIO::Schema::Role->has_many( actor_roles =>
+                                    'My::DBIO::Schema::ActorRoles',
                                     'role' );
 
-  My::DBIC::Schema::Role->many_to_many( actors => 'actor_roles', 'actor' );
+  My::DBIO::Schema::Role->many_to_many( actors => 'actor_roles', 'actor' );
 
 To add a role for your actor, and fill in the year of the role in the
 actor_roles table:
@@ -633,11 +633,11 @@ relationships as well.
 
 =head1 FURTHER QUESTIONS?
 
-Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.
+Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
 
 =head1 COPYRIGHT AND LICENSE
 
 This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+by the L<DBIO authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.

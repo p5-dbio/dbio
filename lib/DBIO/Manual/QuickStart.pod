@@ -2,7 +2,7 @@
 # ABSTRACT: up and running with DBIO in 10 minutes
 =head1 DESCRIPTION
 
-This document shows the minimum amount of code to make you a productive DBIC
+This document shows the minimum amount of code to make you a productive DBIO
 user. It requires you to be familiar with just the basics of database
 programming (what database tables, rows and columns are) and the basics of
 Perl object-oriented programming (calling methods on an object instance).
@@ -33,7 +33,7 @@ L<SQLite Manager|https://addons.mozilla.org/firefox/addon/sqlite-manager>.
 
 Have a look at the schema classes files in the subdirectory F<MyApp>. The
 C<MyApp::Schema> class is the entry point for loading the other classes and
-interacting with the database through DBIC and the C<Result> classes correspond
+interacting with the database through DBIO and the C<Result> classes correspond
 to the tables in the database. L<DBIO::Manual::Example> shows how to
 write all that Perl code. That is almost never necessary, though. Instead use
 L<dbicdump> (part of the distribution L<DBIO::Schema::Loader>) to
@@ -193,11 +193,11 @@ L<DBIO/"WHERE TO START READING">.
 
 =head1 FURTHER QUESTIONS?
 
-Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.
+Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
 
 =head1 COPYRIGHT AND LICENSE
 
 This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+by the L<DBIO authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.

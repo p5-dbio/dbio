@@ -105,7 +105,7 @@ sub __total_bindtype () {
 # as the value to abuse with MSSQL ordered subqueries)
 sub __max_int () { 0x7FFFFFFF };
 
-# we ne longer need to check this - DBIC has ways of dealing with it
+# we ne longer need to check this - DBIO has ways of dealing with it
 # specifically ::Storage::DBI::_resolve_bindattrs()
 sub _assert_bindval_matches_bindtype () { 1 };
 
@@ -172,7 +172,7 @@ sub select {
         'Support for the legacy emulate_limit() mechanism inherited from '
       . 'SQL::Abstract::Limit has been deprecated, and will be removed at '
       . 'some future point, as it gets in the way of architectural and/or '
-      . 'performance advances within DBIC. If your code uses this type of '
+      . 'performance advances within DBIO. If your code uses this type of '
       . 'limit specification please file an RT and provide the source of '
       . 'your emulate_limit() implementation, so an acceptable upgrade-path '
       . 'can be devised'
@@ -1219,7 +1219,7 @@ sub _subqueried_limit_attrs {
   my ($self, $proto_sql, $rs_attrs) = @_;
 
   $self->throw_exception(
-    'Limit dialect implementation usable only in the context of DBIC (missing $rs_attrs)'
+    'Limit dialect implementation usable only in the context of DBIO (missing $rs_attrs)'
   ) unless ref ($rs_attrs) eq 'HASH';
 
   # mangle the input sql as we will be replacing the selector entirely
@@ -1335,12 +1335,12 @@ sub _unqualify_colname {
 
 =head1 FURTHER QUESTIONS?
 
-Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.
+Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
 
 =head1 COPYRIGHT AND LICENSE
 
 This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+by the L<DBIO authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.
 

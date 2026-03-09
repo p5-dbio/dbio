@@ -562,7 +562,7 @@ sub move_to_group {
 
 =head2 insert
 
-Overrides the DBIC insert() method by providing a default
+Overrides the DBIO insert() method by providing a default
 position number.  The default will be the number of rows in
 the table +1, thus positioning the new record at the last position.
 
@@ -591,7 +591,7 @@ sub insert {
 
 =head2 update
 
-Overrides the DBIC update() method by checking for a change
+Overrides the DBIO update() method by checking for a change
 to the position and/or group columns.  Movement within a
 group or to another group is handled by repositioning
 the appropriate siblings.  Position defaults to the end
@@ -649,7 +649,7 @@ sub update {
 
 =head2 delete
 
-Overrides the DBIC delete() method by first moving the object
+Overrides the DBIO delete() method by first moving the object
 to the last position, then deleting it, thus ensuring the
 integrity of the positions.
 
@@ -996,7 +996,7 @@ you need to be careful when executing C<move_*> operations on them:
 without a L</position_column> reload the L</_position_value> of the
 "siblings" will be out of sync with the underlying storage.
 
-Starting from version C<0.082800> DBIC will implicitly perform such
+Starting from version C<0.082800> DBIO will implicitly perform such
 reloads when the C<move_*> happens as a part of a transaction
 (a good example of such situation is C<< $ordered_resultset->delete_all >>).
 
@@ -1011,11 +1011,11 @@ could result in the position not being assigned correctly.
 
 =head1 FURTHER QUESTIONS?
 
-Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.
+Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
 
 =head1 COPYRIGHT AND LICENSE
 
 This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+by the L<DBIO authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.

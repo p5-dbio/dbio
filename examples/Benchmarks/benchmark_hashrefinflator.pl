@@ -10,13 +10,13 @@ use warnings;
 use strict;
 
 use FindBin;
-use lib ("$FindBin::Bin/../../lib", "$FindBin::Bin/../../t/lib");
+use lib ("$FindBin::Bin/../../lib");
 
 use Class::Unload '0.07';
 use Benchmark ();
 use Dumbbench;
 use Benchmark::Dumb ':all';
-use DBICTest;
+use DBIO::Test;
 
 # for git reporting to work, and to use it as INC key directly
 chdir ("$FindBin::Bin/../../lib");
@@ -99,7 +99,7 @@ printf "\nAbout to benchmark %d HRI variants (%s)\n",
   (join ', ', map { $_->{title} } @to_bench),
 ;
 
-my $schema = DBICTest->init_schema();
+my $schema = DBIO::Test->init_schema();
 
 # add some extra data for the complex test
 $schema->resultset ('Artist')->create({

@@ -453,7 +453,7 @@ L<DBIO::Exception/throw>, with the exception message passed as the only
 argument.
 
 Your custom throw code B<must> rethrow the exception, as L</throw_exception> is
-an integral part of DBIC's internal execution control flow.
+an integral part of DBIO's internal execution control flow.
 
 Example:
 
@@ -1540,12 +1540,12 @@ sub _unregister_source {
 
 =head1 FURTHER QUESTIONS?
 
-Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.
+Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
 
 =head1 COPYRIGHT AND LICENSE
 
 This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+by the L<DBIO authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.
 

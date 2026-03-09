@@ -230,8 +230,8 @@ sub new {
   }
 
   sub CLONE {
-    # As per DBI's recommendation, DBIC disconnects all handles as
-    # soon as possible (DBIC will reconnect only on demand from within
+    # As per DBI's recommendation, DBIO disconnects all handles as
+    # soon as possible (DBIO will reconnect only on demand from within
     # the thread)
     my @instances = grep { defined $_ } values %seek_and_destroy;
     %seek_and_destroy = ();
@@ -989,7 +989,7 @@ sub sql_maker {
         carp_unique (
           "Your storage class ($s_class) does not set sql_limit_dialect and you "
         . 'have not supplied an explicit limit_dialect in your connection_info. '
-        . 'DBIC will attempt to use the GenericSubQ dialect, which works on most '
+        . 'DBIO will attempt to use the GenericSubQ dialect, which works on most '
         . 'databases but can be (and often is) painfully slow. '
         . "Please file an RT ticket against '$s_class'"
         ) if $self->_dbi_connect_info->[0];
@@ -1006,7 +1006,7 @@ sub sql_maker {
         carp_unique (
           "You requested 'quote_names' but your storage class ($s_class) does "
         . 'not explicitly define a default sql_quote_char and you have not '
-        . 'supplied a quote_char as part of your connection_info. DBIC will '
+        . 'supplied a quote_char as part of your connection_info. DBIO will '
         .q{default to the ANSI SQL standard quote '"', which works most of }
         . "the time. Please file an RT ticket against '$s_class'."
         );
@@ -1508,7 +1508,7 @@ sub _warn_undetermined_driver {
   my ($self, $msg) = @_;
 
   carp_once ($msg . ' While we will attempt to continue anyway, the results '
-  . 'are likely to be underwhelming. Please upgrade DBIC, and if this message '
+  . 'are likely to be underwhelming. Please upgrade DBIO, and if this message '
   . "does not go away, file a bugreport including the following info:\n"
   . dump_value($self->_describe_connection)
   );
@@ -1719,8 +1719,8 @@ sub _connect {
       }
       else {
         # the handler may be invoked by something totally out of
-        # the scope of DBIC
-        DBIO::Exception->throw("DBI Exception (unhandled by DBIC, ::Schema GCed): $_[0]");
+        # the scope of DBIO
+        DBIO::Exception->throw("DBI Exception (unhandled by DBIO, ::Schema GCed): $_[0]");
       }
     }, '__DBIC__DBH__ERROR__HANDLER__';
   };
@@ -1737,7 +1737,7 @@ sub _connect {
     die $DBI::errstr unless $dbh;
 
     die sprintf ("%s fresh DBI handle with a *false* 'Active' attribute. "
-      . 'This handle is disconnected as far as DBIC is concerned, and we can '
+      . 'This handle is disconnected as far as DBIO is concerned, and we can '
       . 'not continue',
       ref $info->[0] eq 'CODE'
         ? "Connection coderef $info->[0] returned a"
@@ -3264,7 +3264,7 @@ sub create_ddl_dir {
     }
 
     # The "new" style of producers have sane normalization and can support
-    # diffing a SQL file against a DBIC->SQLT schema. Old style ones don't
+    # diffing a SQL file against a DBIO->SQLT schema. Old style ones don't
     # And we have to diff parsed SQL against parsed SQL.
     my $dest_schema = $sqlt_schema;
 
@@ -3597,11 +3597,11 @@ be with raw DBI.
 
 =head1 FURTHER QUESTIONS?
 
-Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.
+Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
 
 =head1 COPYRIGHT AND LICENSE
 
 This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+by the L<DBIO authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.

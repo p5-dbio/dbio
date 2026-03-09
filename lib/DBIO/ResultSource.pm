@@ -278,7 +278,7 @@ retrieve the name of the sequence from the database automatically.
 
   { retrieve_on_insert => 1 }
 
-For every column where this is set to true, DBIC will retrieve the RDBMS-side
+For every column where this is set to true, DBIO will retrieve the RDBMS-side
 value upon a new row insertion (normally only the autoincrement PK is
 retrieved on insert). C<INSERT ... RETURNING> is used automatically if
 supported by the underlying storage, otherwise an extra SELECT statement is
@@ -2420,12 +2420,12 @@ should not be used.  It will be removed before 1.0.
 
 =head1 FURTHER QUESTIONS?
 
-Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.
+Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
 
 =head1 COPYRIGHT AND LICENSE
 
 This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+by the L<DBIO authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.
 

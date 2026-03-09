@@ -80,8 +80,8 @@ L<DBIO::Schema/create_ddl_dir>.
 
 A table called I<dbix_class_schema_versions> is created and maintained by the
 module. This is used to determine which version your database is currently at.
-Similarly the $VERSION in your DBIC schema class is used to determine the
-current DBIC schema version.
+Similarly the $VERSION in your DBIO schema class is used to determine the
+current DBIO schema version.
 
 The upgrade is initiated manually by calling C<upgrade> on your schema object,
 this will attempt to upgrade the database from its current version to the current
@@ -324,7 +324,7 @@ sub ordered_schema_versions {
 =head2 upgrade
 
 Call this to attempt to upgrade your database from the version it
-is at to the version this DBIC schema is at. If they are the same
+is at to the version this DBIO schema is at. If they are the same
 it does nothing.
 
 It will call L</ordered_schema_versions> to retrieve an ordered
@@ -576,7 +576,7 @@ sub backup
 
 =head2 connection
 
-Overloaded method. This checks the DBIC schema version against the DB version and
+Overloaded method. This checks the DBIO schema version against the DB version and
 warns if they are not the same or if the DB is unversioned. It also provides
 compatibility between the old versions table (SchemaVersions) and the new one
 (dbix_class_schema_versions).
@@ -722,7 +722,7 @@ sub _create_db_to_schema_diff {
   print $file $diff;
   close($file);
 
-  carp "WARNING: There may be differences between your DB and your DBIC schema. Please review and if necessary run the SQL in $filename to sync your DB.";
+  carp "WARNING: There may be differences between your DB and your DBIO schema. Please review and if necessary run the SQL in $filename to sync your DB.";
 }
 
 
@@ -802,12 +802,12 @@ sub _source_exists
 
 =head1 FURTHER QUESTIONS?
 
-Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.
+Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
 
 =head1 COPYRIGHT AND LICENSE
 
 This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+by the L<DBIO authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.
 

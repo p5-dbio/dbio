@@ -12,7 +12,7 @@ use DBIO::Util 'detected_reinvoked_destructor';
 use namespace::clean;
 
 __PACKAGE__->mk_group_accessors('simple' =>
-    qw/storage args attrs/
+    qw/storage args attrs sth/
 );
 
 =head1 SYNOPSIS
@@ -250,6 +250,7 @@ sub reset {
 
 Ensures active statement handles are finished during object destruction.
 
+=cut
 
 sub DESTROY {
   return if &detected_reinvoked_destructor;
@@ -260,6 +261,8 @@ sub DESTROY {
 =method __finish_sth
 
 Internal helper to safely finish a statement handle, suppressing warnings.
+
+=cut
 
 sub __finish_sth {
   # It is (sadly) extremely important to finish() handles we are about
@@ -280,12 +283,12 @@ sub __finish_sth {
 
 =head1 FURTHER QUESTIONS?
 
-Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.
+Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
 
 =head1 COPYRIGHT AND LICENSE
 
 This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+by the L<DBIO authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.
 

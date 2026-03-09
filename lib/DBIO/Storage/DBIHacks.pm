@@ -2,10 +2,10 @@ package DBIO::Storage::DBIHacks;
 
 #
 # This module contains code supporting a battery of special cases and tests for
-# many corner cases pushing the envelope of what DBIC can do. When work on
+# many corner cases pushing the envelope of what DBIO can do. When work on
 # these utilities began in mid 2009 (51a296b402c) it wasn't immediately obvious
 # that these pieces, despite their misleading on-first-sighe-flakiness, will
-# become part of the generic query rewriting machinery of DBIC, allowing it to
+# become part of the generic query rewriting machinery of DBIO, allowing it to
 # both generate and process queries representing incredibly complex sets with
 # reasonable efficiency.
 #
@@ -389,10 +389,10 @@ sub _adjust_select_args_for_complex_prefetch {
 # part *MAY NEVER BE REMOVED*, even if in the future it is limited to only AST
 # nodes that are deemed opaque (i.e. contain literal expressions). The use and
 # comprehension of blackbox literals is at this point firmly a user-facing API,
-# and is one of *the* reasons DBIC remains as flexible as it is.
+# and is one of *the* reasons DBIO remains as flexible as it is.
 #
 # In other words, when working on this keep in mind that the following is both
-# a widespread and *encouraged* way of using DBIC in the wild when push comes
+# a widespread and *encouraged* way of using DBIO in the wild when push comes
 # to shove:
 #
 # $rs->search( {}, {
@@ -845,7 +845,7 @@ sub _resolve_column_info {
   return \%return;
 }
 
-# The DBIC relationship chaining implementation is pretty simple - every
+# The DBIO relationship chaining implementation is pretty simple - every
 # new related_relationship is pushed onto the {from} stack, and the {select}
 # window simply slides further in. This means that when we count somewhere
 # in the middle, we got to make sure that everything in the join chain is an

@@ -197,7 +197,7 @@ To add methods to your resultsets, you can subclass L<DBIO::ResultSet>, similar 
 
   1;
 
-See L<DBIO::Schema/load_namespaces> on how DBIC can discover and
+See L<DBIO::Schema/load_namespaces> on how DBIO can discover and
 automatically attach L<Result|DBIO::Manual::ResultClass>-specific
 L<ResulSet|DBIO::ResultSet> classes.
 
@@ -210,7 +210,7 @@ your code via roles.
 
 In order to write custom ResultSet classes with L<Moo> you need to use the
 following template. The L<BUILDARGS|Moo/BUILDARGS> is necessary due to the
-unusual signature of the L<constructor provided by DBIC
+unusual signature of the L<constructor provided by DBIO
 |DBIO::ResultSet/new> C<< ->new($source, \%args) >>.
 
   use Moo;
@@ -225,7 +225,7 @@ If you want to build your custom ResultSet classes with L<Moose>, you need
 a similar, though a little more elaborate template in order to interface the
 inlining of the L<Moose>-provided
 L<object constructor|Moose::Manual::Construction/WHERE'S THE CONSTRUCTOR?>,
-with the DBIC one.
+with the DBIO one.
 
   package MyApp::Schema::ResultSet::User;
 
@@ -242,7 +242,7 @@ with the DBIC one.
   1;
 
 The L<MooseX::NonMoose> is necessary so that the L<Moose> constructor does not
-entirely overwrite the DBIC one (in contrast L<Moo> does this automatically).
+entirely overwrite the DBIO one (in contrast L<Moo> does this automatically).
 Alternatively, you can skip L<MooseX::NonMoose> and get by with just L<Moose>
 instead by doing:
 
@@ -726,7 +726,7 @@ C<key> attribute, which is the name of a
 L<unique constraint|DBIO::ResultSource/add_unique_constraint> (the
 unique constraint corresponding to the
 L<primary columns|DBIO::ResultSource/primary_columns> is always named
-C<primary>). If the C<key> attribute has been supplied, and DBIC is unable
+C<primary>). If the C<key> attribute has been supplied, and DBIO is unable
 to construct a query that satisfies the named unique constraint fully (
 non-NULL values for each column member of the constraint) an exception is
 thrown.
@@ -1154,7 +1154,7 @@ instead. An example conversion is:
 sub search_like {
   my $class = shift;
   carp_unique (
-    'search_like() is deprecated and will be removed in DBIC version 0.09.'
+    'search_like() is deprecated and will be removed in DBIO version 0.09.'
    .' Instead use ->search({ x => { -like => "y%" } })'
    .' (note the outer pair of {}s - they are important!)'
   );
@@ -1977,7 +1977,7 @@ sub _rs_update_delete {
           ) {
             $self->throw_exception (
               "You have just attempted a $op operation on a resultset which does group_by"
-              . ' on columns other than the primary keys, while DBIC internally needs to retrieve'
+              . ' on columns other than the primary keys, while DBIO internally needs to retrieve'
               . ' the primary keys in a subselect. All sane RDBMS engines do not support this'
               . ' kind of queries. Please retry the operation with a modified group_by or'
               . ' without using one at all.'
@@ -2062,7 +2062,7 @@ sub update {
 =back
 
 Fetches all objects and updates them one at a time via
-L<DBIO::Row/update>. Note that C<update_all> will run DBIC defined
+L<DBIO::Row/update>. Note that C<update_all> will run DBIO defined
 triggers, while L</update> will not.
 
 =cut
@@ -2120,7 +2120,7 @@ sub delete {
 =back
 
 Fetches all objects and deletes them one at a time via
-L<DBIO::Row/delete>. Note that C<delete_all> will run DBIC defined
+L<DBIO::Row/delete>. Note that C<delete_all> will run DBIO defined
 triggers, while L</delete> will not.
 
 =cut
@@ -2729,7 +2729,7 @@ sub _remove_alias {
 
 =item Arguments: none
 
-=item Return Value: \[ $sql, L<@bind_values|/DBIC BIND VALUES> ]
+=item Return Value: \[ $sql, L<@bind_values|/DBIO BIND VALUES> ]
 
 =back
 
@@ -4573,7 +4573,7 @@ case the key is the C<as> value, and the value is used as the C<select>
 expression). Adds the L</current_source_alias> onto the start of any column without a C<.> in
 it and sets C<select> from that, then auto-populates C<as> from
 C<select> as normal. (You may also use the C<cols> attribute, as in
-earlier versions of DBIC, but this is deprecated)
+earlier versions of DBIx::Class, but this is deprecated)
 
 Essentially C<columns> does the same as L</select> and L</as>.
 
@@ -4589,7 +4589,7 @@ manual L</prefetch>) you have to make sure to specify the correct inflation slot
 chain such that it matches existing relationships:
 
     my $rs = $schema->resultset('Artist')->search({}, {
-        # required to tell DBIC to collapse has_many relationships
+        # required to tell DBIO to collapse has_many relationships
         collapse => 1,
         join     => { cds => 'tracks' },
         '+columns'  => {
@@ -4627,7 +4627,7 @@ with a unary plus operator before it, which is the same as simply C<columns>.
 
 Indicates additional columns to be selected from storage. Works the same as
 L</columns> but adds columns to the current selection. (You may also use the
-C<include_columns> attribute, as in earlier versions of DBIC, but this is
+C<include_columns> attribute, as in earlier versions of DBIx::Class, but this is
 deprecated)
 
   $schema->resultset('CD')->search(undef, {
@@ -4695,7 +4695,7 @@ a new explicit list.
 
 =back
 
-Indicates DBIC-side names for object inflation. That is L</as> indicates the
+Indicates DBIO-side names for object inflation. That is L</as> indicates the
 slot name in which the column value will be stored within the
 L<Row|DBIO::Row> object. The value will then be accessible via this
 identifier by the C<get_column> method (or via the object accessor B<if one
@@ -4859,7 +4859,7 @@ object with all of its related data.
 
 If an L</order_by> is already declared, and orders the resultset in a way that
 makes collapsing as described above impossible (e.g. C<< ORDER BY
-has_many_rel.column >> or C<ORDER BY RANDOM()>), DBIC will automatically
+has_many_rel.column >> or C<ORDER BY RANDOM()>), DBIO will automatically
 switch to "eager" mode and slurp the entire resultset before constructing the
 first object returned by L</next>.
 
@@ -5030,7 +5030,7 @@ of the first row of the first page if paging is used.
 
 When combined with L</rows> and/or L</offset> the generated SQL will not
 include any limit dialect stanzas. Instead the entire result will be selected
-as if no limits were specified, and DBIC will perform the limit locally, by
+as if no limits were specified, and DBIO will perform the limit locally, by
 artificially advancing and finishing the resulting L</cursor>.
 
 This is the recommended way of performing resultset limiting when no sane RDBMS
@@ -5265,9 +5265,9 @@ condition|DBIO::Relationship::Base/condition>
 
 =back
 
-=head1 DBIC BIND VALUES
+=head1 DBIO BIND VALUES
 
-Because DBIC may need more information to bind values than just the column name
+Because DBIO may need more information to bind values than just the column name
 and value itself, it uses a special format for both passing and receiving bind
 values.  Each bind value should be composed of an arrayref of
 C<< [ \%args => $val ] >>.  The format of C<< \%args >> is currently:
@@ -5316,12 +5316,12 @@ supported:
 
 =head1 FURTHER QUESTIONS?
 
-Check the list of L<additional DBIC resources|DBIO/GETTING HELP/SUPPORT>.
+Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
 
 =head1 COPYRIGHT AND LICENSE
 
 This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO (DBIC) authors|DBIO/AUTHORS>. You can
+by the L<DBIO authors|DBIO/AUTHORS>. You can
 redistribute it and/or modify it under the same terms as the
 L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.
 

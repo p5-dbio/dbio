@@ -5,14 +5,13 @@ use warnings;
 
 use Benchmark qw/cmpthese/;
 use FindBin;
-use lib "$FindBin::Bin/../../t/lib";
 use lib "$FindBin::Bin/../../lib";
-use DBICTest::Schema;
+use DBIO::Test::Schema;
 use DBIO::ResultClass::HashRefInflator;  # older dbic didn't load it
 
 printf "Benchmarking DBIC version %s\n", DBIO->VERSION;
 
-my $schema = DBICTest::Schema->connect ('dbi:SQLite::memory:');
+my $schema = DBIO::Test::Schema->connect ('dbi:SQLite::memory:');
 $schema->deploy;
 
 my $rs = $schema->resultset ('Artist');
