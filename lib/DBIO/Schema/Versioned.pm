@@ -617,7 +617,7 @@ sub _on_connect
     # proxy some flags from the main storage
     { map { $_ => $w_storage->$_ } qw( unsafe ) },
   );
-  my $conn_attrs = $w_storage->_dbic_connect_attributes || {};
+  my $conn_attrs = $w_storage->_dbio_connect_attributes || {};
 
   my $vtable = $self->{vschema}->resultset('Table');
 

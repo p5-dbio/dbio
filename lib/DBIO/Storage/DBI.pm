@@ -31,7 +31,7 @@ __PACKAGE__->datetime_parser_type('DateTime::Format::MySQL'); # historic default
 __PACKAGE__->sql_name_sep('.');
 
 __PACKAGE__->mk_group_accessors('simple' => qw/
-  _connect_info _dbic_connect_attributes _driver_determined
+  _connect_info _dbio_connect_attributes _driver_determined
   _dbh _dbh_details _conn_pid _sql_maker _sql_maker_opts _dbh_autocommit
   _perform_autoinc_retrieval _autoinc_supplied_for_op
 /);
@@ -666,7 +666,7 @@ sub connect_info {
   # FIXME - dirty:
   # save attributes in a separate accessor so they are always
   # introspectable, even in case of a CODE $dbhmaker
-  $self->_dbic_connect_attributes (\%attrs);
+  $self->_dbio_connect_attributes (\%attrs);
 
   return $self->_connect_info;
 }
@@ -3543,7 +3543,7 @@ sub _max_column_bytesize {
     }
   }
 
-  $max_size || $self->_dbic_connect_attributes->{LongReadLen} || $self->_get_dbh->{LongReadLen} || 8000;
+  $max_size || $self->_dbio_connect_attributes->{LongReadLen} || $self->_get_dbh->{LongReadLen} || 8000;
 }
 
 # Determine if a data_type is some type of BLOB
