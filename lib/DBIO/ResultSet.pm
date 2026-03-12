@@ -3597,6 +3597,28 @@ sub _resolved_attrs {
     $self->{attrs}{alias} => $source->from,
   }];
 
+  # Auto-discover joins from WHERE/HAVING condition keys that reference
+  # relationships (e.g. 'artist.name' implies join => 'artist').
+  # Skip if from is already custom (joins were resolved by a prior
+  # _resolved_attrs call, e.g. count internals building a new RS from
+  # already-resolved attrs).
+  if (
+    ! $attrs->{_auto_joins_done}
+      and
+    ref $attrs->{from} eq 'ARRAY'
+      and
+    @{ $attrs->{from} } == 1  # only the base table, no joins resolved yet
+  ) {
+    if ( my $auto_joins = $self->_extract_condition_rels(
+      [ $attrs->{where}, $attrs->{having} ], $source, $alias
+    )) {
+      $attrs->{join} = defined $attrs->{join}
+        ? $self->_merge_joinpref_attr( $attrs->{join}, $auto_joins )
+        : $auto_joins;
+    }
+    $attrs->{_auto_joins_done} = 1;
+  }
+
   if ( $attrs->{join} || $attrs->{prefetch} ) {
 
     $self->throw_exception ('join/prefetch can not be used with a custom {from}')
@@ -3842,6 +3864,126 @@ sub _calculate_score {
       return ($b eq $a) ? 1 : 0;
     }
   }
+}
+
+# Walk condition structures and extract relationship names referenced
+# via dotted column notation (e.g. 'artist.name' -> 'artist').
+# Supports nested relationships ('artist.producer.name') and builds
+# the appropriate join structure ({ artist => 'producer' }).
+# Returns undef if no auto-joins are needed.
+sub _extract_condition_rels {
+  my ($self, $conds, $source, $alias) = @_;
+
+  my %rels;
+  $self->_walk_condition_keys($_, $source, $alias, \%rels) for grep { defined } @$conds;
+
+  return undef unless %rels;
+
+  # Convert flat relationship hash into join structure
+  # e.g. { artist => undef, 'cd.artist' => undef }
+  # becomes [ 'artist', { cd => 'artist' } ]
+  my @joins;
+  for my $path (sort keys %rels) {
+    my @parts = split /\./, $path;
+    if (@parts == 1) {
+      push @joins, $parts[0];
+    } else {
+      # Build nested: [a, b, c] -> { a => { b => 'c' } }
+      my $leaf = pop @parts;
+      my $node = $leaf;
+      for my $part (reverse @parts) {
+        $node = { $part => $node };
+      }
+      push @joins, $node;
+    }
+  }
+
+  return @joins == 1 ? $joins[0] : \@joins;
+}
+
+sub _walk_condition_keys {
+  my ($self, $cond, $source, $alias, $rels) = @_;
+
+  return unless defined $cond;
+
+  if (ref $cond eq 'HASH') {
+    for my $key (keys %$cond) {
+      if ($key =~ /^-(?:and|or|not|not_bool|bool)$/i) {
+        $self->_walk_condition_keys($cond->{$key}, $source, $alias, $rels);
+      }
+      elsif ($key =~ /^-/) {
+        # Other SQL::Abstract operators, skip
+        next;
+      }
+      else {
+        $self->_check_column_rel($key, $source, $alias, $rels);
+        # Also walk into the value for nested conditions
+        if (ref $cond->{$key} eq 'HASH' || ref $cond->{$key} eq 'ARRAY') {
+          # Value-side hashrefs are operator conditions ({ '>' => 3 }), not column refs
+          # No need to recurse into them
+        }
+      }
+    }
+  }
+  elsif (ref $cond eq 'ARRAY') {
+    # Array conditions: could be [ -and => cond1, cond2 ] or [ cond1, cond2 ]
+    my @items = @$cond;
+    for my $item (@items) {
+      if (ref $item) {
+        $self->_walk_condition_keys($item, $source, $alias, $rels);
+      }
+      # Skip scalar items like -and, -or
+    }
+  }
+  elsif (ref $cond eq 'SCALAR' || ref $cond eq 'REF') {
+    # Literal SQL - try to extract column refs from the SQL string
+    my $sql = ref $cond eq 'REF' ? $$cond : $cond;
+    $sql = $$sql if ref $sql eq 'SCALAR';
+    if (!ref $sql) {
+      # Look for table.column patterns in literal SQL
+      while ($sql =~ /\b([a-zA-Z_]\w*)\.([a-zA-Z_]\w*)\b/g) {
+        $self->_check_column_rel($1 . '.' . $2, $source, $alias, $rels);
+      }
+    }
+    # For arrayrefs like \[ 'sql ?', @binds ], just check the SQL part
+    elsif (ref $sql eq 'ARRAY') {
+      my $sql_str = $sql->[0];
+      if (!ref $sql_str) {
+        while ($sql_str =~ /\b([a-zA-Z_]\w*)\.([a-zA-Z_]\w*)\b/g) {
+          $self->_check_column_rel($1 . '.' . $2, $source, $alias, $rels);
+        }
+      }
+    }
+  }
+}
+
+sub _check_column_rel {
+  my ($self, $key, $source, $alias, $rels) = @_;
+
+  # Only process dotted column names
+  return unless $key =~ /\./;
+
+  my @parts = split /\./, $key;
+
+  # Skip if first part is the current table alias (e.g. 'me.column')
+  return if $parts[0] eq $alias;
+
+  # Walk relationship chain to verify each part is a valid relationship
+  my $cur_source = $source;
+  my @rel_path;
+  for my $i (0 .. $#parts - 1) {  # all parts except the last (which is the column)
+    my $rel_name = $parts[$i];
+    if ($cur_source->has_relationship($rel_name)) {
+      push @rel_path, $rel_name;
+      $cur_source = $cur_source->related_source($rel_name);
+    } else {
+      # Not a valid relationship chain, skip
+      return;
+    }
+  }
+
+  # Record the full relationship path
+  $rels->{join('.', @rel_path)} = 1 if @rel_path;
 }
 
 sub _merge_joinpref_attr {
