@@ -20,3 +20,6 @@ t/var/
 maint/.Generated_Pod
 examples/Schema/db
 cover_db/
+
+# Claude Code (managed by dbio-dev workspace)
+.claude/
