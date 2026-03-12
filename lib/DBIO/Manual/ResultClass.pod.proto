@@ -51,10 +51,6 @@ C<Result Class>. This document serves as a general overview of C<Result Class>
 declaration best practices, and offers an index of the available methods
 (and the Components/Roles which provide them).
 
-=head1 FURTHER QUESTIONS?
-
-Check the list of L<additional DBIO resources|DBIx::Class/GETTING HELP/SUPPORT>.
-
 =head1 COPYRIGHT AND LICENSE
 
 This module is free software L<copyright|DBIx::Class/COPYRIGHT AND LICENSE>

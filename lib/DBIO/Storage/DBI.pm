@@ -3595,13 +3595,4 @@ transactions.  You're on your own for handling all sorts of exceptional
 cases if you choose the C<< AutoCommit => 0 >> path, just as you would
 be with raw DBI.
 
-=head1 FURTHER QUESTIONS?
-
-Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
-
-=head1 COPYRIGHT AND LICENSE
-
-This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO authors|DBIO/AUTHORS>. You can
-redistribute it and/or modify it under the same terms as the
-L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.
+=cut

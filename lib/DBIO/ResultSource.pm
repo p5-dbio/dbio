@@ -2418,17 +2418,6 @@ Enables the on-demand automatic loading of the above column
 metadata from storage as necessary.  This is *deprecated*, and
 should not be used.  It will be removed before 1.0.
 
-=head1 FURTHER QUESTIONS?
-
-Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
-
-=head1 COPYRIGHT AND LICENSE
-
-This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO authors|DBIO/AUTHORS>. You can
-redistribute it and/or modify it under the same terms as the
-L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.
-
 =cut
 
 1;

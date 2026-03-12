@@ -1,0 +1,34 @@
+DBIO — Future Features
+======================
+
+These items are tracked here until they are moved to the project's
+ticket system.
+
+## UNION support
+
+SQL UNION / UNION ALL via ResultSet API. Depends on SQL::Abstract
+gaining native UNION support or DBIO wrapping it at the SQLMaker level.
+
+## Row/find caching
+
+ResultSet-level cache for find() and single-row lookups:
+  - Configurable cache invalidation strategy
+  - Manual invalidation API (single item / table / entire cache)
+  - Optional TTL-based expiry
+  - Needs clear semantics for when the cache is queried vs bypassed
+
+## Auto-discover joins
+
+Automatically detect required joins from search condition keys:
+  $rs->search({ 'author.name' => 'Fred' })
+  # should auto-add: join => 'author'
+Detection via ResultSource relationship introspection.
+Implementation point: ResultSet::_resolved_attrs() before join resolution.
+
+## Inflated objects in search conditions
+
+Auto-deflate inflated column values passed to search():
+  $rs->search({ created_at => $datetime_obj })
+  # should auto-deflate via column's deflator
+Requires extending deflator signature to work without Row object context.
+FIXME comment already exists in Storage::DBI::_select_args().

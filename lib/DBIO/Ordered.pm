@@ -1009,13 +1009,4 @@ up-to-date before proceeding, otherwise undefined behavior will result.
 Using a database defined default_value on one of your group columns
 could result in the position not being assigned correctly.
 
-=head1 FURTHER QUESTIONS?
-
-Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
-
-=head1 COPYRIGHT AND LICENSE
-
-This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
-by the L<DBIO authors|DBIO/AUTHORS>. You can
-redistribute it and/or modify it under the same terms as the
-L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.
+=cut

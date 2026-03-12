@@ -189,6 +189,5 @@ C<isa('DBIO::Foo')>.
 No files are created on disk — the compatibility stubs are generated
 purely at runtime and will not be indexed by PAUSE.
 
-=cut
 
 1;
