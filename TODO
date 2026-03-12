@@ -17,14 +17,6 @@ ResultSet-level cache for find() and single-row lookups:
   - Optional TTL-based expiry
   - Needs clear semantics for when the cache is queried vs bypassed
 
-## Auto-discover joins
-
-Automatically detect required joins from search condition keys:
-  $rs->search({ 'author.name' => 'Fred' })
-  # should auto-add: join => 'author'
-Detection via ResultSource relationship introspection.
-Implementation point: ResultSet::_resolved_attrs() before join resolution.
-
 ## Inflated objects in search conditions
 
 Auto-deflate inflated column values passed to search():
