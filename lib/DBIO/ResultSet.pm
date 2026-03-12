@@ -3601,20 +3601,38 @@ sub _resolved_attrs {
   # relationships (e.g. 'artist.name' implies join => 'artist').
   # Skip if from is already custom (joins were resolved by a prior
   # _resolved_attrs call, e.g. count internals building a new RS from
-  # already-resolved attrs).
+  # already-resolved attrs), or if FROM is a subquery (as_subselect_rs).
   if (
     ! $attrs->{_auto_joins_done}
       and
     ref $attrs->{from} eq 'ARRAY'
       and
     @{ $attrs->{from} } == 1  # only the base table, no joins resolved yet
+      and
+    ref( $attrs->{from}[0]{ $attrs->{from}[0]{'-alias'} || $alias } ) ne 'REF'  # not a subquery
   ) {
     if ( my $auto_joins = $self->_extract_condition_rels(
       [ $attrs->{where}, $attrs->{having} ], $source, $alias
     )) {
-      $attrs->{join} = defined $attrs->{join}
-        ? $self->_merge_joinpref_attr( $attrs->{join}, $auto_joins )
-        : $auto_joins;
+      # Only add auto-discovered joins that are not already in join/prefetch
+      # to preserve the user's explicit join ordering
+      if (defined $attrs->{join} || defined $attrs->{prefetch}) {
+        my %existing = map { $_ => 1 } $self->_flatten_join_attr($attrs->{join});
+        %existing = (%existing, map { $_ => 1 } $self->_flatten_join_attr($attrs->{prefetch}));
+        my @novel;
+        for my $j ($self->_flatten_join_attr($auto_joins)) {
+          push @novel, $j unless $existing{$j};
+        }
+        if (@novel) {
+          my $novel_joins = @novel == 1 ? $novel[0] : \@novel;
+          $attrs->{join} = defined $attrs->{join}
+            ? $self->_merge_joinpref_attr( $attrs->{join}, $novel_joins )
+            : $novel_joins;
+        }
+      }
+      else {
+        $attrs->{join} = $auto_joins;
+      }
     }
     $attrs->{_auto_joins_done} = 1;
   }
@@ -3935,26 +3953,25 @@ sub _walk_condition_keys {
       # Skip scalar items like -and, -or
     }
   }
-  elsif (ref $cond eq 'SCALAR' || ref $cond eq 'REF') {
-    # Literal SQL - try to extract column refs from the SQL string
-    my $sql = ref $cond eq 'REF' ? $$cond : $cond;
-    $sql = $$sql if ref $sql eq 'SCALAR';
-    if (!ref $sql) {
-      # Look for table.column patterns in literal SQL
-      while ($sql =~ /\b([a-zA-Z_]\w*)\.([a-zA-Z_]\w*)\b/g) {
-        $self->_check_column_rel($1 . '.' . $2, $source, $alias, $rels);
-      }
-    }
-    # For arrayrefs like \[ 'sql ?', @binds ], just check the SQL part
-    elsif (ref $sql eq 'ARRAY') {
-      my $sql_str = $sql->[0];
-      if (!ref $sql_str) {
-        while ($sql_str =~ /\b([a-zA-Z_]\w*)\.([a-zA-Z_]\w*)\b/g) {
-          $self->_check_column_rel($1 . '.' . $2, $source, $alias, $rels);
-        }
-      }
-    }
+  # Literal SQL (SCALAR/REF) is intentionally NOT scanned for auto-discover.
+  # Literal SQL may contain correlated sub-query references, function calls,
+  # or other constructs where table.column patterns should not trigger joins.
+  # Users writing literal SQL are responsible for declaring their own joins.
+}
+
+sub _flatten_join_attr {
+  my ($self, $attr) = @_;
+  return () unless defined $attr;
+  if (!ref $attr) {
+    return ($attr);
   }
+  elsif (ref $attr eq 'ARRAY') {
+    return map { $self->_flatten_join_attr($_) } @$attr;
+  }
+  elsif (ref $attr eq 'HASH') {
+    return map { $_, $self->_flatten_join_attr($attr->{$_}) } keys %$attr;
+  }
+  return ();
 }
 
 sub _check_column_rel {
