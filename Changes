@@ -1,5 +1,46 @@
 Revision history for DBIO
 
+    * Candy / Cake Enhancements
+        - DBIO::Candy: fix namespace::clean ordering (must come after imports)
+        - DBIO::Candy::Exports: name the Sub::Exporter-generated import using
+          Sub::Name to fix namespace leak detection (t/55namespaces_cleaned.t)
+        - DBIO::Cake: add comprehensive column type support:
+          serial/bigserial/smallserial, timestamptz/timetz/interval,
+          vector/halfvec/sparsevec (pgvector), inet/cidr/macaddr/macaddr8,
+          tsvector/tsquery, hstore/xml, money, bit/varbit,
+          geometric types (point/line/lseg/box/path/polygon/circle),
+          range types (int4range/int8range/numrange/tsrange/tstzrange/daterange)
+        - DBIO::Cake: add 'unsigned' column modifier
+
+    * Schema Loader Integration
+        - Port DBIx::Class::Schema::Loader into DBIO core as DBIO::Loader
+          (14 core files: Loader.pm, Base.pm, DBI.pm, RelBuilder.pm,
+          Table.pm, Column.pm, DBObject.pm, Utils.pm, ODBC.pm, etc.)
+        - Driver-specific Loader classes live in driver distributions using
+          DBIO::DriverName::Loader naming convention (not DBIO::Loader::DBI::*)
+        - ODBC proxy moved to DBIO::Loader::ODBC (dispatches to driver-specific
+          ODBC variants based on backend detection)
+        - Driver dispatch in DBI.pm maps DBI driver names to new class names:
+          Pg → DBIO::PostgreSQL::Loader, mysql → DBIO::MySQL::Loader, etc.
+        - dbicdump references renamed to dbiodump throughout documentation
+
+    * Admin Tests
+        - Rewrite t/92admin_data.t to use DBIO::Test::Storage with mocks
+          instead of requiring a real database connection
+
+    * Documentation
+        - Add EARLY VERSION WARNING to DBIO.pm
+        - Add IRC #dbio on irc.perl.org as primary contact channel
+        - Replace all RT issue tracker references with GitHub Issues
+        - Convert string concatenation chains to heredocs in
+          Storage::DBI and SQLMaker::ClassicExtensions
+        - Fix dead external links: Tripod → Wikipedia, Google Code → GitHub,
+          cpan.org → metacpan.org, MySQL version-specific → versionless URLs,
+          Firefox SQLite Manager → DBeaver/DB Browser
+        - Remove .dir-locals.el (replaced by .editorconfig at workspace level)
+        - Update Loader documentation to reflect driver distribution architecture
+        - Fix ResultDDL test schema belongs_to syntax
+
     * Dependency Cleanup
         - Remove Moo dependency: rewrite Storage::Statistics and
           Storage::BlockRunner to plain Perl OOP

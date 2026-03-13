@@ -321,7 +321,7 @@ sub parse {
 
 Custom SQL through ->name(\'( SELECT ...') is DEPRECATED, for more details see
 "Arbitrary SQL through a custom ResultSource" in DBIO::Manual::Cookbook
-or http://search.cpan.org/dist/DBIO/lib/DBIO/Manual/Cookbook.pod
+or https://metacpan.org/pod/DBIO::Manual::Cookbook
 
 EOW
 

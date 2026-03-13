@@ -9,19 +9,26 @@ our %EXPORT_TAGS;
 
 my @col_types = qw(
   integer tinyint smallint bigint
+  serial bigserial smallserial
   numeric decimal
   real float4 double float8 float
   char varchar
   text tinytext mediumtext longtext
   blob tinyblob mediumblob longblob bytea
   boolean bool
-  date datetime timestamp
-  enum uuid json jsonb
+  date datetime timestamp time timetz timestamptz interval
+  enum uuid json jsonb xml hstore
   array
+  money
+  vector halfvec sparsevec bit varbit
+  inet cidr macaddr macaddr8
+  tsvector tsquery
+  point line lseg box path polygon circle
+  int4range int8range numrange tsrange tstzrange daterange
 );
 
 my @col_modifiers = qw(
-  null auto_inc fk default
+  null auto_inc fk default unsigned
 );
 
 my @table_funcs = qw(
@@ -206,6 +213,8 @@ sub auto_inc { return (is_auto_increment => 1) }
 
 sub fk { return (is_foreign_key => 1) }
 
+sub unsigned { return ('extra.unsigned' => 1) }
+
 sub default {
   my ($val) = @_;
   return (default_value => $val);
@@ -214,10 +223,15 @@ sub default {
 # --- Column type functions (return key-value pairs) ---
 
 # Integers
-sub integer  { return (data_type => 'integer') }
-sub tinyint  { return (data_type => 'tinyint') }
-sub smallint { return (data_type => 'smallint') }
-sub bigint   { return (data_type => 'bigint') }
+sub integer    { return (data_type => 'integer') }
+sub tinyint    { return (data_type => 'tinyint') }
+sub smallint   { return (data_type => 'smallint') }
+sub bigint     { return (data_type => 'bigint') }
+
+# Serial (auto-increment integer shortcuts)
+sub serial      { return (data_type => 'serial', is_auto_increment => 1) }
+sub bigserial   { return (data_type => 'bigserial', is_auto_increment => 1) }
+sub smallserial { return (data_type => 'smallserial', is_auto_increment => 1) }
 
 # Numeric
 sub numeric {
@@ -292,6 +306,17 @@ sub timestamp {
   return @r;
 }
 
+sub time {
+  my ($tz) = @_;
+  my @r = (data_type => 'time');
+  push @r, (timezone => $tz) if defined $tz;
+  return @r;
+}
+
+sub timetz      { return (data_type => 'time with time zone') }
+sub timestamptz { return (data_type => 'timestamp with time zone') }
+sub interval    { return (data_type => 'interval') }
+
 # Enum
 sub enum {
   my (@values) = @_;
@@ -305,6 +330,10 @@ sub uuid { return (data_type => 'uuid') }
 sub json  { return (data_type => 'json') }
 sub jsonb { return (data_type => 'jsonb') }
 
+# XML / hstore
+sub xml    { return (data_type => 'xml') }
+sub hstore { return (data_type => 'hstore') }
+
 # Array (PostgreSQL)
 sub array {
   my ($type_info) = @_;
@@ -313,6 +342,73 @@ sub array {
   }
   return (data_type => $type_info . '[]');
 }
+
+# Money
+sub money { return (data_type => 'money') }
+
+# Vector / AI (pgvector)
+sub vector {
+  my ($dims) = @_;
+  my @r = (data_type => 'vector');
+  push @r, (size => $dims) if defined $dims;
+  return @r;
+}
+
+sub halfvec {
+  my ($dims) = @_;
+  my @r = (data_type => 'halfvec');
+  push @r, (size => $dims) if defined $dims;
+  return @r;
+}
+
+sub sparsevec {
+  my ($dims) = @_;
+  my @r = (data_type => 'sparsevec');
+  push @r, (size => $dims) if defined $dims;
+  return @r;
+}
+
+# Bit strings
+sub bit {
+  my ($size) = @_;
+  my @r = (data_type => 'bit');
+  push @r, (size => $size) if defined $size;
+  return @r;
+}
+
+sub varbit {
+  my ($size) = @_;
+  my @r = (data_type => 'varbit');
+  push @r, (size => $size) if defined $size;
+  return @r;
+}
+
+# Network types (PostgreSQL)
+sub inet     { return (data_type => 'inet') }
+sub cidr     { return (data_type => 'cidr') }
+sub macaddr  { return (data_type => 'macaddr') }
+sub macaddr8 { return (data_type => 'macaddr8') }
+
+# Full-text search (PostgreSQL)
+sub tsvector { return (data_type => 'tsvector') }
+sub tsquery  { return (data_type => 'tsquery') }
+
+# Geometric types (PostgreSQL)
+sub point   { return (data_type => 'point') }
+sub line    { return (data_type => 'line') }
+sub lseg    { return (data_type => 'lseg') }
+sub box     { return (data_type => 'box') }
+sub path    { return (data_type => 'path') }
+sub polygon { return (data_type => 'polygon') }
+sub circle  { return (data_type => 'circle') }
+
+# Range types (PostgreSQL)
+sub int4range  { return (data_type => 'int4range') }
+sub int8range  { return (data_type => 'int8range') }
+sub numrange   { return (data_type => 'numrange') }
+sub tsrange    { return (data_type => 'tsrange') }
+sub tstzrange  { return (data_type => 'tstzrange') }
+sub daterange  { return (data_type => 'daterange') }
 
 # --- Keys / Constraints ---
 

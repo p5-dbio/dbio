@@ -12,3 +12,7 @@ Has additional plugins beyond `[@DBIO]`: MetaNoIndex, MetaResources.
 copyright_holder = DBIO Contributors
 copyright_year = 2005
 ```
+
+## Testing
+
+Core tests MUST use `DBIO::Test::Storage` (fake storage), NEVER `dbi:SQLite` or any real database. Use `DBIO::Test->init_schema` without DSN arguments. The mock system (`$storage->mock(qr/.../, \@rows)`) provides fake query results. Real DB testing belongs in driver distributions (dbio-sqlite, dbio-postgresql, etc.).

@@ -97,6 +97,12 @@ __END__
 #
 =encoding UTF-8
 
+=head1 EARLY VERSION WARNING
+
+B<DBIO is an early release and may contain mistakes.> The API is largely
+compatible with L<DBIx::Class> but has not yet reached 1.0. Please report
+any issues you encounter.
+
 =head1 WHERE TO START READING
 
 See L<DBIO::Manual::DocMap> for an overview of the exhaustive documentation.
@@ -115,6 +121,8 @@ approach do not hesitate to contact us via any of the following options (the
 list is sorted by "fastest response time"):
 
 =over
+
+=item * IRC: C<#dbio> on C<irc.perl.org> (highlight Getty for quicker answer)
 
 =item * GitHub Issues: L<https://github.com/p5-dbio/dbio/issues>
 
@@ -301,7 +309,8 @@ merged back to trunk for a major release.
 Contributions are always welcome, in all usable forms (we especially
 welcome documentation improvements). The delivery methods include git-
 or unified-diff formatted patches, GitHub pull requests, or plain bug
-reports either via RT or the Mailing list. Do not hesitate to
+reports via L<GitHub Issues|https://github.com/p5-dbio/dbio/issues>.
+Do not hesitate to
 L<get in touch|/GETTING HELP/SUPPORT> with any further questions you may
 have.
 

@@ -20,7 +20,7 @@
 
 =item L<DBIO::Manual::Cookbook> - Various short recipes on how to do things.
 
-=item L<DBIO::Manual::FAQ> - Frequently Asked Questions, gathered from IRC and the mailing list.
+=item L<DBIO::Manual::FAQ> - Frequently Asked Questions.
 
 =item L<DBIO::Manual::Troubleshooting> - What to do if things go wrong (diagnostics of known error messages).
 

@@ -7,5 +7,5 @@ col artist_id => integer, unsigned;
 col title     => varchar(255);
 col year      => integer, null;
 primary_key 'id';
-belongs_to artist => { id => 'Artist.artist_id' };
+belongs_to artist => 'DBIO::Test::Schema::ResultDDL::Result::Artist', 'artist_id';
 1;

@@ -168,15 +168,16 @@ sub select {
     my $limiter;
 
     if( $limiter = $self->can ('emulate_limit') ) {
-      carp_unique(
-        'Support for the legacy emulate_limit() mechanism inherited from '
-      . 'SQL::Abstract::Limit has been deprecated, and will be removed at '
-      . 'some future point, as it gets in the way of architectural and/or '
-      . 'performance advances within DBIO. If your code uses this type of '
-      . 'limit specification please file an RT and provide the source of '
-      . 'your emulate_limit() implementation, so an acceptable upgrade-path '
-      . 'can be devised'
-      );
+      carp_unique(<<'__EOW__');
+Support for the legacy emulate_limit() mechanism inherited from
+SQL::Abstract::Limit has been deprecated, and will be removed at
+some future point, as it gets in the way of architectural and/or
+performance advances within DBIO. If your code uses this type of
+limit specification please file a GitHub issue at
+https://github.com/p5-dbio/dbio/issues and provide the source of
+your emulate_limit() implementation, so an acceptable upgrade-path
+can be devised
+__EOW__
     }
     else {
       my $dialect = $self->limit_dialect

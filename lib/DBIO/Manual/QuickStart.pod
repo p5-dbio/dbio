@@ -16,7 +16,7 @@ rest of the documentation.
 =head2 Preparation
 
 First, install DBIO like you do with any other CPAN distribution.
-See L<http://www.cpan.org/modules/INSTALL.html> and L<perlmodinstall>.
+See L<https://metacpan.org/pod/DBIO> and L<perlmodinstall>.
 
 Then open the distribution in your shell and change to the subdirectory
 mentioned earlier, the next command will download and unpack it:
@@ -29,7 +29,7 @@ Inspect the database:
     DBIO/examples/Schema$ sqlite3 db/example.db .dump
 
 You can also use a GUI database browser such as
-L<SQLite Manager|https://addons.mozilla.org/firefox/addon/sqlite-manager>.
+L<DBeaver|https://dbeaver.io> or L<DB Browser for SQLite|https://sqlitebrowser.org>.
 
 Have a look at the schema classes files in the subdirectory F<MyApp>. The
 C<MyApp::Schema> class is the entry point for loading the other classes and
@@ -182,7 +182,7 @@ From a detail to the root:
 =head2 Where to go next
 
 If you want to exercise what you learned with a more complicated schema,
-load L<Northwind|http://code.google.com/p/northwindextended/> into your
+load L<Northwind|https://github.com/dalers/mywind> into your
 database.
 
 If you want to transfer your existing SQL knowledge, read

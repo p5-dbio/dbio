@@ -4,6 +4,8 @@ package DBIO::Candy::Exports;
 use strict;
 use warnings;
 
+use Sub::Name ();
+
 our %methods;
 our %aliases;
 
@@ -14,6 +16,10 @@ use Sub::Exporter -setup => {
    exports => [ qw(export_methods export_method_aliases) ],
    groups  => { default => [ qw(export_methods export_method_aliases) ] },
 };
+
+# Sub::Exporter generates an anonymous import; name it so
+# t/55namespaces_cleaned.t can verify it
+Sub::Name::subname('DBIO::Candy::Exports::import', \&import);
 
 1;
 

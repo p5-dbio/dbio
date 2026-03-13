@@ -986,13 +986,14 @@ sub sql_maker {
         ||
       do {
         my $s_class = (ref $self) || $self;
-        carp_unique (
-          "Your storage class ($s_class) does not set sql_limit_dialect and you "
-        . 'have not supplied an explicit limit_dialect in your connection_info. '
-        . 'DBIO will attempt to use the GenericSubQ dialect, which works on most '
-        . 'databases but can be (and often is) painfully slow. '
-        . "Please file an RT ticket against '$s_class'"
-        ) if $self->_dbi_connect_info->[0];
+        carp_unique (<<"__EOW__") if $self->_dbi_connect_info->[0];
+Your storage class ($s_class) does not set sql_limit_dialect and you
+have not supplied an explicit limit_dialect in your connection_info.
+DBIO will attempt to use the GenericSubQ dialect, which works on most
+databases but can be (and often is) painfully slow.
+Please file a GitHub issue against '$s_class' at
+https://github.com/p5-dbio/dbio/issues
+__EOW__
 
         'GenericSubQ';
       }
@@ -1003,13 +1004,14 @@ sub sql_maker {
     if ($opts{quote_names}) {
       $quote_char = (delete $opts{quote_char}) || $self->sql_quote_char || do {
         my $s_class = (ref $self) || $self;
-        carp_unique (
-          "You requested 'quote_names' but your storage class ($s_class) does "
-        . 'not explicitly define a default sql_quote_char and you have not '
-        . 'supplied a quote_char as part of your connection_info. DBIO will '
-        .q{default to the ANSI SQL standard quote '"', which works most of }
-        . "the time. Please file an RT ticket against '$s_class'."
-        );
+        carp_unique (<<"__EOW__");
+You requested 'quote_names' but your storage class ($s_class) does
+not explicitly define a default sql_quote_char and you have not
+supplied a quote_char as part of your connection_info. DBIO will
+default to the ANSI SQL standard quote '"', which works most of
+the time. Please file a GitHub issue against '$s_class' at
+https://github.com/p5-dbio/dbio/issues
+__EOW__
 
         '"'; # RV
       };

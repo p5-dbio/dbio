@@ -4,11 +4,11 @@ package DBIO::Candy;
 use strict;
 use warnings;
 
-use namespace::clean;
 require DBIO::Candy::Exports;
 use MRO::Compat;
 use Sub::Exporter 'build_exporter';
 use Carp 'croak';
+use namespace::clean;
 
 my %aliases = (
    column            => 'add_columns',

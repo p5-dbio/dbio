@@ -267,8 +267,7 @@ Made for inserting lots of rows very quickly into database
 
 See L<DBIO::Schema/populate>
 
-I use populate L<here|http://blog.afoolishmanifesto.com/archives/1255> to export our whole
-(200M~) db to SQLite
+See L<DBIO::Schema/populate> for details on bulk loading data.
 
 =head2 Multicreate
 
