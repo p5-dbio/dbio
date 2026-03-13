@@ -42,7 +42,7 @@ distributions. Install the driver distribution that matches your backend:
 =back
 
 Additional DBIO driver distributions exist for other databases; some are still
-in migration from the historical monolithic DBIx::Class test setup.
+in migration from the historical monolithic test setup.
 
 =head1 Some essential reference documentation
 

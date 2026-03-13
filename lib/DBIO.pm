@@ -76,7 +76,7 @@ sub _attr_cache {
 # *DO NOT* change this URL nor the identically named =head1 below
 # it is linked throughout the ecosystem
 sub DBIO::_ENV_::HELP_URL () {
-  'http://p3rl.org/DBIO#GETTING_HELP/SUPPORT'
+  'https://github.com/p5-dbio/dbio/issues'
 }
 
 1;
@@ -116,11 +116,7 @@ list is sorted by "fastest response time"):
 
 =over
 
-=item * RT Bug Tracker: L<https://rt.cpan.org/Public/Dist/Display.html?Name=DBIO>
-
-=item * Email: L<mailto:bug-DBIO@rt.cpan.org>
-
-=item * Twitter: L<https://twitter.com/intent/tweet?text=%40ribasushi%20%23DBIC>
+=item * GitHub Issues: L<https://github.com/p5-dbio/dbio/issues>
 
 =back
 
@@ -129,7 +125,7 @@ list is sorted by "fastest response time"):
 For the very impatient: L<DBIO::Manual::QuickStart>
 
 This code in the next step can be generated automatically from an existing
-database, see L<dbicdump> from the distribution C<DBIO-Schema-Loader>.
+database, see L<dbiodump> from the distribution C<DBIO-Schema-Loader>.
 
 =head2 Schema classes preparation
 
@@ -277,17 +273,12 @@ reports either via RT or the Mailing list. Do not hesitate to
 L<get in touch|/GETTING HELP/SUPPORT> with any further questions you may
 have.
 
-=for comment
-FIXME: Getty, frew and jnap need to get off their asses and finish the contrib section so we can link it here ;)
-
 This project is maintained in a git repository. The code and related tools are
 accessible at the following locations:
 
 =over
 
-=item * Current git repository: L<https://github.com/Perl5/DBIO>
-
-=item * Travis-CI log: L<https://travis-ci.com/github/Perl5/DBIO/branches>
+=item * Current git repository: L<https://github.com/p5-dbio/dbio>
 
 =back
 
@@ -308,10 +299,3 @@ the root of this distribution (or repository). The canonical source of
 per-line authorship is the L<git repository|/HOW TO CONTRIBUTE> history
 itself.
 
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (c) 2005 by mst, castaway, ribasushi, and other DBIO
-L</AUTHORS> as listed above and in F<AUTHORS>.
-
-This library is free software and may be distributed under the same terms
-as perl5 itself. See F<LICENSE> for the complete licensing terms.

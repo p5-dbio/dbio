@@ -103,7 +103,7 @@ See also: L<DBIO::ResultSet/METHODS>
 
 Result objects contain your actual data. They are returned from
 ResultSet objects.  These are sometimes (incorrectly) called
-row objects, including older versions of the DBIx::Class documentation.
+row objects, including older versions of the documentation.
 
 See also: L<DBIO::Manual::ResultClass>
 
