@@ -24,6 +24,14 @@ Revision history for DBIO
           Pg → DBIO::PostgreSQL::Loader, mysql → DBIO::MySQL::Loader, etc.
         - dbicdump references renamed to dbiodump throughout documentation
 
+    * Query Timing
+        - DBIO::Storage::Statistics now tracks elapsed time for every query
+          using Time::HiRes, even when debug output is disabled
+        - New accessors: last_query_elapsed, total_elapsed, query_count,
+          reset_stats — always available via $schema->storage->debugobj
+        - When DBIO_TRACE is enabled, elapsed time is printed after each
+          query (e.g. "Elapsed: 0.003421s")
+
     * Admin Tests
         - Rewrite t/92admin_data.t to use DBIO::Test::Storage with mocks
           instead of requiring a real database connection

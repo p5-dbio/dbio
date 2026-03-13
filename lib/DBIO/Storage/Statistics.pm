@@ -6,6 +6,7 @@ use warnings;
 
 use DBIO::Util qw(sigwarn_silencer qsub);
 use IO::Handle ();
+use Time::HiRes ();
 
 use base 'DBIO';
 use namespace::clean;
@@ -14,19 +15,38 @@ __PACKAGE__->mk_group_accessors(simple => qw(
   _defaulted_to_stderr
   silence
   callback
+  _query_start_time
+  last_query_elapsed
+  total_elapsed
+  query_count
 ));
 
 =head1 SYNOPSIS
 
+    my $stats = $schema->storage->debugobj;
+
+    # Query timing is always available, even without DBIO_TRACE
+    say $stats->last_query_elapsed;   # seconds (float) of last query
+    say $stats->total_elapsed;        # cumulative seconds
+    say $stats->query_count;          # number of queries executed
+    $stats->reset_stats;              # reset counters
+
+    # Enable trace output to see SQL and timing:
+    #   DBIO_TRACE=1 ./my_app.pl
+    # Output:
+    #   SELECT me.id, me.name FROM artist me: '1', '2'
+    #     Elapsed: 0.003421s
+
 =head1 DESCRIPTION
 
 This class is called by DBIO::Storage::DBI as a means of collecting
-statistics on its actions.  Using this class alone merely prints the SQL
-executed, the fact that it completes and begin/end notification for
-transactions.
+statistics on its actions.  It prints SQL statements and elapsed time
+when tracing is enabled, and always tracks query timing internally
+for programmatic access.
 
-To really use this class you should subclass it and create your own method
-for collecting the statistics as discussed in L<DBIO::Manual::Cookbook>.
+To customize statistics collection, subclass this class and override
+the C<query_start>/C<query_end> methods as discussed in
+L<DBIO::Manual::Cookbook>.
 
 =head1 METHODS
 
@@ -54,6 +74,8 @@ sub new {
   my $self = bless {}, ref $class || $class;
   $self->{$_} = $args{$_} for grep { exists $args{$_} }
     qw(_debugfh _defaulted_to_stderr silence callback);
+  $self->{total_elapsed} = 0;
+  $self->{query_count} = 0;
   return $self;
 }
 
@@ -109,6 +131,21 @@ Boolean flag to suppress trace output when true.
 =attr callback
 
 Optional callback invoked by C<query_start> instead of printing.
+
+=attr last_query_elapsed
+
+The elapsed time (in seconds, as a float) of the most recent query.
+Always available, even when debug output is disabled.
+
+=attr total_elapsed
+
+The cumulative elapsed time (in seconds) of all queries since the
+statistics object was created or L</reset_stats> was called.
+
+=attr query_count
+
+The number of queries executed since the statistics object was created
+or L</reset_stats> was called.
 
 =method print
 
@@ -217,6 +254,11 @@ executed and subsequent arguments are the parameters used for the query.
 sub query_start {
   my ($self, $string, @bind) = @_;
 
+  $self->_query_start_time(Time::HiRes::time());
+
+  # @bind is only populated when debug output is enabled
+  return unless @bind;
+
   my $message = "$string: ".join(', ', @bind)."\n";
 
   if(defined($self->callback)) {
@@ -230,12 +272,41 @@ sub query_start {
 
 =method query_end
 
-Called when a query finishes executing.  Has the same arguments as query_start.
+Called when a query finishes executing.  Has the same arguments as
+C<query_start>.  Records the elapsed time and updates L</query_count>
+and L</total_elapsed>.
 
 =cut
 
 sub query_end {
-  my ($self, $string) = @_;
+  my ($self, $string, @bind) = @_;
+
+  my $start = $self->_query_start_time;
+  return unless defined $start;
+
+  my $elapsed = Time::HiRes::time() - $start;
+  $self->last_query_elapsed($elapsed);
+  $self->{total_elapsed} += $elapsed;
+  $self->{query_count}++;
+  $self->_query_start_time(undef);
+
+  # only print elapsed when debug output is active
+  if (@bind && !$self->silence && !defined($self->callback)) {
+    $self->print(sprintf("  Elapsed: %.6fs\n", $elapsed));
+  }
+}
+
+=method reset_stats
+
+Resets L</query_count>, L</total_elapsed>, and L</last_query_elapsed>.
+
+=cut
+
+sub reset_stats {
+  my $self = shift;
+  $self->{query_count} = 0;
+  $self->{total_elapsed} = 0;
+  $self->{last_query_elapsed} = undef;
 }
 
 

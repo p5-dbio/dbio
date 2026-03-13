@@ -1984,15 +1984,19 @@ sub _format_for_trace {
 sub _query_start {
   my ( $self, $sql, $bind ) = @_;
 
-  $self->debugobj->query_start( $sql, $self->_format_for_trace($bind) )
-    if $self->debug;
+  $self->debugobj->query_start(
+    $sql,
+    $self->debug ? $self->_format_for_trace($bind) : (),
+  );
 }
 
 sub _query_end {
   my ( $self, $sql, $bind ) = @_;
 
-  $self->debugobj->query_end( $sql, $self->_format_for_trace($bind) )
-    if $self->debug;
+  $self->debugobj->query_end(
+    $sql,
+    $self->debug ? $self->_format_for_trace($bind) : (),
+  );
 }
 
 sub _dbi_attrs_for_bind {
