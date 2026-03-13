@@ -1,6 +1,6 @@
 package DBIO::Test::Schema::ResultDDL::Result::CD;
-# ABSTRACT: Test ResultDDL result class for the cd table
-use DBIx::Class::ResultDDL qw/ -V2 /;
+# ABSTRACT: Test Cake result class for the cd table
+use DBIO::Cake;
 table 'cd';
 col id        => integer, unsigned, auto_inc;
 col artist_id => integer, unsigned;

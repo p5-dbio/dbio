@@ -23,7 +23,11 @@ requires 'MRO::Compat', '0.12';
 requires 'Module::Find', '0.07';
 requires 'namespace::clean', '0.24';
 requires 'SQL::Abstract', '2.000001';
+requires 'Sub::Exporter', '0.982';
 requires 'Try::Tiny', '0.07';
+
+# Optional: DBIO::Candy -autotable pluralization
+recommends 'Lingua::EN::Inflect', '0';
 
 # Recommended for stronger salt generation in DBIO::EncodedColumn.
 recommends 'Crypt::URandom', '0';
