@@ -167,6 +167,36 @@ F<MyApp/Schema/Result/CD.pm>:
 
   1;
 
+=head2 Alternative: Sugar syntax with DBIO::Candy
+
+L<DBIO::Candy> removes the C<< __PACKAGE__-> >> boilerplate:
+
+  package MyApp::Schema::Result::Artist;
+  use DBIO::Candy;
+
+  table 'artist';
+  column artistid => { data_type => 'int', is_auto_increment => 1 };
+  primary_key 'artistid';
+  column name => { data_type => 'varchar', size => 100 };
+  has_many cds => 'MyApp::Schema::Result::CD', 'artistid';
+
+  1;
+
+=head2 Alternative: DDL-like syntax with DBIO::Cake
+
+L<DBIO::Cake> provides type functions that read like DDL:
+
+  package MyApp::Schema::Result::Artist;
+  use DBIO::Cake;
+
+  table 'artist';
+  col artistid => integer, auto_inc;
+  col name     => varchar(100);
+  primary_key 'artistid';
+  has_many cds => 'MyApp::Schema::Result::CD', 'artistid';
+
+  1;
+
 =head2 API usage
 
 Then you can use these classes in your application's code:
@@ -232,8 +262,10 @@ Then you can use these classes in your application's code:
 =head1 DESCRIPTION
 
 This is an SQL to OO mapper with an object API inspired by L<Class::DBI>
-(with a compatibility layer as a springboard for porting) and a resultset API
-that allows abstract encapsulation of database operations. It aims to make
+and a resultset API that allows abstract encapsulation of database operations.
+DBIO includes L<DBIO::Candy> (sugar syntax, based on L<DBIx::Class::Candy>)
+and L<DBIO::Cake> (DDL-like DSL, based on L<DBIx::Class::ResultDDL>)
+for concise result class definitions. It aims to make
 representing queries in your code as perl-ish as possible while still
 providing access to as many of the capabilities of the database as possible,
 including retrieving related records from multiple tables in a single query,
