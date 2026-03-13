@@ -1,4 +1,5 @@
 package DBIO::ResultSource::RowParser;
+# ABSTRACT: Build row-inflating parsers from result source metadata
 
 use strict;
 use warnings;

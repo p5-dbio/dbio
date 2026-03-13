@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::Serialized;
+# ABSTRACT: Test result class for the serialized table
 
 use warnings;
 use strict;

@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::ResultSetManager;
+# ABSTRACT: Test schema for ResultSetManager component testing
 
 use warnings;
 use strict;

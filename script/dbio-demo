@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+# ABSTRACT: Interactive demonstration of DBIO capabilities
 # dbio-demo — interactive demonstration of DBIO capabilities
 #
 # Usage:

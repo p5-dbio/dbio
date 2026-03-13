@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::ResultSetManager::Foo;
+# ABSTRACT: Test result class for ResultSetManager component testing
 
 use warnings;
 use strict;

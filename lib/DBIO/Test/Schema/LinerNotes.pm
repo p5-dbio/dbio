@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::LinerNotes;
+# ABSTRACT: Test result class for the liner_notes table
 
 use warnings;
 use strict;

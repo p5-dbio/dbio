@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::FourKeys;
+# ABSTRACT: Test result class for the fourkeys table
 
 use warnings;
 use strict;

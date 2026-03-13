@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::Owners;
+# ABSTRACT: Test result class for the owners table
 
 use warnings;
 use strict;

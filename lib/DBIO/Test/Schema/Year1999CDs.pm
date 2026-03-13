@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::Year1999CDs;
+# ABSTRACT: Test virtual view result class for 1999 CDs
 ## Used in 104view.t
 
 use warnings;

@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::OneKey;
+# ABSTRACT: Test result class for the onekey table
 
 use warnings;
 use strict;

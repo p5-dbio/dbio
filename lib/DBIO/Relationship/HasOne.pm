@@ -1,4 +1,5 @@
 package DBIO::Relationship::HasOne;
+# ABSTRACT: Declare a one-to-one relationship
 
 use strict;
 use warnings;

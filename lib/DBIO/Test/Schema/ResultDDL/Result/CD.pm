@@ -1,4 +1,5 @@
 package DBIO::Test::Schema::ResultDDL::Result::CD;
+# ABSTRACT: Test ResultDDL result class for the cd table
 use DBIx::Class::ResultDDL qw/ -V2 /;
 table 'cd';
 col id        => integer, unsigned, auto_inc;

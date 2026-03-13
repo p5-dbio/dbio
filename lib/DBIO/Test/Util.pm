@@ -1,4 +1,5 @@
 package DBIO::Test::Util;
+# ABSTRACT: Utility functions for DBIO test suite
 
 use warnings;
 use strict;

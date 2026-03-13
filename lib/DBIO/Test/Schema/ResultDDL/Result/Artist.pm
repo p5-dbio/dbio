@@ -1,4 +1,5 @@
 package DBIO::Test::Schema::ResultDDL::Result::Artist;
+# ABSTRACT: Test ResultDDL result class for the artist table
 use DBIx::Class::ResultDDL qw/ -V2 /;
 table 'artist';
 col id   => integer, unsigned, auto_inc;

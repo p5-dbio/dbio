@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Taint::Namespaces::Result::Test;
+# ABSTRACT: Test result class for taint mode namespace loading
 
 use warnings;
 use strict;

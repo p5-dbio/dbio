@@ -1,6 +1,7 @@
 #   belongs to t/05components.t
 package # hide from PAUSE
     DBIO::Test::ForeignComponent;
+# ABSTRACT: Test class for foreign component loading
 use warnings;
 use strict;
 

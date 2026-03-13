@@ -1,6 +1,7 @@
 #   belongs to t/86sqlt.t
 package # hide from PAUSE
     DBIO::Test::DeployComponent;
+# ABSTRACT: Test component for sqlt_deploy_hook testing
 use warnings;
 use strict;
 

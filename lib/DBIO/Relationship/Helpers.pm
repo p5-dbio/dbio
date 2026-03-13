@@ -1,4 +1,5 @@
 package DBIO::Relationship::Helpers;
+# ABSTRACT: Load all standard relationship declaration components
 
 use strict;
 use warnings;

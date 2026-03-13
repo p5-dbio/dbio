@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::Tag;
+# ABSTRACT: Test result class for the tags table
 
 use warnings;
 use strict;

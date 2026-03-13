@@ -1,4 +1,5 @@
 package DBIO::Test::SQLMRebase;
+# ABSTRACT: Test SQLMaker subclass with select call counting
 
 use warnings;
 use strict;

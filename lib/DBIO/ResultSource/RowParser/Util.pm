@@ -1,4 +1,5 @@
 package DBIO::ResultSource::RowParser::Util;
+# ABSTRACT: Assemble row-parser source code for simple and collapsing queries
 
 use strict;
 use warnings;

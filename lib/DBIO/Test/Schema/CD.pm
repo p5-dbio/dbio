@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::CD;
+# ABSTRACT: Test result class for the cd table
 
 use warnings;
 use strict;

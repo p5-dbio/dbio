@@ -1,7 +1,5 @@
-=head1 NAME
-
-DBIO::Manual::ResultClass - Representing a single result (row) from
-a DB query
+# PODNAME: DBIO::Manual::ResultClass
+# ABSTRACT: Representing a single result (row) from a DB query
 
 =head1 SYNOPSIS
 

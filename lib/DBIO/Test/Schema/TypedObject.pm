@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::TypedObject;
+# ABSTRACT: Test result class for the typed_object table
 
 use warnings;
 use strict;

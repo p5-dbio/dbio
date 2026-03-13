@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::TwoKeys;
+# ABSTRACT: Test result class for the twokeys table
 
 use warnings;
 use strict;

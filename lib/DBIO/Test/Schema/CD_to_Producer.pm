@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::CD_to_Producer;
+# ABSTRACT: Test result class for the cd_to_producer table
 
 use warnings;
 use strict;

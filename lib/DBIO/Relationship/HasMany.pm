@@ -1,4 +1,5 @@
 package DBIO::Relationship::HasMany;
+# ABSTRACT: Declare a one-to-many relationship
 
 use strict;
 use warnings;

@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::Artist;
+# ABSTRACT: Test result class for the artist table
 
 use warnings;
 use strict;

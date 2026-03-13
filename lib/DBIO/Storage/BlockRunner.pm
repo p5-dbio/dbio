@@ -1,4 +1,5 @@
 package DBIO::Storage::BlockRunner;
+# ABSTRACT: Execute code blocks with transaction wrapping and retry logic
 
 use warnings;
 use strict;

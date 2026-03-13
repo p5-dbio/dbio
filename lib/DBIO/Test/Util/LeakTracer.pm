@@ -1,4 +1,5 @@
 package DBIO::Test::Util::LeakTracer;
+# ABSTRACT: Memory leak detection and tracing for DBIO tests
 
 use warnings;
 use strict;

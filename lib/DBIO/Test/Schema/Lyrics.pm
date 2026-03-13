@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::Lyrics;
+# ABSTRACT: Test result class for the lyrics table
 
 use warnings;
 use strict;

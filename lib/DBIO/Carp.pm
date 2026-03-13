@@ -1,4 +1,5 @@
 package DBIO::Carp;
+# ABSTRACT: Error reporting utilities for DBIO
 
 use strict;
 use warnings;

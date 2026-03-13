@@ -1,4 +1,5 @@
 package DBIO::ResultSourceProxy;
+# ABSTRACT: Proxy result source methods onto a result class
 
 use strict;
 use warnings;

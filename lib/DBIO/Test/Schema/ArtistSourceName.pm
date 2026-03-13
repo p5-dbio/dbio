@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::ArtistSourceName;
+# ABSTRACT: Test result class for custom source name on the artist table
 
 use warnings;
 use strict;

@@ -1,4 +1,5 @@
 package DBIO::Relationship::CascadeActions;
+# ABSTRACT: Cascade delete and update actions across relationships
 
 use strict;
 use warnings;

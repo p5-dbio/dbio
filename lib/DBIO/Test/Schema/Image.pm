@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::Image;
+# ABSTRACT: Test result class for the images table
 
 use warnings;
 use strict;

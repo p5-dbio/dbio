@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::ArtistUndirectedMap;
+# ABSTRACT: Test result class for the artist_undirected_map table
 
 use warnings;
 use strict;

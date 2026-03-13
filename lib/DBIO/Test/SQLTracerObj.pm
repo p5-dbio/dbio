@@ -1,5 +1,6 @@
 package # moar hide
   DBIO::Test::SQLTracerObj;
+# ABSTRACT: SQL statement tracing object for test diagnostics
 
 use strict;
 use warnings;

@@ -1,4 +1,5 @@
 package DBIO::Relationship::Accessor;
+# ABSTRACT: Generate accessor methods for relationships
 
 use strict;
 use warnings;

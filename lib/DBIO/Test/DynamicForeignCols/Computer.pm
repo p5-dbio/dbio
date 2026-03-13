@@ -1,4 +1,5 @@
 package DBIO::Test::DynamicForeignCols::Computer;
+# ABSTRACT: Test result class for dynamic foreign column resolution
 
 use warnings;
 use strict;

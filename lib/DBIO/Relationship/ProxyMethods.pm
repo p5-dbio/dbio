@@ -1,4 +1,5 @@
 package DBIO::Relationship::ProxyMethods;
+# ABSTRACT: Proxy attribute accessors through a relationship
 
 use strict;
 use warnings;

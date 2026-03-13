@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::NoPrimaryKey;
+# ABSTRACT: Test result class for a table with no primary key
 
 use warnings;
 use strict;

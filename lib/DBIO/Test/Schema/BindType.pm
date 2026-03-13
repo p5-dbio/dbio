@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::BindType;
+# ABSTRACT: Test result class for the bindtype_test table
 
 use warnings;
 use strict;

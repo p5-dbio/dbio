@@ -1,4 +1,5 @@
 package DBIO::Relationship::BelongsTo;
+# ABSTRACT: Declare a foreign-key relationship to a parent row
 
 # Documentation for these methods can be found in
 # DBIO::Relationship

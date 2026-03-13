@@ -1,4 +1,5 @@
 package DBIO::Test::Namespace::OtherRslt::D;
+# ABSTRACT: Test fixture for namespace resolution
 
 use warnings;
 use strict;

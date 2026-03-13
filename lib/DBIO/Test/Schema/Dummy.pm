@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::Dummy;
+# ABSTRACT: Test result class for the dummy table
 
 use strict;
 use warnings;

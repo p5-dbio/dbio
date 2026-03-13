@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::TimestampPrimaryKey;
+# ABSTRACT: Test result class for timestamp primary key handling
 
 use warnings;
 use strict;

@@ -1,4 +1,5 @@
 package DBIO::Test::DynamicForeignCols::TestComputer;
+# ABSTRACT: Test result class for dynamic foreign column joining
 
 use warnings;
 use strict;

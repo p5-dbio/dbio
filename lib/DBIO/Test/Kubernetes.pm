@@ -1,4 +1,5 @@
 package DBIO::Test::Kubernetes;
+# ABSTRACT: Provision temporary database pods in Kubernetes for DBIO testing
 use strict;
 use warnings;
 

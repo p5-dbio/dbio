@@ -1,4 +1,5 @@
 package DBIO::Test::Schema::Event;
+# ABSTRACT: Test result class for the event table with datetime inflation
 
 use strict;
 use warnings;

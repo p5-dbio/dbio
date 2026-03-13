@@ -1,4 +1,5 @@
 package DBIO::Componentised;
+# ABSTRACT: Component loading and management for DBIO
 
 use strict;
 use warnings;

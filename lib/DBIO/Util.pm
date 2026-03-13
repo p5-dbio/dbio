@@ -1,4 +1,5 @@
 package DBIO::Util;
+# ABSTRACT: Internal utility functions for DBIO
 
 use warnings;
 use strict;

@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Schema::SelfRef;
+# ABSTRACT: Test result class for the self_ref table
 
 use warnings;
 use strict;

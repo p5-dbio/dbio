@@ -1,4 +1,5 @@
 package DBIO::Test::Util::OverrideRequire;
+# ABSTRACT: Override CORE::GLOBAL::require for testing
 
 # no use/require of any kind - work bare
 

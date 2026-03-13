@@ -1,4 +1,5 @@
 package DBIO::Relationship::ManyToMany;
+# ABSTRACT: Declare a many-to-many relationship via a bridge table
 
 use strict;
 use warnings;

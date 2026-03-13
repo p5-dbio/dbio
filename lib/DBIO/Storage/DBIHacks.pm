@@ -1,4 +1,5 @@
 package DBIO::Storage::DBIHacks;
+# ABSTRACT: Internal SQL analysis and rewrite utilities
 
 #
 # This module contains code supporting a battery of special cases and tests for

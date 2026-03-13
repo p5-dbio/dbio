@@ -1,4 +1,5 @@
 package DBIO::Test::Schema::Genre;
+# ABSTRACT: Test result class for the genre table
 
 use warnings;
 use strict;

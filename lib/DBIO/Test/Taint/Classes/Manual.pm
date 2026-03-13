@@ -1,5 +1,6 @@
 package # hide from PAUSE
     DBIO::Test::Taint::Classes::Manual;
+# ABSTRACT: Test class for taint mode with manual loading
 
 use warnings;
 use strict;
