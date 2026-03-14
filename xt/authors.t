@@ -5,7 +5,10 @@ use Test::More;
 use Config;
 use File::Spec;
 
-my @known_authors = do {
+my @known_authors;
+my @sections; # array of arrayrefs, one per section
+
+do {
   # according to #p5p this is how one safely reads random unicode
   # this set of boilerplate is insane... wasn't perl unicode-king...?
   no warnings 'once';
@@ -14,9 +17,28 @@ my @known_authors = do {
   local $PerlIO::encoding::fallback = Encode::FB_CROAK();
 
   open (my $fh, '<:encoding(UTF-8)', 'AUTHORS') or die "Unable to open AUTHORS - can't happen: $!\n";
-  map { chomp; ( ( ! $_ or $_ =~ /^\s*\#/ ) ? () : $_ ) } <$fh>;
+  my @current_section;
+  my $in_header = 1;
+  while (<$fh>) {
+    chomp;
+    if ( ! $_ or /^\s*\#/ ) {
+      # blank or comment line — if we had entries, a new comment block
+      # after entries starts a new section
+      if ( @current_section and /^\s*\#/ and !$in_header ) {
+        push @sections, [ @current_section ];
+        @current_section = ();
+        $in_header = 1;
+      }
+      next;
+    }
+    $in_header = 0;
+    push @current_section, $_;
+    push @known_authors, $_;
+  }
+  push @sections, [ @current_section ] if @current_section;
+};
 
-} or die "Known AUTHORS file seems empty... can't happen...";
+die "Known AUTHORS file seems empty... can't happen..." unless @known_authors;
 
 is_deeply (
   [ grep { /^\s/ or /\s\s/ } @known_authors ],
@@ -30,11 +52,13 @@ is_deeply (
   "No entries with malformed nicks",
 );
 
-is_deeply (
-  \@known_authors,
-  [ sort { lc $a cmp lc $b } @known_authors ],
-  'Author list is case-insensitively sorted'
-);
+for my $i ( 0 .. $#sections ) {
+  is_deeply (
+    $sections[$i],
+    [ sort { lc $a cmp lc $b } @{ $sections[$i] } ],
+    "Author list section @{[$i+1]} is case-insensitively sorted"
+  );
+}
 
 my $email_re = qr/( \< [^\<\>]+ \> ) $/x;
 
