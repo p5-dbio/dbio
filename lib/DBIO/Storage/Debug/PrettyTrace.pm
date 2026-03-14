@@ -121,9 +121,9 @@ sub query_end {
 
 =head1 SYNOPSIS
 
- DBIC_TRACE_PROFILE=~/dbic.json perl -Ilib ./foo.pl
+ DBIO_TRACE_PROFILE=~/dbio.json perl -Ilib ./foo.pl
 
-Where dbic.json contains:
+Where dbio.json contains:
 
  {
    "profile":"console",

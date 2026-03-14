@@ -57,7 +57,7 @@ sub _disable_odbc_array_ops {
   my $self = shift;
   my $dbh  = $self->_get_dbh;
 
-  $DBD::ODBC::__DBIC_DISABLE_ARRAY_OPS_VIA__ ||= [ do {
+  $DBD::ODBC::__DBIO_DISABLE_ARRAY_OPS_VIA__ ||= [ do {
     if( modver_gt_or_eq('DBD::ODBC', '1.35_01') ) {
       odbc_array_operations => 0;
     }
@@ -66,7 +66,7 @@ sub _disable_odbc_array_ops {
     }
   }];
 
-  if (my ($k, $v) = @$DBD::ODBC::__DBIC_DISABLE_ARRAY_OPS_VIA__) {
+  if (my ($k, $v) = @$DBD::ODBC::__DBIO_DISABLE_ARRAY_OPS_VIA__) {
     $dbh->{$k} = $v;
   }
 }

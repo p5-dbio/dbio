@@ -4124,7 +4124,7 @@ sub _merge_joinpref_attr {
             return [ $_[0], $_[1] ];
           },
         }
-      } => 'DBIC_RS_ATTR_MERGER');
+      } => 'DBIO_RS_ATTR_MERGER');
       $hm;
     };
 

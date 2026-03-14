@@ -582,7 +582,7 @@ compatibility between the old versions table (SchemaVersions) and the new one
 (dbix_class_schema_versions).
 
 To avoid the checks on connect, set the environment var DBIO_NO_VERSION_CHECK
-(legacy alias: DBIC_NO_VERSION_CHECK) or alternatively you can set the
+or alternatively you can set the
 ignore_version attr in the forth argument like so:
 
   my $schema = MyApp::Schema->connect(
@@ -626,7 +626,7 @@ sub _on_connect
     $conn_attrs->{ignore_version}
       ||
     (
-      ($ENV{DBIO_NO_VERSION_CHECK} || $ENV{DBIC_NO_VERSION_CHECK})
+      $ENV{DBIO_NO_VERSION_CHECK}
         &&
       !exists $conn_attrs->{ignore_version}
     )

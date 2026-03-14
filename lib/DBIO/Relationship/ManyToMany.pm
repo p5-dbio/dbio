@@ -41,7 +41,7 @@ sub many_to_many {
 
     for ($add_meth, $remove_meth, $set_meth, $rs_meth) {
       if ( $class->can ($_) ) {
-        carp (<<"EOW") unless $ENV{DBIO_OVERWRITE_HELPER_METHODS_OK} || $ENV{DBIC_OVERWRITE_HELPER_METHODS_OK};
+        carp (<<"EOW") unless $ENV{DBIO_OVERWRITE_HELPER_METHODS_OK};
 
 ***************************************************************************
 The many-to-many relationship '$meth' is trying to create a utility method
@@ -54,7 +54,7 @@ relationship, as the functionality of the original method will not be
 accessible anymore.
 
 To disable this warning set to a true value the environment variable
-DBIO_OVERWRITE_HELPER_METHODS_OK (legacy alias: DBIC_OVERWRITE_HELPER_METHODS_OK)
+DBIO_OVERWRITE_HELPER_METHODS_OK
 
 ***************************************************************************
 EOW

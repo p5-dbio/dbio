@@ -27,7 +27,7 @@ sub get_component_class {
 
     no strict 'refs';
     $successfully_loaded_components->{$class}
-      = ${"${class}::__LOADED__BY__DBIC__CAG__COMPONENT_CLASS__"}
+      = ${"${class}::__LOADED__BY__DBIO__CAG__COMPONENT_CLASS__"}
         = do { \(my $anon = 'loaded') };
     weaken($successfully_loaded_components->{$class});
   }

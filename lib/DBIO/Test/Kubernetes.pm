@@ -38,7 +38,6 @@ sub new {
 
     my $kubeconfig = $args{kubeconfig}
         // $ENV{DBIO_TEST_KUBECONFIG}
-        // $ENV{DBICTEST_KUBECONFIG}
         // $ENV{KUBECONFIG}
         // File::Spec->catfile($ENV{HOME}, '.kube', 'config');
 
@@ -294,12 +293,7 @@ sub env_vars {
         $env{"${prefix}_USER"} = $info->{$db}{user};
         $env{"${prefix}_PASS"} = $info->{$db}{pass};
 
-        # Backward compatibility for existing tooling still using DBICTEST_*.
-        (my $legacy_prefix = $prefix) =~ s/^DBIO_TEST_/DBICTEST_/;
-        $env{"${legacy_prefix}_DSN"}  = $info->{$db}{dsn};
-        $env{"${legacy_prefix}_USER"} = $info->{$db}{user};
-        $env{"${legacy_prefix}_PASS"} = $info->{$db}{pass};
-    }
+}
 
     return %env;
 }

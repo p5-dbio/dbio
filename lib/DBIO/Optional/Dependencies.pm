@@ -366,7 +366,7 @@ my $reqs = {
 # a different version that the test group
   test_rdbms_pg => {
     req => {
-      ($ENV{DBIO_TEST_PG_DSN} || $ENV{DBICTEST_PG_DSN})
+      ($ENV{DBIO_TEST_PG_DSN})
         ? (
           # when changing this list make sure to adjust xt/optional_deps.t
           %$rdbms_pg,
@@ -377,7 +377,7 @@ my $reqs = {
 
   test_rdbms_mssql_odbc => {
     req => {
-      ($ENV{DBIO_TEST_MSSQL_ODBC_DSN} || $ENV{DBICTEST_MSSQL_ODBC_DSN})
+      ($ENV{DBIO_TEST_MSSQL_ODBC_DSN})
         ? (
           %$rdbms_mssql_odbc,
         ) : ()
@@ -386,7 +386,7 @@ my $reqs = {
 
   test_rdbms_mssql_sybase => {
     req => {
-      ($ENV{DBIO_TEST_MSSQL_DSN} || $ENV{DBICTEST_MSSQL_DSN})
+      ($ENV{DBIO_TEST_MSSQL_DSN})
         ? (
           %$rdbms_mssql_sybase,
         ) : ()
@@ -395,7 +395,7 @@ my $reqs = {
 
   test_rdbms_mysql => {
     req => {
-      ($ENV{DBIO_TEST_MYSQL_DSN} || $ENV{DBICTEST_MYSQL_DSN})
+      ($ENV{DBIO_TEST_MYSQL_DSN})
         ? (
           %$rdbms_mysql,
         ) : ()
@@ -404,7 +404,7 @@ my $reqs = {
 
   test_rdbms_oracle => {
     req => {
-      ($ENV{DBIO_TEST_ORA_DSN} || $ENV{DBICTEST_ORA_DSN})
+      ($ENV{DBIO_TEST_ORA_DSN})
         ? (
           %$rdbms_oracle,
           'DateTime::Format::Oracle' => '0',
@@ -415,7 +415,7 @@ my $reqs = {
 
   test_rdbms_ase => {
     req => {
-      ($ENV{DBIO_TEST_SYBASE_DSN} || $ENV{DBICTEST_SYBASE_DSN})
+      ($ENV{DBIO_TEST_SYBASE_DSN})
         ? (
           %$rdbms_ase,
         ) : ()
@@ -424,7 +424,7 @@ my $reqs = {
 
   test_rdbms_db2 => {
     req => {
-      ($ENV{DBIO_TEST_DB2_DSN} || $ENV{DBICTEST_DB2_DSN})
+      ($ENV{DBIO_TEST_DB2_DSN})
         ? (
           %$rdbms_db2,
         ) : ()
@@ -433,7 +433,7 @@ my $reqs = {
 
   test_rdbms_informix => {
     req => {
-      ($ENV{DBIO_TEST_INFORMIX_DSN} || $ENV{DBICTEST_INFORMIX_DSN})
+      ($ENV{DBIO_TEST_INFORMIX_DSN})
         ? (
           %$rdbms_informix,
         ) : ()
@@ -442,7 +442,7 @@ my $reqs = {
 
   test_rdbms_firebird => {
     req => {
-      ($ENV{DBIO_TEST_FIREBIRD_DSN} || $ENV{DBICTEST_FIREBIRD_DSN})
+      ($ENV{DBIO_TEST_FIREBIRD_DSN})
         ? (
           %$rdbms_firebird,
         ) : ()
@@ -451,7 +451,7 @@ my $reqs = {
 
   test_rdbms_firebird_interbase => {
     req => {
-      ($ENV{DBIO_TEST_FIREBIRD_INTERBASE_DSN} || $ENV{DBICTEST_FIREBIRD_INTERBASE_DSN})
+      ($ENV{DBIO_TEST_FIREBIRD_INTERBASE_DSN})
         ? (
           %$rdbms_firebird_interbase,
         ) : ()
@@ -460,7 +460,7 @@ my $reqs = {
 
   test_rdbms_firebird_odbc => {
     req => {
-      ($ENV{DBIO_TEST_FIREBIRD_ODBC_DSN} || $ENV{DBICTEST_FIREBIRD_ODBC_DSN})
+      ($ENV{DBIO_TEST_FIREBIRD_ODBC_DSN})
         ? (
           %$rdbms_firebird_odbc,
         ) : ()
@@ -469,7 +469,7 @@ my $reqs = {
 
   test_memcached => {
     req => {
-      ($ENV{DBIO_TEST_MEMCACHED} || $ENV{DBICTEST_MEMCACHED})
+      ($ENV{DBIO_TEST_MEMCACHED})
         ? (
           'Cache::Memcached' => 0,
         ) : ()

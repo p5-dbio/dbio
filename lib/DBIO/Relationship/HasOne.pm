@@ -102,7 +102,7 @@ sub _has_one {
 sub _validate_has_one_condition {
   my ($class, $cond )  = @_;
 
-  return if $ENV{DBIO_DONT_VALIDATE_RELS} || $ENV{DBIC_DONT_VALIDATE_RELS};
+  return if $ENV{DBIO_DONT_VALIDATE_RELS};
   return unless 'HASH' eq ref $cond;
   foreach my $foreign_id ( keys %$cond ) {
     my $self_id = $cond->{$foreign_id};

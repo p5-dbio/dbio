@@ -102,7 +102,7 @@ sub _debugfh {
 sub _build_debugfh {
   my $fh;
 
-  my $debug_env = $ENV{DBIX_CLASS_STORAGE_DBI_DEBUG} || $ENV{DBIO_TRACE} || $ENV{DBIC_TRACE};
+  my $debug_env = $ENV{DBIO_TRACE};
 
   if (defined($debug_env) and ($debug_env =~ /=(.+)$/)) {
     open ($fh, '>>', $1)

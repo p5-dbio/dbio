@@ -634,7 +634,7 @@ sub connect_info {
       . 'DBIO::Storage::DBI for more info). If you still want to '
       . 'do this you can set $ENV{DBIO_UNSAFE_AUTOCOMMIT_OK} to disable '
       . 'this warning.'
-    ) if ! $attrs{AutoCommit} and ! ($ENV{DBIO_UNSAFE_AUTOCOMMIT_OK} || $ENV{DBIC_UNSAFE_AUTOCOMMIT_OK});
+    ) if ! $attrs{AutoCommit} and ! $ENV{DBIO_UNSAFE_AUTOCOMMIT_OK};
 
     push @args, \%attrs if keys %attrs;
   }
@@ -1724,7 +1724,7 @@ sub _connect {
         # the scope of DBIO
         DBIO::Exception->throw("DBI Exception (unhandled by DBIO, ::Schema GCed): $_[0]");
       }
-    }, '__DBIC__DBH__ERROR__HANDLER__';
+    }, '__DBIO__DBH__ERROR__HANDLER__';
   };
 
   try {
@@ -1752,7 +1752,7 @@ sub _connect {
       $self->throw_exception(
         'Refusing clobbering of {HandleError} installed on externally supplied '
        ."DBI handle $dbh. Either remove the handler or use the 'unsafe' attribute."
-      ) if $dbh->{HandleError} and ref $dbh->{HandleError} ne '__DBIC__DBH__ERROR__HANDLER__';
+      ) if $dbh->{HandleError} and ref $dbh->{HandleError} ne '__DBIO__DBH__ERROR__HANDLER__';
 
       # Default via _default_dbi_connect_attributes is 1, hence it was an explicit
       # request, or an external handle. Complain and set anyway
@@ -1902,7 +1902,7 @@ sub _gen_sql_bind {
   );
 
   if (
-    ! ($ENV{DBIO_DT_SEARCH_OK} || $ENV{DBIC_DT_SEARCH_OK})
+    ! $ENV{DBIO_DT_SEARCH_OK}
       and
     $op eq 'select'
       and
