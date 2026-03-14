@@ -22,16 +22,18 @@ use namespace::clean;
     $k8s->setup_port_forwards;
     my %env = $k8s->env_vars;
     local @ENV{keys %env} = values %env;
-    # PostgreSQL tests moved to dbio-postgresql distribution
-    system('prove', '-l', 't/');
+    system('prove', '-Ilib', 't/');
 
     $k8s->cleanup;
 
 =head1 DESCRIPTION
 
 L<DBIO::Test::Kubernetes> provisions temporary PostgreSQL and MySQL test
-databases inside Kubernetes and exposes the corresponding DBIO test
+databases inside Kubernetes and exposes the corresponding C<DBIO_TEST_*>
 environment variables for local or in-cluster test runs.
+
+It is intended for integration-style test runs that need short-lived database
+instances without hand-managed local services.
 
 =cut
 
@@ -94,13 +96,13 @@ my %DB_SPECS = (
         port       => 5432,
         svc_name   => 'pg-svc',
         env        => [
-            { name => 'POSTGRES_PASSWORD', value => 'dbictest' },
+            { name => 'POSTGRES_PASSWORD', value => 'dbiotest' },
             { name => 'POSTGRES_DB',       value => 'dbio_test' },
         ],
         readiness_cmd => [qw(pg_isready -U postgres)],
         dsn_template  => 'dbi:Pg:database=dbio_test;host=%s;port=%s',
         user          => 'postgres',
-        pass          => 'dbictest',
+        pass          => 'dbiotest',
         env_prefix    => 'DBIO_TEST_PG',
     },
     mysql => {
@@ -109,7 +111,7 @@ my %DB_SPECS = (
         port       => 3306,
         svc_name   => 'mysql-svc',
         env        => [
-            { name => 'MYSQL_ROOT_PASSWORD', value => 'dbictest' },
+            { name => 'MYSQL_ROOT_PASSWORD', value => 'dbiotest' },
             { name => 'MYSQL_DATABASE',      value => 'dbio_test' },
         ],
         readiness_cmd => [qw(mysqladmin ping -h localhost)],
@@ -118,7 +120,7 @@ my %DB_SPECS = (
             : 'dbi:mysql:database=dbio_test;host=%s;port=%s'
         ),
         user          => 'root',
-        pass          => 'dbictest',
+        pass          => 'dbiotest',
         env_prefix    => 'DBIO_TEST_MYSQL',
     },
 );
