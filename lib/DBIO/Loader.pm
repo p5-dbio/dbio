@@ -96,6 +96,10 @@ function to a greater or lesser degree with the base loader, depending
 on how much of the DBI spec they implement and how standard their
 implementation is.
 
+This module was ported from the historical
+L<DBIx::Class::Schema::Loader>, with the namespace and surrounding DBIO
+integration updated for the DBIO ecosystem.
+
 Patches to make other DBDs work correctly welcome.
 
 See L<DBIO::Loader::DBI::Writing> for notes on writing
