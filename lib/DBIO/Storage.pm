@@ -694,6 +694,100 @@ only.
 
 sub select_single { die "Virtual method!" }
 
+=head2 select_async
+
+Async variant of L</select>. Returns a L<DBIO::Future> that resolves
+with the query results. Default implementation executes synchronously
+and returns an immediately-resolved Future via L</future_class>.
+
+=cut
+
+sub select_async {
+  my $self = shift;
+  my $fc = $self->future_class;
+  my @r = eval { $self->select(@_) };
+  return $@ ? $fc->fail($@) : $fc->done(@r);
+}
+
+=head2 select_single_async
+
+Async variant of L</select_single>.
+
+=cut
+
+sub select_single_async {
+  my $self = shift;
+  my $fc = $self->future_class;
+  my @r = eval { $self->select_single(@_) };
+  return $@ ? $fc->fail($@) : $fc->done(@r);
+}
+
+=head2 insert_async
+
+Async variant of L</insert>.
+
+=cut
+
+sub insert_async {
+  my $self = shift;
+  my $fc = $self->future_class;
+  my @r = eval { $self->insert(@_) };
+  return $@ ? $fc->fail($@) : $fc->done(@r);
+}
+
+=head2 update_async
+
+Async variant of L</update>.
+
+=cut
+
+sub update_async {
+  my $self = shift;
+  my $fc = $self->future_class;
+  my @r = eval { $self->update(@_) };
+  return $@ ? $fc->fail($@) : $fc->done(@r);
+}
+
+=head2 delete_async
+
+Async variant of L</delete>.
+
+=cut
+
+sub delete_async {
+  my $self = shift;
+  my $fc = $self->future_class;
+  my @r = eval { $self->delete(@_) };
+  return $@ ? $fc->fail($@) : $fc->done(@r);
+}
+
+=head2 txn_do_async
+
+Async variant of L</txn_do>. Returns a L<DBIO::Future> that resolves
+after COMMIT or rejects after ROLLBACK.
+
+=cut
+
+sub txn_do_async {
+  my $self = shift;
+  my $fc = $self->future_class;
+  my @r = eval { $self->txn_do(@_) };
+  return $@ ? $fc->fail($@) : $fc->done(@r);
+}
+
+=head2 future_class
+
+Returns the class name used to construct Future objects. Defaults to
+L<DBIO::Test::Future> which resolves synchronously. Async storage
+drivers override this to return their event loop's Future class.
+
+=cut
+
+sub future_class {
+  require DBIO::Test::Future;
+  'DBIO::Test::Future';
+}
+
 =head2 columns_info_for
 
 Returns metadata for the given source's columns.  This

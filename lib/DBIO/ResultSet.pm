@@ -1862,6 +1862,91 @@ sub first {
   return $_[0]->reset->next;
 }
 
+=head2 all_async
+
+  my $future = $rs->all_async;
+  $future->then(sub { my @rows = @_; ... });
+
+Async variant of L</all>. Returns a L<DBIO::Future> that resolves with
+all result objects. With synchronous storage, the Future resolves
+immediately.
+
+=cut
+
+sub all_async {
+  my $self = shift;
+  my $storage = $self->result_source->storage;
+  my $fc = $storage->future_class;
+  my @r = eval { $self->all };
+  return $@ ? $fc->fail($@) : $fc->done(@r);
+}
+
+=head2 first_async
+
+  my $future = $rs->first_async;
+
+Async variant of L</first>. Returns a L<DBIO::Future> that resolves
+with the first result object (or undef).
+
+=cut
+
+sub first_async {
+  my $self = shift;
+  my $storage = $self->result_source->storage;
+  my $fc = $storage->future_class;
+  my $r = eval { $self->first };
+  return $@ ? $fc->fail($@) : $fc->done($r);
+}
+
+=head2 single_async
+
+  my $future = $rs->single_async;
+
+Async variant of L</single>.
+
+=cut
+
+sub single_async {
+  my $self = shift;
+  my $storage = $self->result_source->storage;
+  my $fc = $storage->future_class;
+  my $r = eval { $self->single(@_) };
+  return $@ ? $fc->fail($@) : $fc->done($r);
+}
+
+=head2 count_async
+
+  my $future = $rs->count_async;
+  $future->then(sub { my $count = shift; ... });
+
+Async variant of L</count>.
+
+=cut
+
+sub count_async {
+  my $self = shift;
+  my $storage = $self->result_source->storage;
+  my $fc = $storage->future_class;
+  my $r = eval { $self->count(@_) };
+  return $@ ? $fc->fail($@) : $fc->done($r);
+}
+
+=head2 create_async
+
+  my $future = $rs->create_async(\%vals);
+  $future->then(sub { my $row = shift; ... });
+
+Async variant of L</create>.
+
+=cut
+
+sub create_async {
+  my $self = shift;
+  my $storage = $self->result_source->storage;
+  my $fc = $storage->future_class;
+  my $r = eval { $self->create(@_) };
+  return $@ ? $fc->fail($@) : $fc->done($r);
+}
 
 # _rs_update_delete
 #
