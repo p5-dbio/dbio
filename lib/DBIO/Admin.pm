@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Carp ();
+use JSON::MaybeXS;
 use Try::Tiny;
 use Scalar::Util 'blessed';
 use namespace::clean;
@@ -528,21 +529,13 @@ sub _json_to_data {
 }
 
 sub _build_json_decoder {
-  if (eval { require JSON::MaybeXS; 1 }) {
-    return eval {
-      JSON::MaybeXS->new(
-        allow_barekey     => 1,
-        allow_singlequote => 1,
-        relaxed           => 1,
-      );
-    } || JSON::MaybeXS->new(relaxed => 1);
-  }
-
-  require JSON::PP;
-  return JSON::PP->new
-    ->allow_barekey(1)
-    ->allow_singlequote(1)
-    ->relaxed(1);
+  return eval {
+    JSON::MaybeXS->new(
+      allow_barekey     => 1,
+      allow_singlequote => 1,
+      relaxed           => 1,
+    );
+  } || JSON::MaybeXS->new(relaxed => 1);
 }
 
 sub _require_module {

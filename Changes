@@ -1,5 +1,51 @@
 Revision history for DBIO (DBI Objects)
 
+{{$NEXT}}
+    * Async Storage Interface
+        - New event-loop agnostic async API for storage operations
+        - DBIO::Future — interface contract for future objects with validate()
+        - DBIO::Test::Future — synchronous mock future for testing without
+          any event loop framework (done/fail/then/catch/get/needs_all)
+        - DBIO::Storage — async virtual methods with sync fallback:
+          select_async, insert_async, update_async, delete_async,
+          select_single_async, txn_do_async
+        - DBIO::Storage::Async — abstract base class for async drivers
+        - DBIO::Storage::Pool — abstract connection pool interface
+        - DBIO::ResultSet — all_async, first_async, single_async,
+          count_async, create_async (return DBIO::Test::Future with
+          sync storage, real Futures with async drivers)
+
+    * Change Tracking (DBIO::ChangeLog)
+        - Integrated change tracking as a core Row component
+        - Automatic logging of insert/update/delete operations with
+          old/new column values and primary key serialization
+        - Custom event logging via log_event()
+        - DBIO::Schema::ChangeLog — txn_do override for automatic
+          ChangeSet grouping with user/session metadata
+        - DBIO::ChangeLog::Set and DBIO::ChangeLog::Entry table definitions
+        - Driver override hooks for changelog_column_definitions,
+          changelog_serialize_changes
+
+    * Replicated Storage Merged into Core
+        - Move DBIO::Replicated and all sub-modules back into DBIO core
+          (Storage, Pool, Balancer, Backend, DebugProxy)
+        - Balancer strategies: First and Random
+        - DBIO::Test now supports replicated storage testing
+        - Add DBIO::Test::DateTimeParser helper
+
+    * Remove DBIC Backward-Compatibility
+        - Clean break from DBIx::Class naming conventions
+        - Remove all $ENV{DBIC_*} and $ENV{DBICTEST_*} fallback logic
+        - Rename internal markers: __DBIC__ to __DBIO__ throughout
+        - Rename DBIC_RS_ATTR_MERGER to DBIO_RS_ATTR_MERGER
+        - Remove $ENV{DBIX_CLASS_STORAGE_DBI_DEBUG} legacy support
+
+    * Documentation
+        - Align all core module POD with DBIO conventions (=attr, =method)
+        - Restore historical provenance notes in Loader modules
+        - Split AUTHORS into DBIO and DBIx::Class sections
+        - Clean up Kubernetes test helper naming
+
     * Naming and Branding
         - DBIO officially stands for "DBI Objects"
         - Motto: "Relational mapping. Joins itself. Fully native. Everything included."

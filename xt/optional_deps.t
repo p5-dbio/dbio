@@ -137,6 +137,18 @@ is_deeply(
   }, 'optional dependencies for deploying to Postgres ok');
 
 is_deeply(
+  DBIO::Optional::Dependencies->req_list_for('config_files'),
+  {
+    'Config::Any' => '0',
+  }, 'config file parsing dependency list is explicit');
+
+is_deeply(
+  DBIO::Optional::Dependencies->req_list_for('admin_script'),
+  {
+    'Text::CSV' => '1.16',
+  }, 'dbioadmin CSV dependency list stays script-specific');
+
+is_deeply(
   DBIO::Optional::Dependencies->req_list_for('test_rdbms_pg'),
   {
     'DBD::Pg'        => '2.009002',
@@ -145,5 +157,10 @@ is_deeply(
 is_deeply(
   DBIO::Optional::Dependencies->req_list_for('test_rdbms_oracle'),
   {}, 'optional dependencies for testing Oracle without ENV var ok');
+
+throws_ok {
+  DBIO::Optional::Dependencies->req_list_for('replicated');
+} qr/Requirement group 'replicated' does not exist/,
+  'removed replicated dependency group stays gone';
 
 done_testing;

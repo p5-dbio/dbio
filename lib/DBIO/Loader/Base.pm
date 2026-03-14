@@ -23,7 +23,7 @@ use Class::Inspector ();
 use Scalar::Util 'looks_like_number';
 use DBIO::Loader::Column;
 use DBIO::Loader::Utils qw/split_name dumper_squashed eval_package_without_redefine_warnings class_path slurp_file sigwarn_silencer firstidx uniq/;
-use DBIO::Loader::Optional::Dependencies ();
+use DBIO::Optional::Dependencies ();
 use Try::Tiny;
 use DBIO ();
 use Encode qw/encode decode/;
@@ -815,23 +815,11 @@ You may use this in conjunction with L</components>.
 
 =head2 result_roles
 
-List of L<Moose> roles to be applied to all of your Result classes.
+Removed legacy option. Loader now generates plain DBIO classes only.
 
 =head2 result_roles_map
 
-A hashref of moniker keys and role values.  Unlike L</result_roles>, which
-applies the given roles to every Result class, this option allows you to apply
-certain roles for specified Result classes. For example:
-
-    result_roles_map => {
-        StationVisited => [
-                              'YourApp::Role::Building',
-                              'YourApp::Role::Destination',
-                          ],
-        RouteChange    => 'YourApp::Role::TripEvent',
-    }
-
-You may use this in conjunction with L</result_roles>.
+Removed legacy option. Loader now generates plain DBIO classes only.
 
 =head2 use_namespaces
 
@@ -976,28 +964,11 @@ unless explicitly set to false by the user.
 
 =head2 use_moose
 
-Creates Schema and Result classes that use L<Moose>, L<MooseX::NonMoose> and
-L<MooseX::MarkAsMethods> (or L<namespace::autoclean>, see below). The default
-content after the md5 sum also makes the classes immutable.
-
-It is safe to upgrade your existing Schema to this option.
+Removed legacy option. Loader no longer generates Moose-based schema dumps.
 
 =head2 only_autoclean
 
-By default, we use L<MooseX::MarkAsMethods> to remove imported functions from
-your generated classes.  It uses L<namespace::autoclean> to do this, after
-telling your object's metaclass that any operator L<overload>s in your class
-are methods, which will cause namespace::autoclean to spare them from removal.
-
-This prevents the "Hey, where'd my overloads go?!" effect.
-
-If you don't care about operator overloads (or if you know your Moose is at at
-least version 2.1400, where MooseX::MarkAsMethods is no longer necessary),
-enabling this option falls back to just using L<namespace::autoclean> itself.
-
-If none of the above made any sense, or you don't have some pressing need to
-only use L<namespace::autoclean>, leaving this set to the default is
-just fine.
+Removed with L</use_moose>.
 
 =head2 col_collision_map
 
@@ -1088,6 +1059,32 @@ sub _ensure_arrayref {
     }
 }
 
+sub _legacy_loader_option_has_value {
+    my ($value) = @_;
+
+    return 0 unless defined $value;
+    return scalar(@$value) if ref $value eq 'ARRAY';
+    return scalar(keys %$value) if ref $value eq 'HASH';
+    return length "$value" ? 1 : 0;
+}
+
+sub _reject_removed_legacy_options {
+    my ($self) = @_;
+
+    croak 'use_moose is no longer supported; generate plain DBIO classes instead'
+        if $self->{use_moose};
+
+    croak 'only_autoclean is no longer supported because use_moose has been removed'
+        if $self->{only_autoclean};
+
+    croak 'result_roles is no longer supported; use components or plain base classes instead'
+        if _legacy_loader_option_has_value($self->{result_roles});
+
+    croak 'result_roles_map is no longer supported; use result_components_map or plain base classes instead'
+        if _legacy_loader_option_has_value($self->{result_roles_map})
+        || _legacy_loader_option_has_value($self->{result_role_map});
+}
+
 =head2 new
 
 Constructor for L<DBIO::Loader::Base>, used internally
@@ -1123,23 +1120,14 @@ sub new {
         }
     }
 
+    $self->_reject_removed_legacy_options;
+
     if (defined $self->{result_component_map}) {
         if (defined $self->result_components_map) {
             croak "Specify only one of result_components_map or result_component_map";
         }
         $self->result_components_map($self->{result_component_map})
     }
-
-    if (defined $self->{result_role_map}) {
-        if (defined $self->result_roles_map) {
-            croak "Specify only one of result_roles_map or result_role_map";
-        }
-        $self->result_roles_map($self->{result_role_map})
-    }
-
-    croak "the result_roles and result_roles_map options may only be used in conjunction with use_moose=1"
-        if ((not defined $self->use_moose) || (not $self->use_moose))
-            && ((defined $self->result_roles) || (defined $self->result_roles_map));
 
     $self->_ensure_arrayref(qw/schema_components
                                additional_classes
@@ -1181,21 +1169,6 @@ sub new {
         $self->result_roles_map({});
     }
     $self->_validate_result_roles_map;
-
-    if ($self->use_moose) {
-        if ($self->only_autoclean) {
-            if (not DBIO::Loader::Optional::Dependencies->req_ok_for('use_moose_only_autoclean')) {
-                die sprintf "You must install the following CPAN modules to enable the use_moose and only_autoclean options: %s.\n",
-                    DBIO::Loader::Optional::Dependencies->req_missing_for('use_moose_only_autoclean');
-            }
-        }
-        else {
-            if (not DBIO::Loader::Optional::Dependencies->req_ok_for('use_moose')) {
-                die sprintf "You must install the following CPAN modules to enable the use_moose option: %s.\n",
-                    DBIO::Loader::Optional::Dependencies->req_missing_for('use_moose');
-            }
-        }
-    }
 
     $self->{_tables} = {};
     $self->{monikers} = {};
@@ -1400,10 +1373,8 @@ EOF
 
     return unless $old_ver;
 
-    # determine if the existing schema was dumped with use_moose => 1
-    if (! defined $self->use_moose) {
-        $self->{use_moose} = 1 if $old_gen =~ /^ (?!\s*\#) use \s+ Moose/xm;
-    }
+    croak "$filename was generated with the removed use_moose option; regenerate it as plain DBIO classes"
+        if $old_gen =~ /^ (?!\s*\#) use \s+ Moose/xm;
 
     my $load_classes = ($old_gen =~ /^__PACKAGE__->load_classes;/m) ? 1 : 0;
 
@@ -3201,6 +3172,7 @@ sub _remove_table {
 sub DESTROY {
     my $self = shift;
 
+    return unless defined $self->dump_directory;
     @INC = grep $_ ne $self->dump_directory, @INC;
 }
 

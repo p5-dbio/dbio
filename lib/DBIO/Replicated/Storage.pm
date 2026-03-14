@@ -73,6 +73,8 @@ C<pool_type>, C<pool_args>, C<balancer_type>, C<balancer_args>, and
 C<backend_storage_class>. All remaining connect attributes are passed through
 to the master backend.
 
+=cut
+
 sub new {
   my ($class, $schema, $args) = @_;
   $args ||= {};

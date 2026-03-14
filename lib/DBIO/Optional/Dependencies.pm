@@ -22,27 +22,17 @@ my $test_and_dist_json_any = {
   'JSON::Any'                     => '1.31',
 };
 
-my $replicated = {
-};
-
-my $admin_basic = {
+my $config_files = {
   'Config::Any'                   => '0',
-  'JSON::MaybeXS'                 => '0',
 };
 
 my $admin_script = {
-  %$admin_basic,
   'Text::CSV'                 => '1.16',
 };
 
 my $datetime_basic = {
   'DateTime'                      => '0.55',
   'DateTime::Format::Strptime'    => '1.2',
-};
-
-my $id_shortener = {
-  'Math::BigInt'                  => '1.80',
-  'Math::Base36'                  => '0.07',
 };
 
 my $rdbms_sqlite = {
@@ -66,7 +56,6 @@ my $rdbms_mysql = {
 };
 my $rdbms_oracle = {
   'DBD::Oracle'                   => '0',
-  %$id_shortener,
 };
 my $rdbms_ase = {
   'DBD::Sybase'                   => '0',
@@ -87,26 +76,13 @@ my $rdbms_firebird_odbc = {
   'DBD::ODBC'                     => '0',
 };
 my $reqs = {
-  replicated => {
-    req => $replicated,
-    pod => {
-      title => 'Replicated',
-      desc => 'Optional requirements for L<DBIO::Replicated> and L<DBIO::Replicated::Storage>',
-    },
-  },
-
-  test_replicated => {
-    req => $replicated,
-  },
-
-
-  admin => {
+  config_files => {
     req => {
-      %$admin_basic,
+      %$config_files,
     },
     pod => {
-      title => 'DBIO::Admin',
-      desc => 'Modules required for the DBIO administrative library',
+      title => 'Config file support',
+      desc => 'Modules required to parse DBIO config and profile files',
     },
   },
 
@@ -116,7 +92,7 @@ my $reqs = {
     },
     pod => {
       title => 'dbioadmin',
-      desc => 'Modules required for the CLI DBIO interface dbioadmin',
+      desc => 'Modules required for optional dbioadmin output formats',
     },
   },
 
@@ -138,10 +114,6 @@ my $reqs = {
       title => 'Storage::DBI::deploy()',
       desc => 'Modules required for L<DBIO::Storage::DBI/deployment_statements> and L<DBIO::Schema/deploy>',
     },
-  },
-
-  id_shortener => {
-    req => $id_shortener,
   },
 
   test_component_accessor => {
@@ -466,6 +438,7 @@ my $reqs = {
 
   dist_dir => {
     req => {
+      %$config_files,
       %$admin_script,
       %$test_and_dist_json_any,
       'ExtUtils::MakeMaker' => '6.64',

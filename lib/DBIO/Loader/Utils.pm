@@ -50,7 +50,7 @@ sub dumper_squashed($) {
     return $dd->Values([ $val ])->Dump;
 }
 
-# copied from DBIO::_Util, import from there once it's released
+# copied from DBIO::Util, import from there once the loader utilities can share it directly
 sub sigwarn_silencer {
     my $pattern = shift;
 

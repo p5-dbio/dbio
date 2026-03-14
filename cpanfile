@@ -19,6 +19,7 @@ requires 'Class::C3::Componentised', '1.0009';
 requires 'Context::Preserve', '0.01';
 requires 'Devel::GlobalDestruction', '0.09';
 requires 'Hash::Merge', '0.12';
+requires 'JSON::MaybeXS', '0';
 requires 'MRO::Compat', '0.12';
 requires 'Module::Find', '0.07';
 requires 'namespace::clean', '0.24';
