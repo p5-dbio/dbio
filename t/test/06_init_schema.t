@@ -26,6 +26,47 @@ use DBIO::Test;
   # it's a composed namespace, not connected
 }
 
+# replicated shortcut wraps fake storage by default
+{
+  my $schema = DBIO::Test->init_schema(
+    no_deploy  => 1,
+    replicated => 1,
+  );
+
+  isa_ok $schema->storage, 'DBIO::Replicated::Storage';
+  isa_ok $schema->storage->master->storage, 'DBIO::Test::Storage';
+}
+
+# replicated shortcut can wrap a requested backend storage type
+{
+  my $schema = DBIO::Test->init_schema(
+    no_deploy    => 1,
+    replicated   => 1,
+    storage_type => 'DBIO::Storage::DBI::NoBindVars',
+  );
+
+  isa_ok $schema->storage, 'DBIO::Replicated::Storage';
+  ok $schema->storage->master->storage->isa('DBIO::Test::Storage'),
+    'replicated backend keeps fake test storage execution';
+  ok $schema->storage->master->storage->isa('DBIO::Storage::DBI::NoBindVars'),
+    'replicated backend also inherits requested storage type';
+}
+
+# replicated shortcut can auto-connect replicants
+{
+  my $schema = DBIO::Test->init_schema(
+    no_deploy             => 1,
+    replicated            => 1,
+    replicant_connect_info => [
+      ['dbi:Test:replicant_one', '', '', { AutoCommit => 1 }],
+      ['dbi:Test:replicant_two', '', '', { AutoCommit => 1 }],
+    ],
+  );
+
+  is scalar($schema->storage->pool->all_replicants), 2,
+    'replicated shortcut auto-connects replicants';
+}
+
 # Multiple independent schemas
 {
   my $s1 = DBIO::Test->init_schema;

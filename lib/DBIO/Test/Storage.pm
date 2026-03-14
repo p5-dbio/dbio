@@ -54,6 +54,7 @@ Any test that only cares about I<what> SQL would be generated
 =cut
 
 __PACKAGE__->sql_limit_dialect('LimitOffset');
+__PACKAGE__->datetime_parser_type('DBIO::Test::DateTimeParser');
 
 __PACKAGE__->mk_group_accessors(simple => qw(
   _captured_queries
@@ -71,6 +72,7 @@ sub new {
   $self->_last_insert_ids({});
   $self->_auto_increment({});
   $self->{_sql_maker_opts} ||= {};
+  $self->{_driver_determined} = 1;
   $self;
 }
 
@@ -109,7 +111,10 @@ sub _dbh { undef }
 sub _get_dbh { undef }
 sub _server_info { { dbms_version => 0, normalized_dbms_version => 0 } }
 
-sub _determine_driver { '' }
+sub _determine_driver {
+  $_[0]->{_driver_determined} = 1;
+  return '';
+}
 sub _init {}
 sub _rebless {}
 sub _seems_connected { $_[0]->_fake_connected }

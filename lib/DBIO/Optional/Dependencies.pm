@@ -22,15 +22,7 @@ my $test_and_dist_json_any = {
   'JSON::Any'                     => '1.31',
 };
 
-my $moose_basic = {
-  'Moose'                         => '0.98',
-  'MooseX::Types'                 => '0.21',
-  'MooseX::Types::LoadableClass'  => '0.011',
-};
-
 my $replicated = {
-  'Clone' => 0,
-  %$moose_basic,
 };
 
 my $admin_basic = {
@@ -95,20 +87,16 @@ my $rdbms_firebird_odbc = {
   'DBD::ODBC'                     => '0',
 };
 my $reqs = {
-  # Replicated storage is now in the separate DBIO-Replicated distribution
   replicated => {
     req => $replicated,
     pod => {
-      title => 'Storage::Replicated',
-      desc => 'Modules required for L<DBIO::Storage::DBI::Replicated> (from the DBIO-Replicated distribution)',
+      title => 'Replicated',
+      desc => 'Optional requirements for L<DBIO::Replicated> and L<DBIO::Replicated::Storage>',
     },
   },
 
   test_replicated => {
-    req => {
-      %$replicated,
-      'Test::Moose'               => '0',
-    },
+    req => $replicated,
   },
 
 

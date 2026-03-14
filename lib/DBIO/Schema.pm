@@ -18,7 +18,7 @@ __PACKAGE__->mk_classdata('source_registrations' => {});
 __PACKAGE__->mk_classdata('storage_type' => '::DBI');
 __PACKAGE__->mk_classdata('storage');
 __PACKAGE__->mk_classdata('exception_action');
-__PACKAGE__->mk_classdata('stacktrace' => ($ENV{DBIO_TRACE} || $ENV{DBIC_TRACE} || 0));
+__PACKAGE__->mk_classdata('stacktrace' => ($ENV{DBIO_TRACE} || 0));
 __PACKAGE__->mk_classdata('default_resultset_attributes' => {});
 
 =head1 SYNOPSIS
@@ -433,7 +433,7 @@ defined as a second argument in the form of a hashref and the entire
 value needs to be wrapped into an arrayref or a hashref.  We support
 both types of refs here in order to play nice with your
 Config::[class] or your choice. See
-L<DBIO::Storage::DBI::Replicated> (from the DBIO-Replicated distribution) for an example of this.
+L<DBIO::Replicated::Storage> for an example of this.
 
 =head2 exception_action
 
@@ -477,7 +477,6 @@ Example:
 
 Whether L</throw_exception> should include stack trace information.
 Defaults to false normally, but defaults to true if C<$ENV{DBIO_TRACE}>
-or legacy C<$ENV{DBIC_TRACE}>
 is true.
 
 =head2 sqlt_deploy_hook

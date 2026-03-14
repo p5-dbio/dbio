@@ -52,7 +52,7 @@ distribution (for example C<DBIO-SQLite>, C<DBIO-PostgreSQL>, C<DBIO-MySQL>).
 
 Put admin/CLI-specific tests in C<dbio-admin>.
 
-Put replicated-storage-specific tests in C<dbio-replicated>.
+Put replicated-storage-specific tests in the DBIO core distribution.
 
 =head1 SYNOPSIS
 
@@ -73,29 +73,14 @@ Put replicated-storage-specific tests in C<dbio-replicated>.
 
 =cut
 
-=head1 MIGRATING FROM DBICTest
+=head1 NOTE
 
-If you still have older tests based on C<DBICTest>, the usual replacements are:
+This module replaces the old C<DBICTest> from DBIx::Class.  For reference,
+the mapping is:
 
-=over 4
-
-=item *
-
-C<use DBICTest;> -> C<use DBIO::Test;>
-
-=item *
-
-C<DBICTest-E<gt>init_schema(...)> -> C<DBIO::Test-E<gt>init_schema(...)>
-
-=item *
-
-C<DBICTest::Schema> -> C<DBIO::Test::Schema>
-
-=item *
-
-C<DBICTest::Util::...> -> C<DBIO::Test::Util::...>
-
-=back
+  DBICTest              -> DBIO::Test
+  DBICTest::Schema      -> DBIO::Test::Schema
+  DBICTest::Util::*     -> DBIO::Test::Util::*
 
 C<:DiffSQL> export support is preserved.
 
@@ -163,6 +148,28 @@ driver-specific SQLMaker behavior, for example:
     storage_type => 'DBIO::MySQL::Storage',
   );
 
+=item replicated
+
+Wrap the requested storage in L<DBIO::Replicated::Storage>.
+
+This is primarily intended for shared driver tests that should also run
+through the replicated storage path without rewriting the whole test
+setup. For example:
+
+  my $schema = DBIO::Test->init_schema(
+    no_deploy    => 1,
+    replicated   => 1,
+    storage_type => 'DBIO::MySQL::Storage',
+  );
+
+Without an explicit C<storage_type>, the replicated backend defaults to
+L<DBIO::Test::Storage>.
+
+=item replicant_connect_info
+
+Optional arrayref of additional connect-info arrayrefs passed to
+C<< $schema->storage->connect_replicants >> when C<replicated> is enabled.
+
 =item connect_opts
 
 Extra hashref merged into connect options.
@@ -174,11 +181,13 @@ Extra hashref merged into connect options.
 sub init_schema {
   my $self = shift;
   my %args = @_;
+  %args = %{ __PACKAGE__->normalize_init_schema_args(\%args) };
 
   my $schema;
 
   if ($args{no_connect}) {
     $schema = DBIO::Test::Schema->compose_namespace('DBIO::Test');
+    $schema->storage_type($args{storage_type}) if $args{storage_type};
     return $schema;
   }
 
@@ -194,45 +203,66 @@ sub init_schema {
     $schema = DBIO::Test::Schema->clone;
     $schema->storage_type($args{storage_type}) if $args{storage_type};
     $schema = $schema->connect(@connect);
+
+    if ($args{replicant_connect_info} && $schema->storage->isa('DBIO::Replicated::Storage')) {
+      $schema->storage->connect_replicants(@{ $args{replicant_connect_info} });
+    }
   }
   else {
     # Fake storage — no database needed
+    require DBIO::Test::Storage;
     $schema = DBIO::Test::Schema->connect(
       sub { }, # dummy connect coderef, Storage overrides everything
     );
-    # Re-bless storage to our fake one
-    require DBIO::Test::Storage;
+    my ($storage_class, $storage_args) = $args{storage_type}
+      ? __PACKAGE__->_normalize_storage_type($args{storage_type})
+      : (undef, {});
 
-    my $storage_class = 'DBIO::Test::Storage';
+    my $storage;
 
-    if (my $st = $args{storage_type}) {
-      # Create a dynamic subclass that combines fake execution
-      # (from DBIO::Test::Storage) with SQL generation behavior
-      # (from the requested storage type)
-      (my $st_file = "$st.pm") =~ s|::|/|g;
-      require $st_file;
+    if ($storage_class && $storage_class eq 'DBIO::Replicated::Storage') {
+      require DBIO::Replicated::Storage;
 
-      $storage_class = "DBIO::Test::Storage::_hybrid_::${st}";
-      if (!$storage_class->isa('DBIO::Test::Storage')) {
-        no strict 'refs';
-        @{"${storage_class}::ISA"} = ('DBIO::Test::Storage', $st);
-        mro::set_mro($storage_class, 'c3');
-        # Copy class data from the requested storage type
-        for my $attr (qw(sql_limit_dialect sql_quote_char sql_name_sep datetime_parser_type)) {
-          my $val = $st->$attr;
-          $storage_class->$attr($val) if defined $val;
-        }
+      my %replicated_args = %{ $storage_args || {} };
+      my $backend_storage_class = delete $replicated_args{backend_storage_class};
+      my $backend_storage_type  = delete $replicated_args{backend_storage_type};
+
+      $backend_storage_class ||= $backend_storage_type
+        ? __PACKAGE__->_build_fake_storage_class($backend_storage_type)
+        : 'DBIO::Test::Storage';
+
+      $storage = DBIO::Replicated::Storage->new($schema, {
+        %replicated_args,
+        backend_storage_class => $backend_storage_class,
+      });
+
+      $storage->connect_info([
+        'dbi:DBIOTest:master',
+        '',
+        '',
+        { AutoCommit => 1, %{ $args{connect_opts} || {} } },
+      ]);
+    }
+    else {
+      my $effective_class = $storage_class
+        ? __PACKAGE__->_build_fake_storage_class($storage_class)
+        : 'DBIO::Test::Storage';
+
+      $storage = $effective_class->new($schema);
+
+      # If the requested storage type sets sql_quote_char, propagate it
+      # to the sql_maker_opts so the sql_maker picks it up
+      if (my $qc = $effective_class->sql_quote_char) {
+        $storage->{_sql_maker_opts}{quote_char} = $qc;
+        $storage->{_sql_maker_opts}{name_sep} = $effective_class->sql_name_sep || '.';
       }
     }
 
-    my $storage = $storage_class->new($schema);
-    # If the requested storage type sets sql_quote_char, propagate it
-    # to the sql_maker_opts so the sql_maker picks it up
-    if (my $qc = $storage_class->sql_quote_char) {
-      $storage->{_sql_maker_opts}{quote_char} = $qc;
-      $storage->{_sql_maker_opts}{name_sep} = $storage_class->sql_name_sep || '.';
-    }
     $schema->storage($storage);
+
+    if ($args{replicant_connect_info} && $schema->storage->isa('DBIO::Replicated::Storage')) {
+      $schema->storage->connect_replicants(@{ $args{replicant_connect_info} });
+    }
   }
 
   if (!$args{no_deploy}) {
@@ -258,7 +288,7 @@ sub deploy_schema {
   $args ||= {};
 
   # Fake storage doesn't need deployment
-  return if $schema->storage->isa('DBIO::Test::Storage');
+  return if __PACKAGE__->_uses_fake_storage($schema);
 
   $schema->deploy($args);
 }
@@ -276,7 +306,7 @@ sub populate_schema {
   my ($self, $schema) = @_;
 
   # Fake storage can't hold data
-  return if $schema->storage->isa('DBIO::Test::Storage');
+  return if __PACKAGE__->_uses_fake_storage($schema);
 
   $schema->populate('Genre', [
     [qw/genreid name/],
@@ -450,6 +480,103 @@ sub populate_schema {
     [ 2, 1, "Dynamical Systems", "Library",  37 ],
     [ 3, 2, "Best Recipe Cookbook", "Library", 65 ],
   ]);
+}
+
+sub _normalize_storage_type {
+  my ($class, $storage_type) = @_;
+
+  if (ref $storage_type eq 'ARRAY') {
+    my ($normalized_class, $args) = @$storage_type;
+    $normalized_class =~ s/^\+// if defined $normalized_class;
+    return ($normalized_class, $args);
+  }
+  elsif (ref $storage_type eq 'HASH') {
+    my ($normalized_class, $args) = %$storage_type;
+    $normalized_class =~ s/^\+// if defined $normalized_class;
+    return ($normalized_class, $args);
+  }
+
+  $storage_type =~ s/^\+//;
+  return ($storage_type, {});
+}
+
+=method normalize_init_schema_args
+
+  my $args = DBIO::Test->normalize_init_schema_args(\%args);
+
+Normalizes high-level L</init_schema> options into the underlying
+storage configuration. Driver-specific test helpers can call this to
+inherit shared features such as C<replicated =E<gt> 1>.
+
+=cut
+
+sub normalize_init_schema_args {
+  my ($class, $args) = @_;
+  my %normalized = %{$args || {}};
+
+  my $replicated = delete $normalized{replicated};
+  return \%normalized unless $replicated;
+
+  my %replicated_args = ref $replicated eq 'HASH' ? %{$replicated} : ();
+
+  if (exists $normalized{storage_type}) {
+    my ($backend_storage_type, $backend_storage_args)
+      = $class->_normalize_storage_type($normalized{storage_type});
+
+    if (keys %{ $backend_storage_args || {} }) {
+      croak 'replicated => 1 does not support storage_type constructor args; pass the full replicated storage_type hashref instead';
+    }
+
+    $replicated_args{backend_storage_type} ||= $backend_storage_type;
+  }
+
+  $normalized{storage_type} = {
+    'DBIO::Replicated::Storage' => \%replicated_args,
+  };
+
+  return \%normalized;
+}
+
+sub _normalize_init_schema_args {
+  shift->normalize_init_schema_args(@_);
+}
+
+sub _build_fake_storage_class {
+  my ($class, $storage_class) = @_;
+  require DBIO::Test::Storage;
+
+  $storage_class =~ s/^\+//;
+
+  (my $st_file = "$storage_class.pm") =~ s|::|/|g;
+  require $st_file;
+
+  my $hybrid = "DBIO::Test::Storage::_hybrid_::${storage_class}";
+  if (!$hybrid->isa('DBIO::Test::Storage')) {
+    no strict 'refs';
+    @{"${hybrid}::ISA"} = ('DBIO::Test::Storage', $storage_class);
+    mro::set_mro($hybrid, 'c3');
+    for my $attr (qw(sql_limit_dialect sql_quote_char sql_name_sep)) {
+      my $val = $storage_class->$attr;
+      $hybrid->$attr($val) if defined $val;
+    }
+    $hybrid->datetime_parser_type('DBIO::Test::DateTimeParser');
+  }
+
+  return $hybrid;
+}
+
+sub _uses_fake_storage {
+  my ($class, $schema) = @_;
+  my $storage = $schema->storage or return 0;
+
+  return 1 if $storage->isa('DBIO::Test::Storage');
+
+  return (
+    $storage->isa('DBIO::Replicated::Storage')
+      && $storage->master
+      && $storage->master->storage
+      && $storage->master->storage->isa('DBIO::Test::Storage')
+  ) ? 1 : 0;
 }
 
 1;

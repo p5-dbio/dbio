@@ -17,7 +17,7 @@ use SQL::Abstract::Util 'is_literal_value';
 ###
 BEGIN {
   *MULTICREATE_DEBUG =
-    ($ENV{DBIO_MULTICREATE_DEBUG} || $ENV{DBIC_MULTICREATE_DEBUG})
+    $ENV{DBIO_MULTICREATE_DEBUG}
       ? sub () { 1 }
       : sub () { 0 };
 }
@@ -748,7 +748,7 @@ sub get_columns {
           "Returning primary keys of prefetched 'filter' rels as part of get_columns() is deprecated and will "
         . 'eventually be removed entirely (set DBIO_COLUMNS_INCLUDE_FILTER_RELS to disable this warning)'
         ) if (
-          ! ($ENV{DBIO_COLUMNS_INCLUDE_FILTER_RELS} || $ENV{DBIC_COLUMNS_INCLUDE_FILTER_RELS})
+          ! $ENV{DBIO_COLUMNS_INCLUDE_FILTER_RELS}
             and
           defined $self->{related_resultsets}{$col}
             and
@@ -858,7 +858,7 @@ sub get_inflated_columns {
 
   my %cols_to_return = ( %{$self->{_column_data}}, %$loaded_colinfo );
 
-  unless ($ENV{DBIO_COLUMNS_INCLUDE_FILTER_RELS} || $ENV{DBIC_COLUMNS_INCLUDE_FILTER_RELS}) {
+  unless ($ENV{DBIO_COLUMNS_INCLUDE_FILTER_RELS}) {
     for (keys %$loaded_colinfo) {
       # if cached related_resultset is present assume this was a prefetch
       if (
@@ -1538,8 +1538,7 @@ changes made since the row was last read from storage.
 $attrs, if supplied, is expected to be a hashref of attributes suitable for passing as the
 second argument to C<< $resultset->search($cond, $attrs) >>;
 
-Note: If you are using L<DBIO::Storage::DBI::Replicated> (from the
-DBIO-Replicated distribution) as your storage, a default of
+Note: If you are using L<DBIO::Replicated::Storage> as your storage, a default of
 C<< { force_pool => 'master' } >> is automatically set for
 you. Prior to C<< DBIO 0.08109 >> (before 2010) one would have been
 required to explicitly wrap the entire operation in a transaction to guarantee
