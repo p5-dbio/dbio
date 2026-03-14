@@ -36,6 +36,43 @@ my @reader_methods = qw(
   select select_single columns_info_for _dbh_columns_info_for _select
 );
 
+=head1 SYNOPSIS
+
+  my $schema = MyApp::Schema->connect($master_dsn, $user, $pass, {
+    storage_type  => '+DBIO::Replicated::Storage',
+    balancer_type => 'DBIO::Replicated::Balancer::First',
+  });
+
+  $schema->storage->connect_replicants(
+    [ $replica_dsn_1, $user, $pass ],
+    [ $replica_dsn_2, $user, $pass ],
+  );
+
+  # Temporarily force reads to the master
+  $schema->storage->execute_reliably(sub {
+    my $artist = $schema->resultset('Artist')->find(1);
+    ...
+  });
+
+=head1 DESCRIPTION
+
+L<DBIO::Replicated::Storage> coordinates one master backend plus zero or more
+replicant backends.
+
+The master backend handles write-oriented work such as inserts, updates,
+deletes, transactions, deploy operations, and connection-time setup.
+Read-oriented methods are delegated to the current read handler, which is a
+balancer by default.
+
+Replicants are managed through L<DBIO::Replicated::Pool>. The pool can use
+replication hooks such as C<is_replicating> and C<lag_behind_master> when the
+underlying driver storage provides them.
+
+The replicated layer consumes a small set of connect-info options for itself:
+C<pool_type>, C<pool_args>, C<balancer_type>, C<balancer_args>, and
+C<backend_storage_class>. All remaining connect attributes are passed through
+to the master backend.
+
 sub new {
   my ($class, $schema, $args) = @_;
   $args ||= {};
@@ -218,11 +255,53 @@ sub connect_info {
   return $rv;
 }
 
+=method connect_info
+
+Accepts the normal DBI connect-info arrayref used for the master connection.
+
+Replicated-specific options can be supplied in connect-info hashrefs:
+
+=over 4
+
+=item *
+
+C<pool_type> / C<pool_args>
+
+=item *
+
+C<balancer_type> / C<balancer_args>
+
+=item *
+
+C<backend_storage_class>
+
+=back
+
+These options are consumed by the replicated layer. Remaining DBI attributes
+are passed through to the master backend and are also used as defaults when
+replicant connect info is merged later.
+
+=cut
+
 sub connect_replicants {
   my ($self, @replicants) = @_;
   my @merged = map { $self->_merge_replicant_connect_info($_) } @replicants;
   return $self->pool->connect_replicants($self->schema, @merged);
 }
+
+=method connect_replicants
+
+  $storage->connect_replicants(
+    [ $dsn_1, $user, $pass ],
+    [ $dsn_2, $user, $pass, { RaiseError => 1 } ],
+  );
+
+Connects one or more replicant backends and adds them to the pool.
+
+Any connect attributes captured from the master connection are merged into each
+replicant connect-info hashref unless explicitly overridden.
+
+=cut
 
 sub replicants {
   my $self = shift;
@@ -248,15 +327,37 @@ sub execute_reliably {
   return $coderef->(@args);
 }
 
+=method execute_reliably
+
+  $storage->execute_reliably(sub { ... });
+
+Temporarily forces reads to use the master backend while the supplied coderef
+runs.
+
+=cut
+
 sub set_reliable_storage {
   my $self = shift;
   $self->read_handler($self->write_handler);
 }
 
+=method set_reliable_storage
+
+Persistently switches the current read handler to the master backend.
+
+=cut
+
 sub set_balanced_storage {
   my $self = shift;
   $self->read_handler($self->balancer);
 }
+
+=method set_balanced_storage
+
+Restores the balancer as the current read handler after
+L</set_reliable_storage>.
+
+=cut
 
 sub connected {
   my $self = shift;

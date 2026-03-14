@@ -1405,7 +1405,7 @@ retry if the server goes away mid-operations, unlike C<txn_do>.
 L<DBIO::Schema::Loader> will connect to a database and create a
 L<DBIO::Schema> and associated sources by examining the database.
 
-The recommend way of achieving this is to use the L<dbicdump> utility or the
+The recommend way of achieving this is to use the L<dbiodump> utility or the
 L<Catalyst> helper, as described in
 L<Manual::Intro|DBIO::Manual::Intro/Using DBIO::Schema::Loader>.
 

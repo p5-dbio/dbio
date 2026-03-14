@@ -1,5 +1,5 @@
 # PODNAME: DBIO::Manual::Features
-# ABSTRACT: A boatload of DBIO features with links to respective documentation
+# ABSTRACT: DBIO features with links to the relevant documentation
 =head1 META
 
 =head2 Large Community
@@ -10,10 +10,9 @@ features, to entire database support.
 
 =head2 Active Community
 
-Currently (June 9, 2010) 6 active branches (committed to
-in the last two weeks) in git.  Last release (0.08122)
-had 14 new features, and 16 bug fixes.  Of course that
-L<ebbs and flows|https://metacpan.org/changes/distribution/DBIO>.)
+Development activity changes over time, but DBIO continues to evolve across
+core and driver distributions. For recent releases and changelog history, see
+L<https://metacpan.org/changes/distribution/DBIO>.
 
 =head2 Responsive Community
 
@@ -243,7 +242,7 @@ Create a DBIO schema from your database.
 
  __PACKAGE__->loader_options({
     naming => 'v7',
-    debug  => $ENV{DBIC_TRACE},
+    debug  => $ENV{DBIO_TRACE},
  });
 
  1;

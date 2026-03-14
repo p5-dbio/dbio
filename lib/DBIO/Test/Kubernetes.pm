@@ -8,10 +8,6 @@ use File::Spec;
 use POSIX qw(WNOHANG);
 use namespace::clean;
 
-=head1 NAME
-
-DBIO::Test::Kubernetes - Provision temporary database pods in Kubernetes for DBIO testing
-
 =head1 SYNOPSIS
 
     my $k8s = DBIO::Test::Kubernetes->new(
@@ -30,6 +26,12 @@ DBIO::Test::Kubernetes - Provision temporary database pods in Kubernetes for DBI
     system('prove', '-l', 't/');
 
     $k8s->cleanup;
+
+=head1 DESCRIPTION
+
+L<DBIO::Test::Kubernetes> provisions temporary PostgreSQL and MySQL test
+databases inside Kubernetes and exposes the corresponding DBIO test
+environment variables for local or in-cluster test runs.
 
 =cut
 
@@ -78,7 +80,7 @@ sub kubeconfig { $_[0]->{kubeconfig} }
 sub _generate_namespace {
     my @chars = ('a'..'z', '0'..'9');
     my $suffix = join '', map { $chars[rand @chars] } 1..8;
-    return "dbic-test-$suffix";
+    return "dbio-test-$suffix";
 }
 
 # ============================================================================
@@ -93,10 +95,10 @@ my %DB_SPECS = (
         svc_name   => 'pg-svc',
         env        => [
             { name => 'POSTGRES_PASSWORD', value => 'dbictest' },
-            { name => 'POSTGRES_DB',       value => 'dbic_test' },
+            { name => 'POSTGRES_DB',       value => 'dbio_test' },
         ],
         readiness_cmd => [qw(pg_isready -U postgres)],
-        dsn_template  => 'dbi:Pg:database=dbic_test;host=%s;port=%s',
+        dsn_template  => 'dbi:Pg:database=dbio_test;host=%s;port=%s',
         user          => 'postgres',
         pass          => 'dbictest',
         env_prefix    => 'DBIO_TEST_PG',
@@ -108,12 +110,12 @@ my %DB_SPECS = (
         svc_name   => 'mysql-svc',
         env        => [
             { name => 'MYSQL_ROOT_PASSWORD', value => 'dbictest' },
-            { name => 'MYSQL_DATABASE',      value => 'dbic_test' },
+            { name => 'MYSQL_DATABASE',      value => 'dbio_test' },
         ],
         readiness_cmd => [qw(mysqladmin ping -h localhost)],
         dsn_template  => ( eval { require DBD::MariaDB; 1 }
-            ? 'dbi:MariaDB:database=dbic_test;host=%s;port=%s'
-            : 'dbi:mysql:database=dbic_test;host=%s;port=%s'
+            ? 'dbi:MariaDB:database=dbio_test;host=%s;port=%s'
+            : 'dbi:mysql:database=dbio_test;host=%s;port=%s'
         ),
         user          => 'root',
         pass          => 'dbictest',
@@ -160,7 +162,7 @@ sub _deploy_db {
         metadata => {
             name      => $spec->{name},
             namespace => $ns,
-            labels    => { app => $spec->{name}, role => 'dbic-test-db' },
+            labels    => { app => $spec->{name}, role => 'dbio-test-db' },
         },
         spec => {
             containers => [{
@@ -372,7 +374,7 @@ sub deploy_test_job {
 
     my $api   = $self->api;
     my $ns    = $self->namespace;
-    my $image = $opts{image} // 'dbic-test:latest';
+    my $image = $opts{image} // 'dbio-test:latest';
     my @args  = @{$opts{prove_args} // ['-l', 't/']};
 
     # Build env vars for in-cluster mode
@@ -385,7 +387,7 @@ sub deploy_test_job {
 
     my $job = $api->new_object(Job =>
         metadata => {
-            name      => 'dbic-test-runner',
+            name      => 'dbio-test-runner',
             namespace => $ns,
         },
         spec => {
@@ -406,13 +408,13 @@ sub deploy_test_job {
     );
     $api->create($job);
 
-    return 'dbic-test-runner';
+    return 'dbio-test-runner';
 }
 
 sub wait_for_job {
     my ($self, %opts) = @_;
 
-    my $job_name = $opts{name} // 'dbic-test-runner';
+    my $job_name = $opts{name} // 'dbio-test-runner';
     my $timeout  = $opts{timeout} // 3600;
     my $interval = $opts{interval} // 5;
 
@@ -449,7 +451,7 @@ sub wait_for_job {
 sub fetch_job_logs {
     my ($self, %opts) = @_;
 
-    my $job_name = $opts{name} // 'dbic-test-runner';
+    my $job_name = $opts{name} // 'dbio-test-runner';
     my $api = $self->api;
     my $ns  = $self->namespace;
 

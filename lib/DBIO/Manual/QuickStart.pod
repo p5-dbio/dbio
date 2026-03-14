@@ -1,5 +1,5 @@
 # PODNAME: DBIO::Manual::QuickStart
-# ABSTRACT: up and running with DBIO in 10 minutes
+# ABSTRACT: Up and running with DBIO in 10 minutes
 =head1 DESCRIPTION
 
 This document shows the minimum amount of code to make you a productive DBIO
@@ -36,7 +36,7 @@ C<MyApp::Schema> class is the entry point for loading the other classes and
 interacting with the database through DBIO and the C<Result> classes correspond
 to the tables in the database. L<DBIO::Manual::Example> shows how to
 write all that Perl code. That is almost never necessary, though. Instead use
-L<dbicdump> (part of the distribution L<DBIO::Schema::Loader>) to
+L<dbiodump> (part of the distribution L<DBIO::Schema::Loader>) to
 automatically create schema classes files from an existing database. The
 chapter L</"Resetting the database"> below shows an example invocation.
 
@@ -176,7 +176,7 @@ From a detail to the root:
     DBIO/examples/Schema$ rm -rf MyApp
 
     # recreate schema classes files from database file
-    DBIO/examples/Schema$ dbicdump \
+    DBIO/examples/Schema$ dbiodump \
         -o dump_directory=. MyApp::Schema dbi:SQLite:db/example.db
 
 =head2 Where to go next
@@ -188,5 +188,5 @@ database.
 If you want to transfer your existing SQL knowledge, read
 L<DBIO::Manual::SQLHackers>.
 
-Continue with L<DBIO::Tutorial> and
+Continue with L<DBIO::Manual::Intro> and
 L<DBIO/"WHERE TO START READING">.

@@ -32,10 +32,6 @@ __PACKAGE__->_loader_args({});
 
 =encoding UTF-8
 
-=head1 NAME
-
-DBIO::Loader - Create a DBIO::Schema based on a database
-
 =head1 SYNOPSIS
 
     ### use this module to generate a set of class files
@@ -623,98 +619,9 @@ See L<DBIO::Loader::Base/db_schema>.
 Matt S Trout, all of the #dbio folks, and everyone who's ever sent
 in a bug report or suggestion.
 
-Based on L<DBIO::Loader> by Sebastian Riedel
-
-Based upon the work of IKEBE Tomohiro
-
-=head1 AUTHORS
-
-Caelum: Rafael Kitover <rkitover@cpan.org>
-
-Dag-Erling Smørgrav <des@des.no>
-
-Matias E. Fernandez <mfernandez@pisco.ch>
-
-SineSwiper: Brendan Byrd <byrd.b@insightcom.com>
-
-TSUNODA Kazuya <drk@drk7.jp>
-
-acmoore: Andrew Moore <amoore@cpan.org>
-
-alnewkirk: Al Newkirk <awncorp@cpan.org>
-
-andrewalker: André Walker <andre@andrewalker.net>
-
-angelixd: Paul C. Mantz <pcmantz@cpan.org>
-
-arc: Aaron Crane <arc@cpan.org>
-
-arcanez: Justin Hunter <justin.d.hunter@gmail.com>
-
-ash: Ash Berlin <ash@cpan.org>
-
-blblack: Brandon Black <blblack@gmail.com>
-
-bphillips: Brian Phillips <bphillips@cpan.org>
-
-btilly: Ben Tilly <btilly@gmail.com>
-
-domm: Thomas Klausner <domm@plix.at>
-
-ether: Karen Etheridge <ether@cpan.org>
-
-gugu: Andrey Kostenko <a.kostenko@rambler-co.ru>
-
-hobbs: Andrew Rodland <arodland@cpan.org>
-
-ilmari: Dagfinn Ilmari MannsE<aring>ker <ilmari@ilmari.org>
-
-jhannah: Jay Hannah <jay@jays.net>
-
-jnap: John Napiorkowski <jjn1056@yahoo.com>
-
-kane: Jos Boumans <kane@cpan.org>
-
-mattp: Matt Phillips <mattp@cpan.org>
-
-mephinet: Philipp Gortan <philipp.gortan@apa.at>
-
-moritz: Moritz Lenz <moritz@faui2k3.org>
-
-mst: Matt S. Trout <mst@shadowcatsystems.co.uk>
-
-mstratman: Mark A. Stratman <stratman@gmail.com>
-
-oalders: Olaf Alders <olaf@wundersolutions.com>
-
-rbo: Robert Bohne <rbo@cpan.org>
-
-rbuels: Robert Buels <rbuels@gmail.com>
-
-ribasushi: Peter Rabbitson <ribasushi@cpan.org>
-
-schwern: Michael G. Schwern <mschwern@cpan.org>
-
-spb: Stephen Bennett <spb@exherbo.org>
-
-timbunce: Tim Bunce <timb@cpan.org>
-
-waawaamilk: Nigel McNie <nigel@mcnie.name>
-
-... and lots of other folks. If we forgot you, please open a
-GitHub issue or join C<#dbio> on C<irc.perl.org>.
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright (c) 2006 - 2015 by the aforementioned
-L<DBIO::Loader/AUTHORS>.
-
-This library is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
-
 =head1 SEE ALSO
 
-L<DBIO>, L<DBIO::Manual::Intro>, L<DBIO::Tutorial>,
+L<DBIO>, L<DBIO::Manual::Intro>, L<DBIO::Manual::QuickStart>,
 L<DBIO::Loader::Base>
 
 =cut

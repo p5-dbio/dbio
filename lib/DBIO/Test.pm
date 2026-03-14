@@ -18,6 +18,9 @@ database connection you supply.
 External driver distributions (e.g. L<DBIO::PostgreSQL>, L<DBIO::MySQL>)
 should depend on this module for their test suites.
 
+The same shared harness can also wrap a backend in
+L<DBIO::Replicated::Storage> via C<replicated =E<gt> 1>.
+
 =head1 API CONTRACT
 
 Anything under C<DBIO::Test::*> is intended to be reusable test support for

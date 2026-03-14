@@ -191,16 +191,16 @@ This module (L<DBIO::Schema::Loader>) is an external module, and not part
 of the L<DBIO> distribution. It inspects your database, and automatically
 creates classes for all the tables in your schema.
 
-The simplest way to use it is via the L<dbicdump> script from the
+The simplest way to use it is via the L<dbiodump> script from the
 L<DBIO::Schema::Loader> distribution. For example:
 
-    $ dbicdump -o dump_directory=./lib \
+    $ dbiodump -o dump_directory=./lib \
         -o components='["InflateColumn::DateTime"]' \
         MyApp::Schema dbi:mysql:mydb user pass
 
 If you have a mixed-case database, use the C<preserve_case> option, e.g.:
 
-    $ dbicdump -o dump_directory=./lib -o preserve_case=1 \
+    $ dbiodump -o dump_directory=./lib -o preserve_case=1 \
         -o components='["InflateColumn::DateTime"]' \
         MyApp::Schema dbi:mysql:mydb user pass
 

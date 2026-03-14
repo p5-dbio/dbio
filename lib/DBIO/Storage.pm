@@ -511,7 +511,7 @@ sub sql_maker { die "Virtual method!" }
 Causes trace information to be emitted on the L</debugobj> object.
 (or C<STDERR> if L</debugobj> has not specifically been set).
 
-This is the equivalent to setting L</DBIC_TRACE> in your
+This is the equivalent to setting C<DBIO_TRACE> in your
 shell environment.
 
 =head2 debugfh

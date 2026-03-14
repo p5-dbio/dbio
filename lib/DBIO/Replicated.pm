@@ -16,12 +16,21 @@ use base 'DBIO';
     balancer_type => 'DBIO::Replicated::Balancer::First',
   });
 
+  $schema->storage->connect_replicants(
+    [ $replica_dsn_1, $user, $pass ],
+    [ $replica_dsn_2, $user, $pass ],
+  );
+
 =head1 DESCRIPTION
 
 L<DBIO::Replicated> is the DBIO core component for replicated storage
 setups. It configures the schema to use L<DBIO::Replicated::Storage>,
 which then coordinates a master backend plus optional replicant
 backends.
+
+Writes, transactions, deploy operations, and other master-only work go
+through the master backend. Read-oriented operations are delegated to the
+configured balancer, which selects from the active replicants.
 
 For shared test suites, L<DBIO::Test> can wrap a requested backend
 storage in replicated mode with:

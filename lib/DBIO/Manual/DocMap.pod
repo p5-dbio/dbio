@@ -44,6 +44,19 @@ distributions. Install the driver distribution that matches your backend:
 Additional DBIO driver distributions exist for other databases; some are still
 in migration from the historical monolithic test setup.
 
+=head1 Core capabilities
+
+Some DBIO features are part of the core distribution rather than separate
+driver distributions:
+
+=over 4
+
+=item L<DBIO::Replicated> - Replicated storage support in DBIO core.
+
+=item L<DBIO::Test> - Shared test harness for DBIO and driver distributions.
+
+=back
+
 =head1 Some essential reference documentation
 
 The first two list items are the most important.

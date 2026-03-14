@@ -549,7 +549,7 @@ See also L<DBIO::Relationship/has_many>.
 
 =item See the SQL statements my code is producing?
 
-Set the shell environment variable C<DBIC_TRACE> to a true value.
+Set the shell environment variable C<DBIO_TRACE> to a true value.
 
 For more info see L<DBIO::Storage> for details of how
 to turn on debugging in the environment, pass your own filehandle to
