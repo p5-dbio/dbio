@@ -74,6 +74,7 @@ our @EXPORT_OK = qw(
   scope_guard is_exception detected_reinvoked_destructor emit_loud_diag
   quote_sub qsub perlstring serialize dump_value
   UNRESOLVABLE_CONDITION
+  dir_path file_path parent_dir slurp_file mkpath rmtree
 );
 
 use constant UNRESOLVABLE_CONDITION => \ '1 = 0';
@@ -386,6 +387,33 @@ sub modver_gt_or_eq_and_lt ($$$) {
     $mark;
   }
 }
+
+# --- Path helpers (replace Path::Class with core modules) ---
+
+require File::Spec;
+require File::Basename;
+
+sub dir_path  { File::Spec->catdir(@_) }
+sub file_path { File::Spec->catfile(@_) }
+sub parent_dir { File::Basename::dirname($_[0]) }
+
+sub slurp_file {
+  open my $fh, '<', $_[0] or croak "Cannot read $_[0]: $!";
+  local $/;
+  <$fh>;
+}
+
+sub mkpath {
+  require File::Path;
+  File::Path::mkpath([@_]);
+}
+
+sub rmtree {
+  require File::Path;
+  File::Path::rmtree([@_]);
+}
+
+# --- End path helpers ---
 
 sub fail_on_internal_call {
   my ($fr, $argdesc);
