@@ -1,6 +1,8 @@
 # DBIO
 
-Extensible and flexible object <-> relational mapper. Fork of DBIx::Class.
+DBI Objects — Relational mapping. Joins itself. Fully native. Everything included.
+
+A modern fork of [DBIx::Class](https://metacpan.org/pod/DBIx::Class).
 
 ## Key Differences from DBIx::Class
 
@@ -22,7 +24,7 @@ Extensible and flexible object <-> relational mapper. Fork of DBIx::Class.
 
 Three ways to define the same result class:
 
-### Classic (verbose, full control)
+### Vanilla (verbose, full control)
 
 ```perl
 package MyApp::Schema::Result::Artist;

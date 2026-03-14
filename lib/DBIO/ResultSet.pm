@@ -4912,10 +4912,21 @@ Indicates additional inflation names for selectors added via L</+select>. See L<
 
 =back
 
-Contains a list of relationships that should be joined for this query.  For
-example:
+Contains a list of relationships that should be joined for this query.
 
-  # Get CDs by Nine Inch Nails
+B<Note:> In most cases you do not need to specify C<join> explicitly. DBIO
+automatically discovers required joins from dotted column names in your
+search conditions. For example, C<< 'artist.name' => 'Nine Inch Nails' >>
+will automatically add the C<artist> join. You only need explicit C<join>
+when referencing relationships in C<select>, C<order_by>, or other
+attributes that are not part of the WHERE/HAVING conditions.
+
+  # Automatic — join is discovered from the condition:
+  my $rs = $schema->resultset('CD')->search(
+    { 'artist.name' => 'Nine Inch Nails' }
+  );
+
+  # Equivalent explicit form (still supported):
   my $rs = $schema->resultset('CD')->search(
     { 'artist.name' => 'Nine Inch Nails' },
     { join => 'artist' }

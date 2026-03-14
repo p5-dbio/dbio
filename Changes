@@ -1,4 +1,18 @@
-Revision history for DBIO
+Revision history for DBIO (DBI Objects)
+
+    * Naming and Branding
+        - DBIO officially stands for "DBI Objects"
+        - Motto: "Relational mapping. Joins itself. Fully native. Everything included."
+        - Update ABSTRACT, README, and DESCRIPTION across all documentation
+
+    * Auto-Discover Joins
+        - Search conditions referencing relationships via dotted notation
+          (e.g. 'artist.name') now automatically add the required join
+        - No explicit { join => 'artist' } needed for WHERE/HAVING conditions
+        - Supports nested relationship chains, multiple simultaneous auto-joins,
+          and coexists with explicit join/prefetch attributes
+        - Add t/search/auto_join.t test coverage
+        - Document auto-join feature in ResultSet.pm and DBIO.pm SYNOPSIS
 
     * Candy / Cake Enhancements
         - DBIO::Candy: fix namespace::clean ordering (must come after imports)

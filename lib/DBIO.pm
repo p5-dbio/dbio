@@ -1,5 +1,5 @@
 package DBIO;
-# ABSTRACT: Extensible and flexible object <-> relational mapper.
+# ABSTRACT: DBI Objects — Relational mapping. Joins itself. Fully native. Everything included.
 
 use strict;
 use warnings;
@@ -133,7 +133,7 @@ list is sorted by "fastest response time"):
 For the very impatient: L<DBIO::Manual::QuickStart>
 
 This code in the next step can be generated automatically from an existing
-database, see L<dbiodump> from the distribution C<DBIO-Schema-Loader>.
+database, see L<dbiodump> (included with DBIO via L<DBIO::Loader>).
 
 =head2 Schema classes preparation
 
@@ -236,6 +236,11 @@ Then you can use these classes in your application's code:
   # Execute a joined query to get the cds.
   my @all_john_cds = $johns_rs->search_related('cds')->all;
 
+  # Joins are automatic — just reference the relationship in conditions:
+  my @rock_cds = $schema->resultset('CD')->search(
+    { 'artist.name' => 'John Doe' }  # join added automatically
+  )->all;
+
   # Fetch the next available row.
   my $first_john = $johns_rs->next;
 
@@ -269,16 +274,22 @@ Then you can use these classes in your application's code:
 
 =head1 DESCRIPTION
 
-This is an SQL to OO mapper with an object API inspired by L<Class::DBI>
-and a resultset API that allows abstract encapsulation of database operations.
-DBIO includes L<DBIO::Candy> (sugar syntax, based on L<DBIx::Class::Candy>)
-and L<DBIO::Cake> (DDL-like DSL, based on L<DBIx::Class::ResultDDL>)
-for concise result class definitions. It aims to make
-representing queries in your code as perl-ish as possible while still
-providing access to as many of the capabilities of the database as possible,
-including retrieving related records from multiple tables in a single query,
-C<JOIN>, C<LEFT JOIN>, C<COUNT>, C<DISTINCT>, C<GROUP BY>, C<ORDER BY> and
-C<HAVING> support.
+DBIO (DBI Objects) is an SQL to OO mapper with an object API inspired by
+L<Class::DBI> and a resultset API that allows abstract encapsulation of
+database operations. It aims to make representing queries in your code as
+perl-ish as possible while fully embracing the native capabilities of each
+database.
+
+DBIO automatically discovers joins from search conditions — when you
+reference a relationship in a condition (e.g. C<< 'artist.name' => 'Fred' >>),
+the required join is added without needing an explicit C<< join => >> attribute.
+
+Three styles are available for defining result classes:
+L<DBIO::Cake> (DDL-like DSL), L<DBIO::Candy> (import sugar), and the
+classic Vanilla style (C<< use base 'DBIO::Core' >>). Database-specific
+features are provided by fully native driver distributions
+(L<DBIO-PostgreSQL|DBIO::PostgreSQL>, L<DBIO-MySQL|DBIO::MySQL>,
+L<DBIO-SQLite|DBIO::SQLite>, etc.) that speak each database's dialect.
 
 DBIO can handle multi-column primary and foreign keys, complex
 queries and database-level paging, and does its best to only query the
