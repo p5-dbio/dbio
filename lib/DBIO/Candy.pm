@@ -323,21 +323,91 @@ __END__
 
  table 'artists';
 
- column id => {
-     data_type => 'int',
+ primary_column id => {
+     data_type => 'integer',
      is_auto_increment => 1,
  };
-
- primary_key 'id';
 
  column name => {
      data_type => 'varchar',
      size => 100,
  };
 
- unique_constraint [qw(name)];
+ column bio => {
+     data_type => 'text',
+     is_nullable => 1,
+ };
 
+ column created_at => {
+     data_type => 'timestamp',
+     set_on_create => 1,
+ };
+
+ column updated_at => {
+     data_type => 'timestamp',
+     set_on_create => 1,
+     set_on_update => 1,
+ };
+
+ unique_constraint [qw(name)];
  has_many cds => 'MyApp::Schema::Result::CD', 'artist_id';
+
+ 1;
+
+PostgreSQL-specific example:
+
+ package MyApp::Schema::Result::User;
+ use DBIO::Candy -components => ['InflateColumn::DateTime'];
+
+ table 'users';
+
+ primary_column id => {
+     data_type => 'uuid',
+     retrieve_on_insert => 1,
+ };
+
+ column name => {
+     data_type => 'varchar',
+     size => 100,
+ };
+
+ column role => {
+     data_type => 'enum',
+     extra => { list => [qw( admin moderator user guest )] },
+     is_nullable => 1,
+ };
+
+ column metadata => {
+     data_type => 'jsonb',
+     default_value => '{}',
+     serializer_class => 'JSON',
+ };
+
+ column embedding => {
+     data_type => 'vector',
+     size => 1536,
+ };
+
+ column tags => {
+     data_type => 'text[]',
+     is_nullable => 1,
+ };
+
+ column created_at => {
+     data_type => 'timestamp',
+     set_on_create => 1,
+ };
+
+ column updated_at => {
+     data_type => 'timestamp',
+     set_on_create => 1,
+     set_on_update => 1,
+ };
+
+ column deleted_at => {
+     data_type => 'timestamp',
+     is_nullable => 1,
+ };
 
  1;
 
