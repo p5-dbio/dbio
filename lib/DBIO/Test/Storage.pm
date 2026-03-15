@@ -11,9 +11,9 @@ use DBIO::Storage::Statistics;
 
 =head1 DESCRIPTION
 
-A storage backend that generates SQL via L<DBIO::SQLMaker> but never
-executes it against a real database.  Every query is captured and can
-be inspected through L</captured_queries>.
+A storage backend that generates SQL via L<DBIO::SQLMaker> but never executes
+it against a real database. Every query is captured and can be inspected
+through L</captured_queries>.
 
 This is useful for:
 
@@ -45,7 +45,7 @@ Any test that only cares about I<what> SQL would be generated
   # .as_query works without a database
   my ($sql, @bind) = @{ ${$rs->as_query} };
 
-  # or execute and capture
+  # or execute and inspect the captured query log
   my $storage = $schema->storage;
   $storage->reset_captured;
   $rs->all;  # generates SQL, returns empty results

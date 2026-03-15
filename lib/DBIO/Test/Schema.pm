@@ -13,6 +13,8 @@ A test schema with a standard set of Result classes (Artist, CD, Track,
 etc.) used across the DBIO test suite and by driver distributions.
 
 All Result classes live under C<DBIO::Test::Schema::*>.
+Treat it as the shared schema fixture for offline SQL tests, driver checks,
+and cross-repo regression coverage.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package DBIO::Compat::DBIxClass;
-# ABSTRACT: Compatibility layer to use DBIx::Class plugins with DBIO
+# ABSTRACT: Runtime compatibility layer for DBIx::Class names on DBIO
 
 use strict;
 use warnings;
@@ -165,29 +165,30 @@ sub _dbic_inc_hook {
 
   use DBIO::Compat::DBIxClass;
 
-  # Now any DBIx::Class plugin works transparently:
+  # DBIx::Class-oriented plugins can now target the DBIO process:
   use DBIx::Class::ResultDDL qw/ -V2 /;
 
 =head1 DESCRIPTION
 
-This module installs an C<@INC> hook that intercepts any attempt to load
-a C<DBIx::Class::*> module and transparently redirects it to the
-corresponding C<DBIO::*> module. The C<DBIx::Class::*> package inherits
-from the C<DBIO::*> package via C<@ISA>, so method calls and C<can()>
-work correctly.
+This module lets DBIx::Class-oriented extensions run in a DBIO process without
+shipping parallel compatibility files on disk.
 
-Additionally, any time a C<DBIx::Class::*> module is requested, all
-already-loaded C<DBIO::*> modules are automatically aliased to their
-C<DBIx::Class::*> counterparts. This ensures that code referencing
-C<DBIx::Class::Core> works even when the class was set up directly
-through C<DBIO::Core>.
+It installs an C<@INC> hook that maps C<DBIx::Class::*> requests to the
+corresponding C<DBIO::*> modules, then creates runtime alias packages so the
+DBIx::Class names inherit from the DBIO implementations. That keeps
+C<require>, method dispatch, and C<can()> aligned with the loaded DBIO code.
 
-C<isa()> on all DBIO classes is patched so that
-C<< $obj->isa('DBIx::Class::Foo') >> returns true when the object
-C<isa('DBIO::Foo')>.
+Whenever a C<DBIx::Class::*> module is requested, already-loaded C<DBIO::*>
+packages are also synchronized to their DBIx::Class aliases. This covers code
+that reaches for names such as C<DBIx::Class::Core> even though the schema or
+result classes were built directly on C<DBIO::Core>.
 
-No files are created on disk — the compatibility stubs are generated
-purely at runtime and will not be indexed by PAUSE.
+DBIO's C<isa()> handling is patched as well, so
+C<< $obj->isa('DBIx::Class::Foo') >> stays true whenever the object is really a
+C<DBIO::Foo>.
+
+No files are written to disk. The compatibility layer exists entirely at
+runtime and does not create PAUSE-indexed shadow modules.
 
 
 1;

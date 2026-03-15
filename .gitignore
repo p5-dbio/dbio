@@ -21,9 +21,6 @@ maint/.Generated_Pod
 examples/Schema/db
 cover_db/
 
-# Claude Code (managed by dbio-dev workspace)
-
-
 # Claude Code - commit: skills/, agents/, hooks/, settings.json
 # Ignore: local overrides, credentials, session data
 !/.claude/

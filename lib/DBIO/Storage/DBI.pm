@@ -175,9 +175,15 @@ EOC
 
 =head1 DESCRIPTION
 
-This class represents the connection to an RDBMS via L<DBI>.  See
-L<DBIO::Storage> for general information.  This pod only
-documents DBI-specific methods and behaviors.
+This is DBIO's common storage backend for L<DBI>-based databases. It owns the
+live database handle, transaction state, SQL maker integration, and the driver
+detection path that later reblesses into database-specific storage subclasses
+such as L<DBIO::PostgreSQL::Storage>, L<DBIO::MySQL::Storage>, or
+L<DBIO::SQLite::Storage>.
+
+See L<DBIO::Storage> for the storage API shared across all backends. This POD
+focuses on the DBI-specific layer, including connection handling, capability
+checks, and the hooks that driver subclasses build on.
 
 =head1 METHODS
 
