@@ -1,5 +1,5 @@
 package DBIO::Relationship;
-# ABSTRACT: Inter-table relationships
+# ABSTRACT: Relationship declaration helpers for DBIO result classes
 
 use strict;
 use warnings;
@@ -40,47 +40,47 @@ See L<DBIO::Manual::Cookbook> for more.
 
 =head1 DESCRIPTION
 
-The word I<Relationship> has a specific meaning in DBIO, see
-the definition in the L<Glossary|DBIO::Manual::Glossary/Relationship>.
+The word I<Relationship> has a specific meaning in DBIO; see
+L<DBIO::Manual::Glossary/Relationship> for the formal definition.
 
-This class provides methods to set up relationships between the tables
-in your database model. Relationships are the most useful and powerful
-technique that L<DBIO> provides. To create efficient database queries,
-create relationships between any and all tables that have something in
-common, for example if you have a table Authors:
+This module provides the declaration helpers used in result classes:
+C<belongs_to>, C<has_many>, C<has_one>, C<might_have>, and
+C<many_to_many>. These declarations are what let DBIO traverse between
+tables, build joins automatically, and offer the various C<*_related>
+methods on rows and resultsets.
+
+Relationships are one of the most important parts of a DBIO schema. For
+example, imagine a table C<Authors>:
 
   ID  | Name | Age
  ------------------
    1  | Fred | 30
    2  | Joe  | 32
 
-and a table Books:
+and a table C<Books>:
 
   ID  | Author | Name
  --------------------
    1  |      1 | Rulers of the universe
    2  |      1 | Rulers of the galaxy
 
-Then without relationships, the method of getting all books by Fred goes like
-this:
+Without relationships, fetching all books by Fred looks like this:
 
  my $fred = $schema->resultset('Author')->find({ Name => 'Fred' });
  my $fredsbooks = $schema->resultset('Book')->search({ Author => $fred->ID });
 
-With a has_many relationship called "books" on Author (see below for details),
-we can do this instead:
+With a C<has_many> relationship called C<books> on C<Author>, you can instead
+write:
 
  my $fredsbooks = $schema->resultset('Author')->find({ Name => 'Fred' })->books;
 
-Each relationship sets up an accessor method on the
-L<Result|DBIO::Manual::Glossary/"Result"> objects that represent the items
-of your table. From L<ResultSet|DBIO::Manual::Glossary/"ResultSet"> objects,
-the relationships can be searched using the "search_related" method.
-In list context, each returns a list of Result objects for the related class,
-in scalar context, a new ResultSet representing the joined tables is
-returned. Thus, the calls can be chained to produce complex queries.
-Since the database is not actually queried until you attempt to retrieve
-the data for an actual item, no time is wasted producing them.
+Each relationship installs an accessor on
+L<result objects|DBIO::Manual::Glossary/Result>, and the corresponding
+L<DBIO::ResultSet> methods can follow the same relationship through
+C<search_related>, C<related_resultset>, joins, and prefetches. In scalar
+context you typically get a ResultSet back, which means these calls chain
+naturally into larger queries while staying lazy until data is actually
+requested.
 
  my $cheapfredbooks = $schema->resultset('Author')->find({
    Name => 'Fred',
@@ -88,19 +88,18 @@ the data for an actual item, no time is wasted producing them.
    Price => { '<=' => '5.00' },
  });
 
-will produce a query something like:
+This yields a query roughly like:
 
  SELECT * FROM Author me
  LEFT JOIN Books books ON books.author = me.id
  LEFT JOIN Prices prices ON prices.book = books.id
  WHERE prices.Price <= 5.00
 
-all without needing multiple fetches.
+all without manual join bookkeeping or multiple fetches.
 
-Only the helper methods for setting up standard relationship types
-are documented here. For the basic, lower-level methods, and a description
-of all the useful *_related methods that you get for free, see
-L<DBIO::Relationship::Base>.
+This module documents the common relationship declaration helpers. For the
+lower-level API, plus the full family of C<*_related> methods that appear as a
+result, see L<DBIO::Relationship::Base>.
 
 =head1 METHODS
 

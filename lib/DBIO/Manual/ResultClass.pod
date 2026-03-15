@@ -32,16 +32,13 @@
 
 =head1 DESCRIPTION
 
-In L<DBIO>, a user normally receives query results as instances of a
-certain C<Result Class>, depending on the main query source.  Besides being
-the primary "toolset" for interaction with your data, a C<Result Class> also
-serves to establish source metadata, which is then used during initialization
-of your L<DBIO::Schema> instance.
+In DBIO, query results normally arrive as instances of a specific
+C<Result Class> determined by the main query source. A result class is both the
+runtime API for rows and the place where DBIO learns the schema metadata for a
+table or view.
 
-Because of these multiple seemingly conflicting purposes, it is hard to
-aggregate the documentation of various methods available on a typical
-C<Result Class>. This document serves as a general overview of C<Result Class>
-declaration best practices, and offers an index of the available methods
-(and the Components/Roles which provide them).
+Because a result class plays both roles, its available methods come from
+several cooperating modules. This document serves as a high-level map for
+declaring result classes and for finding the deeper API documentation.
 
 =cut

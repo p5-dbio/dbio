@@ -1,5 +1,5 @@
 package DBIO::ResultSetColumn;
-# ABSTRACT: helpful methods for messing with a single column of the resultset
+# ABSTRACT: Convenience wrapper for working with a single ResultSet column
 
 use strict;
 use warnings;
@@ -17,8 +17,9 @@ use namespace::clean;
 
 =head1 DESCRIPTION
 
-A convenience class used to perform operations on a specific column of
-a resultset.
+L<DBIO::ResultSetColumn> is the helper object returned by
+L<DBIO::ResultSet/get_column>. It lets you run column-oriented operations such
+as aggregates or value iteration without fetching full row objects.
 
 =cut
 

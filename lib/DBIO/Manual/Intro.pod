@@ -2,9 +2,9 @@
 # ABSTRACT: Introduction to DBIO
 =head1 INTRODUCTION
 
-You're bored with SQL, and want a native Perl interface for your database?  Or
-you've been doing this for a while with L<Class::DBI>, and think there's a
-better way?  You've come to the right place.
+If you want a more native Perl interface to relational data than raw C<DBI>,
+this is the right place to start. This manual explains the mental model behind
+DBIO before diving into the larger API surface.
 
 =head1 THE DBIO WAY
 
@@ -13,12 +13,11 @@ DBIO.
 
 =head2 Tables become Result classes
 
-DBIO needs to know what your Table structure looks like.  You
-do that by defining Result classes. Result classes are defined by
-calling methods proxied to L<DBIO::ResultSource>.  Each Result
-class defines one Table, which defines the Columns it has, along with
-any Relationships it has to other tables.  (And oh, so much more
-besides) The important thing to understand:
+DBIO needs to know what your tables look like. You describe them by defining
+result classes. A result class declares one table, its columns, and its
+relationships to other tables.
+
+The important simplification is:
 
   A Result class == Table
 
@@ -26,8 +25,8 @@ besides) The important thing to understand:
 
 =head2 It's all about the ResultSet
 
-So, we've got some ResultSources defined.  Now, we want to actually use those
-definitions to help us translate the queries we need into handy perl objects!
+Once the result sources exist, DBIO uses them to build query objects and turn
+database rows into Perl objects.
 
 Let's say we defined a ResultSource for an "album" table with three columns:
 "albumid", "artist", and "title".  Any time we want to query this table, we'll
@@ -39,23 +38,22 @@ results of:
 Would be retrieved by creating a ResultSet object from the album table's
 ResultSource, likely by using the "search" method.
 
-DBIO doesn't limit you to creating only simple ResultSets -- if you
-wanted to do something like:
+DBIO does not stop at simple table queries. For example:
 
   SELECT title FROM album GROUP BY title;
 
 You could easily achieve it.
 
-The important thing to understand:
+The important point is:
 
   Any time you would reach for a SQL query in DBI, you are
   creating a DBIO::ResultSet.
 
 =head2 Search is like "prepare"
 
-DBIO tends to wait until it absolutely must fetch information from the
-database.  If you are returning a ResultSet, the query won't execute until you
-use a method that wants to access the data. (Such as "next", or "first")
+DBIO stays lazy for as long as it can. If you return a ResultSet, the query
+will not run until you call a method that needs rows or aggregates, such as
+C<next> or C<first>.
 
 The important thing to understand:
 
@@ -71,10 +69,9 @@ L<Result|DBIO::Manual::ResultClass> objects.
 
 Let's look at how you can set and use your first native L<DBIO> tree.
 
-First we'll see how you can set up your classes yourself.  If you want them to
-be auto-discovered, just skip to the L<next section|/Using
-DBIO::Schema::Loader>, which shows you how to use
-L<DBIO::Schema::Loader>.
+First this manual shows the manual setup path. If you want DBIO to discover an
+existing schema automatically, jump ahead to
+L</Using DBIO::Schema::Loader>.
 
 =head2 Setting it up manually
 

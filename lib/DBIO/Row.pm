@@ -30,10 +30,11 @@ __PACKAGE__->mk_group_accessors ( simple => [ in_storage => '_in_storage' ] );
 
 =head1 DESCRIPTION
 
-This class is responsible for defining and doing basic operations on rows
-derived from L<DBIO::ResultSource> objects.
+L<DBIO::Row> implements the basic row lifecycle for DBIO result objects:
+construction, column updates, inserts, deletes, refreshes, and related-object
+handling.
 
-Result objects are returned from L<DBIO::ResultSet>s using the
+Result objects are returned from L<DBIO::ResultSet> instances using the
 L<create|DBIO::ResultSet/create>, L<find|DBIO::ResultSet/find>,
 L<next|DBIO::ResultSet/next> and L<all|DBIO::ResultSet/all> methods,
 as well as invocations of 'single' (
@@ -44,17 +45,15 @@ relationship accessors of L<Result|DBIO::Manual::ResultClass> objects.
 
 =head1 NOTE
 
-All "Row objects" derived from a Schema-attached L<DBIO::ResultSet>
-object (such as a typical C<< L<search|DBIO::ResultSet/search>->
-L<next|DBIO::ResultSet/next> >> call) are actually Result
-instances, based on your application's
+All row objects produced from a schema-attached L<DBIO::ResultSet> (for
+example via C<< search->next >>) are actually instances of your application's
 L<Result Class|DBIO::Manual::Glossary/Result Class>.
 
-L<DBIO::Row> implements most of the row-based communication with the
+L<DBIO::Row> implements most of the row-level communication with the
 underlying storage, but a Result class B<should not inherit from it directly>.
-Usually, Result classes inherit from L<DBIO::Core>, which in turn
-combines the methods from several classes, one of them being
-L<DBIO::Row>.  Therefore, while many of the methods available to a
+Result classes normally inherit from L<DBIO::Core>, which composes
+L<DBIO::Row> together with other core behavior. Therefore, while many of the
+methods available to a
 L<DBIO::Core>-derived Result class are described in the following
 documentation, it does not detail all of the methods available to Result
 objects.  Refer to L<DBIO::Manual::ResultClass> for more info.

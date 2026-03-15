@@ -29,8 +29,13 @@ sub cursor { shift->cursor_class(@_); }
 
 =head1 DESCRIPTION
 
-A base implementation of common Storage methods.  For specific
-information about L<DBI>-based storage, see L<DBIO::Storage::DBI>.
+L<DBIO::Storage> is the abstract base class for storage backends. It contains
+the generic transaction, exception, and cursor plumbing shared by concrete
+storage implementations.
+
+Most real applications use L<DBIO::Storage::DBI> or a driver-specific subclass
+such as PostgreSQL, MySQL, or SQLite storage. This module is where the common
+storage contract is defined.
 
 =head1 METHODS
 

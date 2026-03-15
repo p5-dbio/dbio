@@ -1,5 +1,5 @@
 package DBIO::Schema;
-# ABSTRACT: composable schemas
+# ABSTRACT: Schema class and connection container for DBIO applications
 
 use strict;
 use warnings;
@@ -51,12 +51,13 @@ __PACKAGE__->mk_classdata('default_resultset_attributes' => {});
 
 =head1 DESCRIPTION
 
-Creates database classes based on a schema. This is the recommended way to
-use L<DBIO> and allows you to use more than one concurrent connection
-with your classes.
+L<DBIO::Schema> is the central class for a DBIO application. It owns the
+registered result sources, mediates access to storage, and provides the usual
+entry points such as C<connect>, C<resultset>, and C<source>.
 
-NB: It's worth reading the L</SYNOPSIS> carefully. Note in particular which
-module inherits off which.
+Using a dedicated schema class is the normal way to structure a DBIO
+application, and it allows the same result classes to be used with more than
+one concurrent connection when needed.
 
 =head1 SETUP METHODS
 

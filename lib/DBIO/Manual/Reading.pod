@@ -1,14 +1,11 @@
 # PODNAME: DBIO::Manual::Reading
-# ABSTRACT: How to read and write DBIO POD.
+# ABSTRACT: Conventions for reading and writing DBIO POD
 
 =head1 DESCRIPTION
 
-This doc should help users to understand how the examples and
-documentation found in the L<DBIO> distribution can be
-interpreted.
-
-Writers of DBIO POD should also check here to make sure their
-additions are consistent with the rest of the documentation.
+This document explains how DBIO documentation is structured and how its examples
+and method signatures should be read. It is also the style guide for people
+adding or updating POD in the DBIO ecosystem.
 
 =head1 METHODS
 

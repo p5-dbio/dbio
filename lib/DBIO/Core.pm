@@ -1,5 +1,5 @@
 package DBIO::Core;
-# ABSTRACT: Core set of DBIO modules
+# ABSTRACT: Standard base class for DBIO result classes
 
 use strict;
 use warnings;
@@ -25,10 +25,14 @@ __END__
 
 =head1 DESCRIPTION
 
-This class just inherits from the various modules that make up the
-L<DBIO> core features.  You almost certainly want these.
+L<DBIO::Core> is the normal base class for vanilla DBIO result classes. It
+collects the standard row, relationship, primary-key, and table-definition
+behavior that most applications want in every result class.
 
-The core modules currently are:
+If you are not using L<DBIO::Cake> or L<DBIO::Candy>, this is usually the class
+you inherit from directly.
+
+The bundled components currently are:
 
 =over 4
 
@@ -44,7 +48,7 @@ The core modules currently are:
 
 =back
 
-A better overview of the methods found in a Result class can be found
-in L<DBIO::Manual::ResultClass>.
+For a broader tour of what a result class can do, see
+L<DBIO::Manual::ResultClass>.
 
 =cut

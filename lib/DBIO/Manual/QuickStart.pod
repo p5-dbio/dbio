@@ -3,19 +3,18 @@
 =head1 DESCRIPTION
 
 This document shows the minimum amount of code to make you a productive DBIO
-user. It requires you to be familiar with just the basics of database
+user. It assumes you are familiar with the basics of database
 programming (what database tables, rows and columns are) and the basics of
 Perl object-oriented programming (calling methods on an object instance).
-It also helps if you already know a bit of SQL and how to connect to a
+It also helps if you already know a little SQL and how to connect to a
 database through DBI.
 
-Follow along with the example database shipping with this distribution,
-see directory F<examples/Schema>. This database is also used through-out the
-rest of the documentation.
+Follow along with the example database shipped in F<examples/Schema>. The same
+example schema appears throughout the rest of the documentation.
 
 =head2 Preparation
 
-First, install DBIO like you do with any other CPAN distribution.
+First, install DBIO like any other CPAN distribution.
 See L<https://metacpan.org/pod/DBIO> and L<perlmodinstall>.
 
 Then open the distribution in your shell and change to the subdirectory
@@ -31,7 +30,7 @@ Inspect the database:
 You can also use a GUI database browser such as
 L<DBeaver|https://dbeaver.io> or L<DB Browser for SQLite|https://sqlitebrowser.org>.
 
-Have a look at the schema classes files in the subdirectory F<MyApp>. The
+Have a look at the schema class files in the subdirectory F<MyApp>. The
 C<MyApp::Schema> class is the entry point for loading the other classes and
 interacting with the database through DBIO and the C<Result> classes correspond
 to the tables in the database. L<DBIO::Manual::Example> shows how to
@@ -56,7 +55,7 @@ L<resultset|DBIO::Manual::Glossary/ResultSet> object.
 
 =head3 Adding data
 
-Via intermediate result objects:
+Using intermediate result objects:
 
     my $artist_ma = $schema->resultset('Artist')->create({
         name => 'Massive Attack',
@@ -70,7 +69,7 @@ Via intermediate result objects:
         });
     }
 
-Via relation accessors:
+Using relation accessors:
 
     $schema->resultset('Artist')->create({
         name => 'Metallica',
@@ -146,8 +145,8 @@ Removes all tracks titled I<Fuel> regardless of which CD the belong to.
 
 =head2 Introspecting the schema classes
 
-This is useful for getting a feel for the naming of things in a REPL or during
-explorative programming.
+This is useful when you want to learn the generated names in a REPL or during
+exploratory programming.
 
 From the root to the details:
 

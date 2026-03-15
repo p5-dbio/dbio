@@ -80,34 +80,33 @@ __PACKAGE__->_loader_args({});
 
 =head1 DESCRIPTION
 
-DBIO::Loader automates the definition of a
-L<DBIO::Schema> by scanning database table definitions and setting up
-the columns, primary keys, unique constraints and relationships.
+DBIO::Loader automates the definition of a L<DBIO::Schema> by inspecting a
+database and setting up columns, primary keys, unique constraints, and
+relationships.
 
 See L<dbiodump> for the C<dbiodump> utility.
 
-DBIO::Loader currently supports only the DBI storage type. The core
-Loader provides base DBI introspection and automatic driver detection.
-Driver-specific Loader classes that optimize introspection live in their
-respective DBIO driver distributions (e.g. L<DBIO::PostgreSQL::Loader>
-in L<DBIO::PostgreSQL>, L<DBIO::MySQL::Loader> in L<DBIO::MySQL>,
-L<DBIO::SQLite::Loader> in L<DBIO::SQLite>). Other DBI drivers may
-function to a greater or lesser degree with the base loader, depending
-on how much of the DBI spec they implement and how standard their
-implementation is.
+DBIO::Loader currently targets the DBI storage stack. The core loader provides
+baseline DBI introspection and automatic driver detection. Driver-specific
+loader classes live in the relevant DBIO driver distributions, for example
+L<DBIO::PostgreSQL::Loader>, L<DBIO::MySQL::Loader>, and
+L<DBIO::SQLite::Loader>.
+
+Other DBI drivers may work with the base loader to varying degrees depending
+on how closely they follow the DBI conventions that Loader relies on.
 
 This module was ported from the historical
 L<DBIx::Class::Schema::Loader>, with the namespace and surrounding DBIO
 integration updated for the DBIO ecosystem.
 
-Patches to make other DBDs work correctly welcome.
+Patches that improve unsupported DBDs are welcome.
 
 See L<DBIO::Loader::DBI::Writing> for notes on writing
 your own vendor-specific subclass for an unsupported DBD driver.
 
 This module requires L<DBIO> 0.08127 or later.
 
-See L<DBIO::Loader::Base> for available options.
+See L<DBIO::Loader::Base> for the full option reference.
 
 =head1 METHODS
 
