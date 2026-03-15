@@ -3,6 +3,7 @@ package DBIO::Cake;
 
 use strict;
 use warnings;
+use Scalar::Util ();
 
 our @EXPORT;
 our %EXPORT_TAGS;
@@ -205,210 +206,196 @@ sub col {
   $class->add_columns($name => \%info);
 }
 
-# --- Column modifiers (return key-value pairs) ---
+# --- Column modifiers (return key-value pairs, pass through @_) ---
+# The @_ passthrough enables comma-free DDL syntax:
+#   col id => integer auto_inc;
+# Perl parses this as integer(auto_inc()) — auto_inc returns its pairs,
+# which become @_ for integer, which passes them through.
 
-sub null { return (is_nullable => 1) }
-
-sub auto_inc { return (is_auto_increment => 1) }
-
-sub fk { return (is_foreign_key => 1) }
-
-sub unsigned { return ('extra.unsigned' => 1) }
+sub null     { is_nullable => 1, @_ }
+sub auto_inc { is_auto_increment => 1, @_ }
+sub fk       { is_foreign_key => 1, @_ }
+sub unsigned { 'extra.unsigned' => 1, @_ }
 
 sub default {
-  my ($val) = @_;
-  return (default_value => $val);
+  my $val = shift;
+  return (default_value => $val, @_);
 }
 
-# --- Column type functions (return key-value pairs) ---
+# --- Column type functions (return key-value pairs, pass through @_) ---
 
 # Integers
-sub integer    { return (data_type => 'integer') }
-sub tinyint    { return (data_type => 'tinyint') }
-sub smallint   { return (data_type => 'smallint') }
-sub bigint     { return (data_type => 'bigint') }
+sub integer    { data_type => 'integer', @_ }
+sub tinyint    { data_type => 'tinyint', @_ }
+sub smallint   { data_type => 'smallint', @_ }
+sub bigint     { data_type => 'bigint', @_ }
 
 # Serial (auto-increment integer shortcuts)
-sub serial      { return (data_type => 'serial', is_auto_increment => 1) }
-sub bigserial   { return (data_type => 'bigserial', is_auto_increment => 1) }
-sub smallserial { return (data_type => 'smallserial', is_auto_increment => 1) }
+sub serial      { data_type => 'serial', is_auto_increment => 1, @_ }
+sub bigserial   { data_type => 'bigserial', is_auto_increment => 1, @_ }
+sub smallserial { data_type => 'smallserial', is_auto_increment => 1, @_ }
 
 # Numeric
 sub numeric {
-  my ($precision, $scale) = @_;
-  my @r = (data_type => 'numeric');
-  push @r, (size => [$precision, $scale]) if defined $precision;
-  return @r;
+  my $precision = shift if @_ && Scalar::Util::looks_like_number($_[0]);
+  my $scale     = shift if defined $precision && @_ && Scalar::Util::looks_like_number($_[0]);
+  data_type => 'numeric',
+    (defined $precision ? (size => [defined $scale ? ($precision, $scale) : $precision]) : ()),
+    @_;
 }
 
 sub decimal {
-  my ($precision, $scale) = @_;
-  my @r = (data_type => 'decimal');
-  push @r, (size => [$precision, $scale]) if defined $precision;
-  return @r;
+  my $precision = shift if @_ && Scalar::Util::looks_like_number($_[0]);
+  my $scale     = shift if defined $precision && @_ && Scalar::Util::looks_like_number($_[0]);
+  data_type => 'decimal',
+    (defined $precision ? (size => [defined $scale ? ($precision, $scale) : $precision]) : ()),
+    @_;
 }
 
 # Floats
-sub real   { return (data_type => 'real') }
-sub float4 { return (data_type => 'real') }
-sub double { return (data_type => 'double precision') }
-sub float8 { return (data_type => 'double precision') }
+sub real   { data_type => 'real', @_ }
+sub float4 { data_type => 'real', @_ }
+sub double { data_type => 'double precision', @_ }
+sub float8 { data_type => 'double precision', @_ }
 
 sub float {
-  my ($bits) = @_;
-  my @r = (data_type => 'float');
-  push @r, (size => $bits) if defined $bits;
-  return @r;
+  my $bits = shift if @_ && Scalar::Util::looks_like_number($_[0]);
+  data_type => 'float', (defined $bits ? (size => $bits) : ()), @_;
 }
 
 # Strings
 sub char {
-  my ($size) = @_;
-  return (data_type => 'char', size => ($size || 1));
+  my $size = shift if @_ && Scalar::Util::looks_like_number($_[0]);
+  data_type => 'char', size => ($size || 1), @_;
 }
 
 sub varchar {
-  my ($size) = @_;
-  return (data_type => 'varchar', size => ($size || 255));
+  my $size = shift if @_ && Scalar::Util::looks_like_number($_[0]);
+  data_type => 'varchar', size => ($size || 255), @_;
 }
 
 # Text
-sub text       { return (data_type => 'text') }
-sub tinytext   { return (data_type => 'tinytext') }
-sub mediumtext { return (data_type => 'mediumtext') }
-sub longtext   { return (data_type => 'longtext') }
+sub text       { data_type => 'text', @_ }
+sub tinytext   { data_type => 'tinytext', @_ }
+sub mediumtext { data_type => 'mediumtext', @_ }
+sub longtext   { data_type => 'longtext', @_ }
 
 # Binary
-sub blob       { return (data_type => 'blob') }
-sub tinyblob   { return (data_type => 'tinyblob') }
-sub mediumblob { return (data_type => 'mediumblob') }
-sub longblob   { return (data_type => 'longblob') }
-sub bytea      { return (data_type => 'bytea') }
+sub blob       { data_type => 'blob', @_ }
+sub tinyblob   { data_type => 'tinyblob', @_ }
+sub mediumblob { data_type => 'mediumblob', @_ }
+sub longblob   { data_type => 'longblob', @_ }
+sub bytea      { data_type => 'bytea', @_ }
 
 # Boolean
-sub boolean { return (data_type => 'boolean') }
-sub bool    { return (data_type => 'boolean') }
+sub boolean { data_type => 'boolean', @_ }
+sub bool    { data_type => 'boolean', @_ }
 
 # Date/Time
-sub date { return (data_type => 'date') }
+sub date { data_type => 'date', @_ }
 
 sub datetime {
-  my ($tz) = @_;
-  my @r = (data_type => 'datetime');
-  push @r, (timezone => $tz) if defined $tz;
-  return @r;
+  my $tz = shift if @_ && !ref($_[0]) && $_[0] !~ /^[a-z_]+$/;
+  data_type => 'datetime', (defined $tz ? (timezone => $tz) : ()), @_;
 }
 
 sub timestamp {
-  my ($tz) = @_;
-  my @r = (data_type => 'timestamp');
-  push @r, (timezone => $tz) if defined $tz;
-  return @r;
+  my $tz = shift if @_ && !ref($_[0]) && $_[0] !~ /^[a-z_]+$/;
+  data_type => 'timestamp', (defined $tz ? (timezone => $tz) : ()), @_;
 }
 
 sub time {
-  my ($tz) = @_;
-  my @r = (data_type => 'time');
-  push @r, (timezone => $tz) if defined $tz;
-  return @r;
+  my $tz = shift if @_ && !ref($_[0]) && $_[0] !~ /^[a-z_]+$/;
+  data_type => 'time', (defined $tz ? (timezone => $tz) : ()), @_;
 }
 
-sub timetz      { return (data_type => 'time with time zone') }
-sub timestamptz { return (data_type => 'timestamp with time zone') }
-sub interval    { return (data_type => 'interval') }
+sub timetz      { data_type => 'time with time zone', @_ }
+sub timestamptz { data_type => 'timestamp with time zone', @_ }
+sub interval    { data_type => 'interval', @_ }
 
-# Enum
+# Enum — takes values as args, but last args might be modifier pairs
 sub enum {
-  my (@values) = @_;
-  return (data_type => 'enum', extra => { list => [@values] });
+  my @values;
+  push @values, shift while @_ && !ref($_[0]) && $_[0] !~ /^[a-z_]+$/ || (@_ >= 2 && $_[1] !~ /^[a-z_]+|^\d/);
+  data_type => 'enum', extra => { list => [@values] }, @_;
 }
 
 # UUID
-sub uuid { return (data_type => 'uuid') }
+sub uuid { data_type => 'uuid', @_ }
 
 # JSON
-sub json  { return (data_type => 'json') }
-sub jsonb { return (data_type => 'jsonb') }
+sub json  { data_type => 'json', @_ }
+sub jsonb { data_type => 'jsonb', @_ }
 
 # XML / hstore
-sub xml    { return (data_type => 'xml') }
-sub hstore { return (data_type => 'hstore') }
+sub xml    { data_type => 'xml', @_ }
+sub hstore { data_type => 'hstore', @_ }
 
 # Array (PostgreSQL)
 sub array {
-  my ($type_info) = @_;
+  my $type_info = shift;
   if (ref $type_info eq 'HASH') {
-    return (data_type => 'ARRAY', %$type_info);
+    return (data_type => 'ARRAY', %$type_info, @_);
   }
-  return (data_type => $type_info . '[]');
+  return (data_type => $type_info . '[]', @_);
 }
 
 # Money
-sub money { return (data_type => 'money') }
+sub money { data_type => 'money', @_ }
 
 # Vector / AI (pgvector)
 sub vector {
-  my ($dims) = @_;
-  my @r = (data_type => 'vector');
-  push @r, (size => $dims) if defined $dims;
-  return @r;
+  my $dims = shift if @_ && Scalar::Util::looks_like_number($_[0]);
+  data_type => 'vector', (defined $dims ? (size => $dims) : ()), @_;
 }
 
 sub halfvec {
-  my ($dims) = @_;
-  my @r = (data_type => 'halfvec');
-  push @r, (size => $dims) if defined $dims;
-  return @r;
+  my $dims = shift if @_ && Scalar::Util::looks_like_number($_[0]);
+  data_type => 'halfvec', (defined $dims ? (size => $dims) : ()), @_;
 }
 
 sub sparsevec {
-  my ($dims) = @_;
-  my @r = (data_type => 'sparsevec');
-  push @r, (size => $dims) if defined $dims;
-  return @r;
+  my $dims = shift if @_ && Scalar::Util::looks_like_number($_[0]);
+  data_type => 'sparsevec', (defined $dims ? (size => $dims) : ()), @_;
 }
 
 # Bit strings
 sub bit {
-  my ($size) = @_;
-  my @r = (data_type => 'bit');
-  push @r, (size => $size) if defined $size;
-  return @r;
+  my $size = shift if @_ && Scalar::Util::looks_like_number($_[0]);
+  data_type => 'bit', (defined $size ? (size => $size) : ()), @_;
 }
 
 sub varbit {
-  my ($size) = @_;
-  my @r = (data_type => 'varbit');
-  push @r, (size => $size) if defined $size;
-  return @r;
+  my $size = shift if @_ && Scalar::Util::looks_like_number($_[0]);
+  data_type => 'varbit', (defined $size ? (size => $size) : ()), @_;
 }
 
 # Network types (PostgreSQL)
-sub inet     { return (data_type => 'inet') }
-sub cidr     { return (data_type => 'cidr') }
-sub macaddr  { return (data_type => 'macaddr') }
-sub macaddr8 { return (data_type => 'macaddr8') }
+sub inet     { data_type => 'inet', @_ }
+sub cidr     { data_type => 'cidr', @_ }
+sub macaddr  { data_type => 'macaddr', @_ }
+sub macaddr8 { data_type => 'macaddr8', @_ }
 
 # Full-text search (PostgreSQL)
-sub tsvector { return (data_type => 'tsvector') }
-sub tsquery  { return (data_type => 'tsquery') }
+sub tsvector { data_type => 'tsvector', @_ }
+sub tsquery  { data_type => 'tsquery', @_ }
 
 # Geometric types (PostgreSQL)
-sub point   { return (data_type => 'point') }
-sub line    { return (data_type => 'line') }
-sub lseg    { return (data_type => 'lseg') }
-sub box     { return (data_type => 'box') }
-sub path    { return (data_type => 'path') }
-sub polygon { return (data_type => 'polygon') }
-sub circle  { return (data_type => 'circle') }
+sub point   { data_type => 'point', @_ }
+sub line    { data_type => 'line', @_ }
+sub lseg    { data_type => 'lseg', @_ }
+sub box     { data_type => 'box', @_ }
+sub path    { data_type => 'path', @_ }
+sub polygon { data_type => 'polygon', @_ }
+sub circle  { data_type => 'circle', @_ }
 
 # Range types (PostgreSQL)
-sub int4range  { return (data_type => 'int4range') }
-sub int8range  { return (data_type => 'int8range') }
-sub numrange   { return (data_type => 'numrange') }
-sub tsrange    { return (data_type => 'tsrange') }
-sub tstzrange  { return (data_type => 'tstzrange') }
-sub daterange  { return (data_type => 'daterange') }
+sub int4range  { data_type => 'int4range', @_ }
+sub int8range  { data_type => 'int8range', @_ }
+sub numrange   { data_type => 'numrange', @_ }
+sub tsrange    { data_type => 'tsrange', @_ }
+sub tstzrange  { data_type => 'tstzrange', @_ }
+sub daterange  { data_type => 'daterange', @_ }
 
 # --- Keys / Constraints ---
 
@@ -577,10 +564,10 @@ __END__
 
   table 'artists';
 
-  col id     => integer, auto_inc;
-  col name   => varchar(100);
-  col bio    => text, null;
-  col active => boolean, default(1);
+  col id     => integer auto_inc;
+  col name   => varchar(100), null;
+  col bio    => text null;
+  col active => boolean default(1);
 
   primary_key 'id';
   unique artist_name => ['name'];

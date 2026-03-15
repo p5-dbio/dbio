@@ -71,10 +71,10 @@ package MyApp::Schema::Result::Artist;
 use DBIO::Cake;
 
 table 'artists';
-col id     => integer, auto_inc;
-col name   => varchar(100);
-col bio    => text, null;
-col active => boolean, default(1);
+col id     => integer auto_inc;
+col name   => varchar(100), null;
+col bio    => text null;
+col active => boolean default(1);
 col tags   => array(text), null;
 primary_key 'id';
 unique artist_name => ['name'];
@@ -89,17 +89,21 @@ package MyApp::Schema::Result::User;
 use DBIO::Cake -inflate_json;
 
 table 'users';
-col id        => uuid, default(\'gen_random_uuid()');
+col id        => uuid default(\'gen_random_uuid()');
 col name      => varchar(100);
-col role      => enum(qw( admin moderator user guest ));
-col metadata  => jsonb, default('{}');
+col role      => enum(qw( admin moderator user guest )), null;
+col metadata  => jsonb default('{}');
 col embedding => vector(1536);
-col tsv       => tsvector, null;
+col tsv       => tsvector null;
 col tags      => array(text), null;
-col created   => timestamp, default(\'now()');
+col created   => timestamp default(\'now()');
 primary_key 'id';
 1;
 ```
+
+Note: bareword-to-bareword chains need no comma (`integer auto_inc`,
+`text null`, `boolean default(1)`). After a number or closing paren,
+Perl needs a comma (`varchar(100), null` or `varchar 100, null`).
 
 ## Migration from DBIx::Class
 
