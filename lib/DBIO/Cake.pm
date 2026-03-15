@@ -589,15 +589,40 @@ __END__
 
   table 'artists';
 
-  col id     => integer auto_inc;
-  col name   => varchar(100), null;
-  col bio    => text null;
-  col active => boolean default(1);
+  col id         => integer auto_inc;
+  col name       => varchar(100);
+  col bio        => text null;
+  col active     => boolean default(1);
+  col created_at => timestamp;
+  col updated_at => timestamp on_update;
 
   primary_key 'id';
   unique artist_name => ['name'];
 
   has_many cds => 'MyApp::Schema::Result::CD', 'artist_id';
+
+  1;
+
+PostgreSQL-specific example:
+
+  package MyApp::Schema::Result::User;
+  use DBIO::Cake -inflate_json;
+
+  table 'users';
+
+  col id         => uuid;
+  col name       => varchar(100);
+  col role       => enum(qw( admin moderator user guest )), null;
+  col metadata   => jsonb \"{}";
+  col embedding  => vector(1536);
+  col tags       => array(text), null;
+  col tsv        => tsvector null;
+  col created_at => timestamp;
+  col updated_at => timestamp on_update;
+  col deleted_at => timestamp null;
+
+  primary_key 'id';
+  idx user_tags => ['tags'], using => 'gin';
 
   1;
 
@@ -624,6 +649,23 @@ When you C<use DBIO::Cake>, it automatically:
 
 =back
 
+=head1 COMMA-FREE SYNTAX
+
+Cake supports a DDL-like comma-free syntax. All type functions and modifiers
+pass C<@_> through, so Perl chains them via nested function calls:
+
+  col id => integer auto_inc;     # parsed as: integer(auto_inc())
+  col bio => text null;           # parsed as: text(null())
+  col active => boolean default(1); # parsed as: boolean(default(1))
+
+B<When you need a comma:> after a number or closing parenthesis, Perl needs
+a comma before the next bareword:
+
+  col name => varchar(100), null;   # comma after (100)
+  col name => varchar 100, null;    # comma after 100
+
+This matches L<DBIx::Class::ResultDDL> conventions.
+
 =head1 IMPORT OPTIONS
 
   use DBIO::Cake;                            # defaults
@@ -636,20 +678,72 @@ Multiple options can be combined:
 
   use DBIO::Cake -inflate_datetime, -inflate_json;
 
-Cake is intentionally small: import options control convenience behavior, not a
-separate object model.
+=head1 SMART DEFAULTS
+
+Cake automatically sets sensible defaults based on column type and nullability.
+
+=head2 Timestamp columns
+
+NOT NULL timestamp columns automatically get C<set_on_create>:
+
+  col created_at => timestamp;
+  # → set_on_create => 1 (implied by NOT NULL)
+
+  col updated_at => timestamp on_update;
+  # → set_on_create => 1, set_on_update => 1
+
+  col deleted_at => timestamp null;
+  # → no auto-set (nullable means optional)
+
+This integrates with the TimeStamp component built into DBIO core.
+
+=head2 UUID columns
+
+NOT NULL uuid columns automatically get C<retrieve_on_insert> so the
+database-generated default (e.g. PostgreSQL's C<gen_random_uuid()>) is
+retrieved after INSERT:
+
+  col id => uuid;
+  # → retrieve_on_insert => 1
+
+=head2 Scalar references as defaults
+
+A scalar reference anywhere in a C<col> declaration is treated as a
+C<default_value>. This is a shorthand for C<default(\...)>:
+
+  col id      => uuid \"gen_random_uuid()";
+  col active  => boolean \1;
+  col created => timestamp \"now()";
+
+  # equivalent to:
+  col id      => uuid default(\"gen_random_uuid()");
+
+For literal SQL defaults, use a reference to a string. For Perl-side defaults,
+use C<default($value)> without a reference.
 
 =head1 COLUMN TYPES
 
-All type functions return flat key-value lists suitable for passing to C<col>.
+All type functions return flat key-value lists and pass through C<@_>,
+enabling the comma-free syntax.
 
 =head2 Integer types
 
 C<integer>, C<tinyint>, C<smallint>, C<bigint>
 
+  col id    => integer auto_inc;
+  col count => bigint;
+
+=head2 Serial types (auto-increment shortcuts)
+
+C<serial>, C<bigserial>, C<smallserial>
+
+  col id => serial;   # integer + auto_inc in one
+
 =head2 Numeric types
 
 C<numeric($precision, $scale)>, C<decimal($precision, $scale)>
+
+  col price => numeric(10, 2);
 
 =head2 Floating point types
 
@@ -659,9 +753,14 @@ C<real> (alias: C<float4>), C<double> (alias: C<float8>), C<float($bits)>
 
 C<char($size)>, C<varchar($size)>
 
+  col code => char(3);
+  col name => varchar(100), null;
+
 =head2 Text types
 
 C<text>, C<tinytext>, C<mediumtext>, C<longtext>
+
+  col bio => text null;
 
 =head2 Binary types
 
@@ -671,31 +770,115 @@ C<blob>, C<tinyblob>, C<mediumblob>, C<longblob>, C<bytea>
 
 C<boolean> (alias: C<bool>)
 
+  col active => boolean default(1);
+
 =head2 Date/Time types
 
-C<date>, C<datetime($tz)>, C<timestamp($tz)>
+C<date>, C<datetime>, C<timestamp>, C<time>, C<timetz>, C<timestamptz>,
+C<interval>
 
-=head2 Other types
+  col created_at => timestamp;             # auto set_on_create
+  col updated_at => timestamp on_update;   # auto set_on_create + set_on_update
+  col deleted_at => timestamp null;        # no auto-set
+  col birthday   => date null;
 
-C<enum(@values)>, C<uuid>, C<json>, C<jsonb>, C<array($type)>
+=head2 Enum
+
+C<enum(@values)>
+
+  col role => enum(qw( admin moderator user guest ));
+
+=head2 UUID
+
+C<uuid>
+
+  col id => uuid;   # auto retrieve_on_insert
+
+=head2 JSON
+
+C<json>, C<jsonb>
+
+  col metadata => jsonb null;
+
+With C<-inflate_json>, json/jsonb columns are automatically serialized.
+
+=head2 Array (PostgreSQL)
+
+C<array($type)>
+
+  col tags => array(text), null;
+
+=head2 Vector / AI (pgvector)
+
+C<vector($dims)>, C<halfvec($dims)>, C<sparsevec($dims)>
+
+  col embedding => vector(1536);
+
+=head2 Full-text search (PostgreSQL)
+
+C<tsvector>, C<tsquery>
+
+=head2 Network types (PostgreSQL)
+
+C<inet>, C<cidr>, C<macaddr>, C<macaddr8>
+
+=head2 Geometric types (PostgreSQL)
+
+C<point>, C<line>, C<lseg>, C<box>, C<path>, C<polygon>, C<circle>
+
+=head2 Range types (PostgreSQL)
+
+C<int4range>, C<int8range>, C<numrange>, C<tsrange>, C<tstzrange>, C<daterange>
+
+=head2 Other
+
+C<money>, C<xml>, C<hstore>, C<bit($size)>, C<varbit($size)>
 
 =head1 COLUMN MODIFIERS
 
+All modifiers return flat key-value lists and pass through C<@_>.
+
 =head2 null
 
-Marks the column as nullable (C<is_nullable =E<gt> 1>).
+Marks the column as nullable.
+
+  col bio => text null;
 
 =head2 auto_inc
 
-Marks the column as auto-increment (C<is_auto_increment =E<gt> 1>).
+Marks the column as auto-increment.
+
+  col id => integer auto_inc;
 
 =head2 fk
 
-Marks the column as a foreign key (C<is_foreign_key =E<gt> 1>).
+Marks the column as a foreign key.
+
+  col author_id => integer fk;
+
+=head2 unsigned
+
+Marks the column as unsigned (MySQL).
+
+  col count => integer unsigned;
 
 =head2 default($value)
 
-Sets the default value (C<default_value =E<gt> $value>).
+Sets the default value.
+
+  col active => boolean default(1);
+  col created => timestamp default(\"now()");
+
+=head2 on_create
+
+Explicitly set C<set_on_create>. Normally not needed — NOT NULL timestamp
+columns get this automatically.
+
+=head2 on_update
+
+Set C<set_on_update> — the column value is refreshed on every row update.
+
+  col updated_at => timestamp on_update;
 
 =head1 TABLE AND CONSTRAINT FUNCTIONS
 
@@ -721,24 +904,10 @@ Adds a unique constraint.
 
 =head1 RELATIONSHIP FUNCTIONS
 
-=head2 belongs_to
-
   belongs_to author => 'MyApp::Schema::Result::Author', 'author_id';
-
-=head2 has_one
-
-  has_one isbn => 'MyApp::Schema::Result::ISBN', 'book_id';
-
-=head2 has_many
-
-  has_many books => 'MyApp::Schema::Result::Book', 'author_id';
-
-=head2 might_have
-
-  might_have pseudonym => 'MyApp::Schema::Result::Pseudonym', 'author_id';
-
-=head2 many_to_many
-
+  has_one    isbn   => 'MyApp::Schema::Result::ISBN', 'book_id';
+  has_many   books  => 'MyApp::Schema::Result::Book', 'author_id';
+  might_have bio    => 'MyApp::Schema::Result::Bio', 'author_id';
   many_to_many roles => 'actor_roles', 'role';
 
 =head2 rel_one
@@ -774,11 +943,13 @@ Declares a view-based result source.
 
   idx name_idx => ['name'];
   idx composite_idx => ['last_name', 'first_name'], type => 'unique';
+  idx tags_idx => ['tags'], using => 'gin';
 
 Declares an index to be created during deployment via C<sqlt_deploy_hook>.
 
 =head1 SEE ALSO
 
-L<DBIO::Core>, L<DBIO::ResultSource>
+L<DBIO::Core>, L<DBIO::Candy>, L<DBIO::ResultSource>,
+L<DBIx::Class::ResultDDL> (inspiration for Cake's syntax)
 
 =cut
