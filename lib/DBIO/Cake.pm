@@ -368,6 +368,12 @@ sub array {
   if (ref $type_info eq 'HASH') {
     return (data_type => 'ARRAY', %$type_info, @_);
   }
+  # If called as array(text) where text() returns (data_type => 'text', ...),
+  # extract the actual type name from the key-value pairs
+  if ($type_info eq 'data_type' && @_) {
+    my $actual_type = shift;
+    return (data_type => $actual_type . '[]', @_);
+  }
   return (data_type => $type_info . '[]', @_);
 }
 
