@@ -183,6 +183,12 @@ sub col {
   my ($name, @options) = @_;
   my $class = _caller_class();
 
+  # Scalar refs are shorthand for default values:
+  #   col id => uuid \'gen_random_uuid()';
+  #   col active => boolean \1;
+  @options = map { ref $_ eq 'SCALAR' || ref $_ eq 'REF'
+    ? (default_value => $_) : $_ } @options;
+
   my %info = _expand_col_options(@options);
 
   # Default: not nullable
