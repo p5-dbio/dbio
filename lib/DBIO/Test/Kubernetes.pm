@@ -33,7 +33,7 @@ databases inside Kubernetes and exposes the corresponding C<DBIO_TEST_*>
 environment variables for local or in-cluster test runs.
 
 It is intended for integration-style test runs that need short-lived database
-instances without hand-managed local services.
+instances without hand-managed local services or bespoke local containers.
 
 =cut
 

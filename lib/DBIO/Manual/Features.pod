@@ -1,37 +1,37 @@
 # PODNAME: DBIO::Manual::Features
-# ABSTRACT: DBIO features with links to the relevant documentation
-=head1 META
+# ABSTRACT: Feature overview with links to the relevant DBIO documentation
+=head1 PROJECT
 
-=head2 Large Community
+=head2 Broad Contributor Base
 
-There are L<hundreds of DBIO contributors|DBIO/AUTHORS> listed in
-F<AUTHORS>. That ranges from documentation help, to test help, to added
-features, to entire database support.
+DBIO has accumulated contributions across core, drivers, tests, and
+documentation. See L<DBIO/AUTHORS> and F<AUTHORS> for the current list.
 
-=head2 Active Community
+=head2 Active Development
 
 Development activity changes over time, but DBIO continues to evolve across
 core and driver distributions. For recent releases and changelog history, see
 L<https://metacpan.org/changes/distribution/DBIO>.
 
-=head2 Responsive Community
+=head2 Practical Feedback Loop
 
 =over 1
 
-=item I needed MSSQL order-by support; the community helped me add support
+=item Users and maintainers regularly turn driver-specific gaps into concrete fixes
 
-=item generally very welcoming of people willing to help
+=item Documentation improvements, failing tests, and focused bug reports are all useful contributions
 
 =back
 
 =head1 General ORM
 
-These are things that are in most other ORMs, but are still reasons to use
-DBIO over raw SQL.
+These are familiar ORM features, but they are still good reasons to use DBIO
+instead of hand-writing every query.
 
 =head2 Cross DB
 
-The vast majority of code should run on all databases without needing tweaking
+Most schema and query code should remain portable across drivers with little or
+no backend-specific tweaking.
 
 =head2 Basic CRUD
 
@@ -109,7 +109,7 @@ or
 
 See L<DBIO::ResultSet/find>, L<DBIO::ResultSet/search>, L<DBIO::ResultSet/next>, and L<DBIO::ResultSet/all>
 
-B<TMTOWTDI!>
+DBIO intentionally supports several convenient query shapes here.
 
 =head2 SQL: Update
 
@@ -162,13 +162,13 @@ See L<DBIO::Row/delete>
 
 =item See L<SQL::Abstract>, L<DBIO::ResultSet/next>, and L<DBIO::ResultSet/search>
 
-=item (kinda) introspectible
+=item Introspectable at the Perl level
 
-=item Prettier than SQL
+=item Easier to compose than raw SQL in Perl code
 
 =back
 
-=head2 OO Overridability
+=head2 Object-Level Overrides
 
 =over 1
 
@@ -176,7 +176,7 @@ See L<DBIO::Row/delete>
 
 =item Override delete if you want to disable deletion
 
-=item and on and on
+=item Domain logic can live next to the result classes it belongs to
 
 =back
 
@@ -192,8 +192,8 @@ See L<DBIO::Row/delete>
 
 =head2 Non-column methods
 
-Need a method to get a user's gravatar URL?  Add a C<gravatar_url> method to the
-Result class
+Need a method to build a user's gravatar URL? Add a C<gravatar_url> method to
+the result class.
 
 =head2 RELATIONSHIPS
 
@@ -215,7 +215,8 @@ Result class
 
 =head1 DBIO Specific Features
 
-These things may be in other ORM's, but they are very specific, so doubtful
+These features are especially DBIO-shaped, even when similar ideas exist in
+other ORMs.
 
 =head2 ->deploy
 

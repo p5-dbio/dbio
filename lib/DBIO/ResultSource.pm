@@ -1,5 +1,5 @@
 package DBIO::ResultSource;
-# ABSTRACT: Result source object
+# ABSTRACT: Metadata object describing a table, view, or query source
 
 use strict;
 use warnings;
@@ -62,7 +62,8 @@ __PACKAGE__->mk_classdata( sqlt_deploy_callback => 'default_sqlt_deploy_hook' );
 
 =head1 DESCRIPTION
 
-A ResultSource is an object that represents a source of data for querying.
+A ResultSource describes the database object behind a result class: usually a
+table, sometimes a view, and occasionally another query-like source.
 
 This class is a base class for various specialised types of result
 sources, for example L<DBIO::ResultSource::Table>. Table is the
@@ -74,7 +75,7 @@ L<DBIO::ResultSourceProxy::Table> component, which defines
 the L<table|DBIO::ResultSourceProxy::Table/table> method.
 When called, C<table> creates and stores an instance of
 L<DBIO::ResultSource::Table>. Luckily, to use tables as result
-sources, you don't need to remember any of this.
+sources, you usually do not need to think about any of this machinery.
 
 Result sources representing select queries, or views, can also be
 created, see L<DBIO::ResultSource::View> for full details.

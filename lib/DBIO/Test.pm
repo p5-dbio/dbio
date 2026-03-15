@@ -10,21 +10,21 @@ use namespace::clean;
 
 =head1 DESCRIPTION
 
-Provides test utilities for the DBIO ecosystem.  The primary entry point
-is L</init_schema> which gives you a fully set up test schema, either
-backed by L<DBIO::Test::Storage> (no database needed) or by a real
-database connection you supply.
+Provides the shared test harness for the DBIO ecosystem. The main entry point
+is L</init_schema>, which gives you a ready-to-use test schema backed either by
+L<DBIO::Test::Storage> for offline tests or by a real database connection that
+you supply.
 
 External driver distributions (e.g. L<DBIO::PostgreSQL>, L<DBIO::MySQL>)
 should depend on this module for their test suites.
 
-The same shared harness can also wrap a backend in
+The same harness can also wrap a backend in
 L<DBIO::Replicated::Storage> via C<replicated =E<gt> 1>.
 
 =head1 API CONTRACT
 
-Anything under C<DBIO::Test::*> is intended to be reusable test support for
-driver distributions and plugins.
+Anything under C<DBIO::Test::*> is reusable support code for driver
+distributions and plugins.
 
 Intentionally broken fixtures used to trigger edge cases belong under
 C<t/lib/TestDBIO/Broken/*> only, and must not live in installed
@@ -78,7 +78,7 @@ Put replicated-storage-specific tests in the DBIO core distribution.
 
 =head1 NOTE
 
-This module replaces the old C<DBICTest> from DBIx::Class.  For reference,
+This module replaces the old C<DBICTest> from DBIx::Class. For reference,
 the mapping is:
 
   DBICTest              -> DBIO::Test
@@ -155,9 +155,8 @@ driver-specific SQLMaker behavior, for example:
 
 Wrap the requested storage in L<DBIO::Replicated::Storage>.
 
-This is primarily intended for shared driver tests that should also run
-through the replicated storage path without rewriting the whole test
-setup. For example:
+This is primarily intended for shared driver tests that should also exercise
+the replicated storage path without rebuilding the whole setup. For example:
 
   my $schema = DBIO::Test->init_schema(
     no_deploy    => 1,

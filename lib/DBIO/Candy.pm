@@ -343,8 +343,11 @@ __END__
 
 =head1 DESCRIPTION
 
-C<DBIO::Candy> is a sugar layer for defining L<DBIO> result classes.  By
-default it:
+C<DBIO::Candy> sits between vanilla L<DBIO::Core> and L<DBIO::Cake>. It keeps
+the familiar method-based API, but imports shorter helper names so result
+classes read more cleanly.
+
+By default it:
 
 =over
 
@@ -371,6 +374,9 @@ cleans the namespace after export via L<namespace::clean>
 =back
 
 =head1 IMPORT OPTIONS
+
+Candy is a good fit when you want lighter syntax but still prefer explicit
+column hashrefs over Cake's DDL-style declarations.
 
 =head2 -base
 

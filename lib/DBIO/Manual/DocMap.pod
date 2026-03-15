@@ -1,5 +1,5 @@
 # PODNAME: DBIO::Manual::DocMap
-# ABSTRACT: What documentation do we have?
+# ABSTRACT: Guide to the DBIO documentation set
 =head1 Manuals
 
 =over 4
@@ -14,7 +14,7 @@
 
 =item L<DBIO::Manual::Joining> - Joining tables with DBIO.
 
-=item L<DBIO::Manual::Features> - A boatload of DBIO features with links to respective documentation.
+=item L<DBIO::Manual::Features> - Feature overview with links into the API and manuals.
 
 =item L<DBIO::Manual::Glossary> - What do all those terms mean?
 
@@ -41,13 +41,13 @@ distributions. Install the driver distribution that matches your backend:
 
 =back
 
-Additional DBIO driver distributions exist for other databases; some are still
-in migration from the historical monolithic test setup.
+Additional driver distributions exist for other databases as the wider DBIO
+ecosystem continues to split out of the old monolithic layout.
 
 =head1 Core capabilities
 
-Some DBIO features are part of the core distribution rather than separate
-driver distributions:
+Some important capabilities live in the core distribution rather than in a
+database-specific driver:
 
 =over 4
 

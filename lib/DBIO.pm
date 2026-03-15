@@ -1,5 +1,5 @@
 package DBIO;
-# ABSTRACT: DBI Objects — Relational mapping. Joins itself. Fully native. Everything included.
+# ABSTRACT: Native relational mapping for Perl, built on DBI
 
 use strict;
 use warnings;
@@ -99,26 +99,24 @@ __END__
 
 =head1 EARLY VERSION WARNING
 
-B<DBIO is an early release and may contain mistakes.> The API is largely
-compatible with L<DBIx::Class> but has not yet reached 1.0. Please report
-any issues you encounter.
+B<DBIO is still pre-1.0.> The core API is already substantial and largely
+compatible with L<DBIx::Class>, but some edges are still being refined as the
+split driver ecosystem settles down. Please report anything that looks wrong,
+surprising, or incomplete.
 
 =head1 WHERE TO START READING
 
-See L<DBIO::Manual::DocMap> for an overview of the exhaustive documentation.
-To get the most out of DBIO with the least confusion it is strongly
-recommended to read (at the very least) the
-L<Manuals|DBIO::Manual::DocMap/Manuals> in the order presented there.
+See L<DBIO::Manual::DocMap> for the documentation map.
+If you are new to DBIO, start with the
+L<manuals|DBIO::Manual::DocMap/Manuals> in the order listed there.
 
 =cut
 
 =head1 GETTING HELP/SUPPORT
 
-Due to the sheer size of its problem domain, DBIO is a relatively
-complex framework. After you start using DBIO questions will inevitably
-arise. If you are stuck with a problem or have doubts about a particular
-approach do not hesitate to contact us via any of the following options (the
-list is sorted by "fastest response time"):
+DBIO covers a large problem space, so questions are inevitable once you start
+using it in anger. If you are stuck, or you are unsure whether a particular
+approach fits DBIO well, use one of the following channels:
 
 =over
 
@@ -130,10 +128,10 @@ list is sorted by "fastest response time"):
 
 =head1 SYNOPSIS
 
-For the very impatient: L<DBIO::Manual::QuickStart>
+For the shortest path, start with L<DBIO::Manual::QuickStart>.
 
-This code in the next step can be generated automatically from an existing
-database, see L<dbiodump> (included with DBIO via L<DBIO::Loader>).
+The classes shown below can also be generated from an existing database with
+L<dbiodump>, which is provided by L<DBIO::Loader>.
 
 =head2 Schema classes preparation
 
@@ -207,7 +205,7 @@ L<DBIO::Cake> provides type functions that read like DDL:
 
 =head2 API usage
 
-Then you can use these classes in your application's code:
+You can then use these classes in your application code:
 
   # Connect to your database.
   use MyApp::Schema;
@@ -274,11 +272,9 @@ Then you can use these classes in your application's code:
 
 =head1 DESCRIPTION
 
-DBIO (DBI Objects) is an SQL to OO mapper with an object API inspired by
-L<Class::DBI> and a resultset API that allows abstract encapsulation of
-database operations. It aims to make representing queries in your code as
-perl-ish as possible while fully embracing the native capabilities of each
-database.
+DBIO (DBI Objects) is a relational mapper for Perl built on top of L<DBI>. It
+combines an object model for rows and result classes with a resultset API for
+building queries without giving up database-native behavior.
 
 DBIO automatically discovers joins from search conditions — when you
 reference a relationship in a condition (e.g. C<< 'artist.name' => 'Fred' >>),
@@ -291,29 +287,23 @@ features are provided by fully native driver distributions
 (L<DBIO-PostgreSQL|DBIO::PostgreSQL>, L<DBIO-MySQL|DBIO::MySQL>,
 L<DBIO-SQLite|DBIO::SQLite>, etc.) that speak each database's dialect.
 
-DBIO can handle multi-column primary and foreign keys, complex
-queries and database-level paging, and does its best to only query the
-database in order to return something you've directly asked for. If a
-resultset is used as an iterator it only fetches rows off the statement
-handle as requested in order to minimise memory usage. It has auto-increment
-support for SQLite, MySQL, PostgreSQL, Oracle, SQL Server and DB2 and is
-known to be used in production on at least the first four, and is fork-
-and thread-safe out of the box (although
-L<your DBD may not be|DBI/Threads and Thread Safety>).
+DBIO handles multi-column primary and foreign keys, complex query trees,
+database-level paging, and driver-specific SQL features. ResultSets stay lazy
+until you ask for rows or aggregates, and iterator-style access only fetches
+rows as needed to keep memory usage predictable. Auto-increment and
+insert-returning behavior are delegated to the active driver so PostgreSQL,
+MySQL, SQLite, Oracle, and other backends can expose their native strengths.
 
-This project is still under rapid development, so large new features may be
-marked B<experimental> - such APIs are still usable but may have edge bugs.
-Failing test cases are I<always> welcome and point releases are put out rapidly
-as bugs are found and fixed.
+Large new features may still be marked B<experimental>. That means the feature
+is intended to be used, but the API or edge-case behavior may still move as
+real-world feedback arrives. Reproducible failing tests are always welcome.
 
-We do our best to maintain full backwards compatibility for published
-APIs, since DBIO is used in production in many organisations,
-and even backwards incompatible changes to non-published APIs will be fixed
-if they're reported and doing so doesn't cost the codebase anything.
+Published APIs should remain stable. When something breaks unexpectedly, report
+it; even non-public regressions are often fixed if they can be corrected
+without making the rest of the code worse.
 
-The test suite is quite substantial, and several developer releases
-are generally made to CPAN before the branch for the next release is
-merged back to trunk for a major release.
+The test suite is intentionally broad, and developer releases are expected as
+the core and driver distributions continue to converge on a stable 1.0 shape.
 
 =head1 HOW TO CONTRIBUTE
 
@@ -350,4 +340,3 @@ The canonical source of authors and their details is the F<AUTHORS> file at
 the root of this distribution (or repository). The canonical source of
 per-line authorship is the L<git repository|/HOW TO CONTRIBUTE> history
 itself.
-

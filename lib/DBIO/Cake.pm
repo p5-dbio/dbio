@@ -591,9 +591,12 @@ __END__
 
 =head1 DESCRIPTION
 
-DBIO::Cake provides a clean, DDL-like DSL for defining DBIO result classes.
-Instead of calling class methods with hashref arguments, you declare your
-schema using concise function calls that read like a table definition.
+DBIO::Cake is the most concise way to define DBIO result classes. It keeps the
+same underlying schema metadata as vanilla L<DBIO::Core>, but replaces verbose
+hashref-heavy declarations with a DDL-like DSL.
+
+Use Cake when you want result classes to read like schema definitions without
+changing how the rest of DBIO behaves.
 
 When you C<use DBIO::Cake>, it automatically:
 
@@ -620,6 +623,9 @@ When you C<use DBIO::Cake>, it automatically:
 Multiple options can be combined:
 
   use DBIO::Cake -inflate_datetime, -inflate_json;
+
+Cake is intentionally small: import options control convenience behavior, not a
+separate object model.
 
 =head1 COLUMN TYPES
 

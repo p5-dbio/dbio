@@ -1,5 +1,5 @@
 package DBIO::ResultSet;
-# ABSTRACT: Represents a query used for fetching a set of results.
+# ABSTRACT: Lazy query object for fetching and manipulating DBIO rows
 
 use strict;
 use warnings;
@@ -44,12 +44,12 @@ __PACKAGE__->mk_group_accessors('simple' => qw/_result_class result_source/);
 
 =head1 DESCRIPTION
 
-A ResultSet is an object which stores a set of conditions representing
-a query. It is the backbone of DBIO (i.e. the really
-important/useful bit).
+A ResultSet stores the conditions and attributes that make up a query. It is
+the central query object in DBIO and the main way rows are searched, updated,
+deleted, joined, paged, and prefetched.
 
-No SQL is executed on the database when a ResultSet is created, it
-just stores all the conditions needed to create the query.
+Creating a ResultSet does not execute SQL. It only stores the information
+needed to build the eventual query.
 
 A basic ResultSet representing the data of an entire table is returned
 by calling C<resultset> on a L<DBIO::Schema> and passing in a
@@ -61,12 +61,10 @@ A new ResultSet is returned from calling L</search> on an existing
 ResultSet. The new one will contain all the conditions of the
 original, plus any new conditions added in the C<search> call.
 
-A ResultSet also incorporates an implicit iterator. L</next> and L</reset>
-can be used to walk through all the L<DBIO::Row>s the ResultSet
-represents.
+ResultSets also act as iterators. L</next> and L</reset> let you walk through
+the L<DBIO::Row> objects represented by the query.
 
-The query that the ResultSet represents is B<only> executed against
-the database when these methods are called:
+The query is B<only> executed when you call methods such as:
 L</find>, L</next>, L</all>, L</first>, L</single>, L</count>.
 
 If a resultset is used in a numeric context it returns the L</count>.
@@ -201,12 +199,13 @@ See L<DBIO::Schema/load_namespaces> on how DBIO can discover and
 automatically attach L<Result|DBIO::Manual::ResultClass>-specific
 L<ResulSet|DBIO::ResultSet> classes.
 
-=head3 ResultSet subclassing with Moose and similar constructor-providers
+=head3 ResultSet subclassing with custom constructors
 
-Using L<Moose> or L<Moo> in your ResultSet classes is usually overkill, but
-you may find it useful if your ResultSets contain a lot of business logic
-(e.g. C<has xml_parser>, C<has json>, etc) or if you just prefer to organize
-your code via roles.
+DBIO does not require Moose, Moo, or any other constructor layer for custom
+ResultSet classes. A plain subclass of L<DBIO::ResultSet> is usually enough.
+
+If you do use an external constructor provider, you must adapt its constructor
+to DBIO's C<< ->new($source, \%args) >> calling convention.
 
 In order to write custom ResultSet classes with L<Moo> you need to use the
 following template. The L<BUILDARGS|Moo/BUILDARGS> is necessary due to the
