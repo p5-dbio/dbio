@@ -89,14 +89,16 @@ package MyApp::Schema::Result::User;
 use DBIO::Cake -inflate_json;
 
 table 'users';
-col id        => uuid \"gen_random_uuid()";
-col name      => varchar(100);
-col role      => enum(qw( admin moderator user guest )), null;
-col metadata  => jsonb \"{}";
-col embedding => vector(1536);
-col tsv       => tsvector null;
-col tags      => array(text), null;
-col created   => timestamp \"now()";
+col id         => uuid;                                        # auto retrieve_on_insert
+col name       => varchar(100);
+col role       => enum(qw( admin moderator user guest )), null;
+col metadata   => jsonb \"{}";
+col embedding  => vector(1536);
+col tsv        => tsvector null;
+col tags       => array(text), null;
+col created_at => timestamp;                                   # auto set_on_create
+col updated_at => timestamp on_update;                         # auto set_on_create + on_update
+col deleted_at => timestamp null;                              # nullable, no auto-set
 primary_key 'id';
 1;
 ```

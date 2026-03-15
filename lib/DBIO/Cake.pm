@@ -29,7 +29,7 @@ my @col_types = qw(
 );
 
 my @col_modifiers = qw(
-  null auto_inc fk default unsigned
+  null auto_inc fk default unsigned on_create on_update
 );
 
 my @table_funcs = qw(
@@ -209,6 +209,23 @@ sub col {
     }
   }
 
+  # Timestamp auto-behavior:
+  #   col created_at => timestamp;            → set_on_create (NOT NULL implies it)
+  #   col updated_at => timestamp on_update;  → set_on_create + set_on_update
+  #   col deleted_at => timestamp null;       → no auto-set
+  my $dt = $info{data_type} || '';
+  if ($dt =~ /^(?:datetime|timestamp|timestamp with(?:out)? time zone)$/) {
+    unless ($info{is_nullable}) {
+      $info{set_on_create} = 1 unless exists $info{set_on_create};
+    }
+  }
+
+  # UUID auto-behavior: retrieve_on_insert so the driver-provided default
+  # (e.g. gen_random_uuid()) comes back after INSERT
+  if ($dt eq 'uuid' && !$info{is_nullable}) {
+    $info{retrieve_on_insert} = 1 unless exists $info{retrieve_on_insert};
+  }
+
   $class->add_columns($name => \%info);
 }
 
@@ -218,10 +235,12 @@ sub col {
 # Perl parses this as integer(auto_inc()) — auto_inc returns its pairs,
 # which become @_ for integer, which passes them through.
 
-sub null     { is_nullable => 1, @_ }
-sub auto_inc { is_auto_increment => 1, @_ }
-sub fk       { is_foreign_key => 1, @_ }
-sub unsigned { 'extra.unsigned' => 1, @_ }
+sub null      { is_nullable => 1, @_ }
+sub auto_inc  { is_auto_increment => 1, @_ }
+sub fk        { is_foreign_key => 1, @_ }
+sub unsigned  { 'extra.unsigned' => 1, @_ }
+sub on_update { set_on_update => 1, @_ }
+sub on_create { set_on_create => 1, @_ }
 
 sub default {
   my $val = shift;
