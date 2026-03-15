@@ -47,6 +47,7 @@ my @cascade_funcs = qw(
 
 my @other_funcs = qw(
   view idx
+  col_created col_updated cols_updated_created
 );
 
 @EXPORT = (
@@ -210,13 +211,19 @@ sub col {
   }
 
   # Timestamp auto-behavior:
-  #   col created_at => timestamp;            → set_on_create (NOT NULL implies it)
-  #   col updated_at => timestamp on_update;  → set_on_create + set_on_update
-  #   col deleted_at => timestamp null;       → no auto-set
+  #   col created_at => timestamp;                → NOT NULL → set_on_create
+  #   col updated_at => timestamp on_update;      → NOT NULL + on_update → set_on_create + set_on_update
+  #   col deleted_at => timestamp null;            → nullable → no auto-set
+  #   col last_login => timestamp null, on_update; → nullable + on_update → only set_on_update
   my $dt = $info{data_type} || '';
   if ($dt =~ /^(?:datetime|timestamp|timestamp with(?:out)? time zone)$/) {
-    unless ($info{is_nullable}) {
+    if ($info{is_nullable}) {
+      # Nullable: no set_on_create (NULL is fine for create)
+      # set_on_update stays if explicitly requested
+    } else {
+      # NOT NULL: must have a value on create
       $info{set_on_create} = 1 unless exists $info{set_on_create};
+      # If on_update was requested, set_on_create is already implied above
     }
   }
 
@@ -578,6 +585,23 @@ sub idx {
   }
 }
 
+# --- Timestamp column helpers ---
+
+sub col_created {
+  my $name = shift || 'created_at';
+  col($name, timestamp, @_);
+}
+
+sub col_updated {
+  my $name = shift || 'updated_at';
+  col($name, timestamp, on_update, @_);
+}
+
+sub cols_updated_created {
+  col_created(@_);
+  col_updated(@_);
+}
+
 1;
 
 __END__
@@ -684,18 +708,18 @@ Cake automatically sets sensible defaults based on column type and nullability.
 
 =head2 Timestamp columns
 
-NOT NULL timestamp columns automatically get C<set_on_create>:
+The behavior depends on nullability and the C<on_update> modifier:
 
-  col created_at => timestamp;
-  # → set_on_create => 1 (implied by NOT NULL)
+  col created_at => timestamp;                  # NOT NULL → set_on_create
+  col updated_at => timestamp on_update;        # NOT NULL → set_on_create + set_on_update
+  col deleted_at => timestamp null;             # nullable → no auto-set
+  col last_login => timestamp null, on_update;  # nullable → only set_on_update
 
-  col updated_at => timestamp on_update;
-  # → set_on_create => 1, set_on_update => 1
+The logic: NOT NULL timestamp columns B<must> have a value on create, so
+C<set_on_create> is implied. Nullable columns don't need a value on create,
+so only explicit C<on_update> is applied.
 
-  col deleted_at => timestamp null;
-  # → no auto-set (nullable means optional)
-
-This integrates with the TimeStamp component built into DBIO core.
+This integrates with the L<DBIO::Timestamp> component built into DBIO core.
 
 =head2 UUID columns
 
@@ -936,6 +960,31 @@ Returns C<cascade_delete =E<gt> 1, cascade_copy =E<gt> 1>.
   view 'my_view', 'SELECT * FROM artists WHERE active = 1';
 
 Declares a view-based result source.
+
+=head1 TIMESTAMP HELPERS
+
+Shortcut functions for the most common timestamp column patterns.
+
+=head2 col_created
+
+  col_created;               # creates 'created_at' column
+  col_created 'born_at';     # custom column name
+
+Equivalent to C<col created_at =E<gt> timestamp>.
+
+=head2 col_updated
+
+  col_updated;               # creates 'updated_at' column
+  col_updated 'modified_at'; # custom column name
+
+Equivalent to C<col updated_at =E<gt> timestamp on_update>.
+
+=head2 cols_updated_created
+
+  cols_updated_created;      # creates both created_at + updated_at
+
+Creates both timestamp columns in one call. The most common pattern —
+just add this one line and you're done.
 
 =head1 INDEX SUPPORT
 
