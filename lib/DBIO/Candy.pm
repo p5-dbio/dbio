@@ -34,6 +34,10 @@ my @methods = qw(
    many_to_many
 
    sequence
+
+   col_created
+   col_updated
+   cols_updated_created
 );
 
 sub base { return $_[1] || 'DBIO::Core' }
@@ -90,7 +94,8 @@ sub import {
    my @rest         = @{$args->{rest}};
 
    $self->set_base($inheritor, $args->{base});
-   $inheritor->load_components(@{$args->{components}});
+   # Always load Timestamp for col_created/col_updated/cols_updated_created
+   $inheritor->load_components('Timestamp', @{$args->{components}});
    my @custom_methods;
    my %custom_aliases;
    {
@@ -570,3 +575,23 @@ Same as C<v1> but without pluralization:
 
  MyApp::Schema::Result::Cat           -> cat
  MyApp::Schema::Result::LonelyPerson  -> lonely_person
+
+=head1 TIMESTAMP HELPERS
+
+These are proxy methods for L<DBIO::Timestamp> (loaded automatically):
+
+=head2 col_created
+
+ col_created;               # creates 'created_at' column
+ col_created 'born_at';     # custom column name
+
+=head2 col_updated
+
+ col_updated;               # creates 'updated_at' column
+ col_updated 'modified_at'; # custom column name
+
+=head2 cols_updated_created
+
+ cols_updated_created;      # creates both at once
+
+The most common pattern — one line for both timestamp columns.

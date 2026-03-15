@@ -7,6 +7,7 @@ use warnings;
 use base qw/DBIO/;
 
 __PACKAGE__->load_components(qw/
+  Timestamp
   Relationship
   InflateColumn
   PK

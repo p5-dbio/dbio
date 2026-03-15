@@ -107,13 +107,12 @@ sub import {
     }
   }
 
-  # Load optional components
+  # Always load Timestamp for col_created/col_updated/cols_updated_created
+  push @components, 'Timestamp';
   if ($opts{inflate_datetime}) {
     push @components, 'InflateColumn::DateTime';
   }
-  if (@components) {
-    $caller->load_components(@components);
-  }
+  $caller->load_components(@components);
 
   # Store per-caller options
   $CALLER_OPTS{$caller} = \%opts;

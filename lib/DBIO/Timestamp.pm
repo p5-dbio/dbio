@@ -65,6 +65,59 @@ sub get_timestamp {
   return DateTime->now;
 }
 
+=method col_created
+
+  __PACKAGE__->col_created;              # creates 'created_at'
+  __PACKAGE__->col_created('born_at');   # custom name
+
+Adds a NOT NULL timestamp column with C<set_on_create>.
+
+=cut
+
+sub col_created {
+  my ($self, $name) = @_;
+  $name ||= 'created_at';
+  $self->add_columns($name => {
+    data_type     => 'timestamp',
+    set_on_create => 1,
+    is_nullable   => 0,
+  });
+}
+
+=method col_updated
+
+  __PACKAGE__->col_updated;                # creates 'updated_at'
+  __PACKAGE__->col_updated('modified_at'); # custom name
+
+Adds a NOT NULL timestamp column with C<set_on_create> and C<set_on_update>.
+
+=cut
+
+sub col_updated {
+  my ($self, $name) = @_;
+  $name ||= 'updated_at';
+  $self->add_columns($name => {
+    data_type     => 'timestamp',
+    set_on_create => 1,
+    set_on_update => 1,
+    is_nullable   => 0,
+  });
+}
+
+=method cols_updated_created
+
+  __PACKAGE__->cols_updated_created;
+
+Adds both C<created_at> and C<updated_at> columns in one call.
+
+=cut
+
+sub cols_updated_created {
+  my ($self) = @_;
+  $self->col_created;
+  $self->col_updated;
+}
+
 1;
 
 __END__
@@ -77,8 +130,15 @@ __END__
   __PACKAGE__->load_components(qw/Timestamp/);
   __PACKAGE__->table('article');
   __PACKAGE__->add_columns(
-    id         => { data_type => 'integer', is_auto_increment => 1 },
-    title      => { data_type => 'varchar', size => 255 },
+    id    => { data_type => 'integer', is_auto_increment => 1 },
+    title => { data_type => 'varchar', size => 255 },
+  );
+  __PACKAGE__->cols_updated_created;
+  __PACKAGE__->set_primary_key('id');
+
+Or with explicit column definitions:
+
+  __PACKAGE__->add_columns(
     created_at => { data_type => 'datetime', set_on_create => 1 },
     updated_at => { data_type => 'datetime', set_on_create => 1, set_on_update => 1 },
   );
@@ -91,3 +151,26 @@ C<set_on_update> are refreshed on every update.
 
 Explicitly provided values are respected (noclobber on create; update
 always refreshes).
+
+=head1 HELPER METHODS
+
+=over 4
+
+=item C<col_created($name)> — adds a C<set_on_create> timestamp column (default: C<created_at>)
+
+=item C<col_updated($name)> — adds a C<set_on_create + set_on_update> timestamp column (default: C<updated_at>)
+
+=item C<cols_updated_created> — adds both in one call
+
+=back
+
+These work in all three styles:
+
+  # Vanilla
+  __PACKAGE__->cols_updated_created;
+
+  # Candy
+  cols_updated_created;
+
+  # Cake
+  cols_updated_created;
