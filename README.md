@@ -7,29 +7,30 @@ A modern fork of [DBIx::Class](https://metacpan.org/pod/DBIx::Class).
 ## Key Differences from DBIx::Class
 
 - Namespace: `DBIO::` replaces `DBIx::Class::`
-- SQL::Abstract replaces SQL::Abstract::Classic
-- Integrates DBIx::Class::TimeStamp and DBIx::Class::Helpers into core
-- Integrates [DBIx::Class::Candy](https://metacpan.org/pod/DBIx::Class::Candy) as `DBIO::Candy` (import-based sugar)
-- Integrates [DBIx::Class::ResultDDL](https://metacpan.org/pod/DBIx::Class::ResultDDL) as `DBIO::Cake` (DDL-like DSL)
-- Replicated storage built into core (`DBIO::Replicated`)
-- Change tracking built into core (`DBIO::ChangeLog`)
-- Async storage interface (`DBIO::Storage::Async`, `DBIO::Future`)
-- SQL::Translator is optional, replaced by DB-specific modules
+- [SQL::Abstract](https://metacpan.org/pod/SQL::Abstract) replaces SQL::Abstract::Classic
+- Integrates [DBIx::Class::TimeStamp](https://metacpan.org/pod/DBIx::Class::TimeStamp) and [DBIx::Class::Helpers](https://metacpan.org/pod/DBIx::Class::Helpers) into core
+- Integrates [DBIx::Class::Candy](https://metacpan.org/pod/DBIx::Class::Candy) as [DBIO::Candy](https://metacpan.org/pod/DBIO::Candy) (import-based sugar)
+- Integrates [DBIx::Class::ResultDDL](https://metacpan.org/pod/DBIx::Class::ResultDDL) as [DBIO::Cake](https://metacpan.org/pod/DBIO::Cake) (DDL-like DSL)
+- Replicated storage built into core ([DBIO::Replicated](https://metacpan.org/pod/DBIO::Replicated))
+- Change tracking built into core ([DBIO::ChangeLog](https://metacpan.org/pod/DBIO::ChangeLog))
+- Async storage interface ([DBIO::Storage::Async](https://metacpan.org/pod/DBIO::Storage::Async), [DBIO::Future](https://metacpan.org/pod/DBIO::Future))
+- [SQL::Translator](https://metacpan.org/pod/SQL::Translator) is optional, replaced by DB-specific modules
 
 ## Core Features
 
-- **Replicated Storage** — master/slave replication via `DBIO::Replicated`
-- **Change Tracking** — automatic insert/update/delete logging via `DBIO::ChangeLog`
+- **Replicated Storage** — master/slave replication via [DBIO::Replicated](https://metacpan.org/pod/DBIO::Replicated)
+- **Change Tracking** — automatic insert/update/delete logging via [DBIO::ChangeLog](https://metacpan.org/pod/DBIO::ChangeLog)
 - **Async Interface** — `all_async`, `first_async`, `count_async`, `create_async`
-  return Futures; async drivers (e.g. [DBIO-PostgreSQL-Async](https://github.com/p5-dbio/dbio-postgresql-async))
+  return [Futures](https://metacpan.org/pod/DBIO::Future); async drivers
+  (e.g. [DBIO-PostgreSQL-Async](https://metacpan.org/pod/DBIO::PostgreSQL::Async))
   bypass DBI entirely
 
 ## Database Drivers (separate distributions)
 
-- [**DBIO-PostgreSQL**](https://github.com/p5-dbio/dbio-postgresql) — introspection via pg_catalog, deploy via test-and-compare
-- [**DBIO-MySQL**](https://github.com/p5-dbio/dbio-mysql) — MySQL and MariaDB support
-- [**DBIO-SQLite**](https://github.com/p5-dbio/dbio-sqlite) — SQLite support
-- [**DBIO-PostgreSQL-Async**](https://github.com/p5-dbio/dbio-postgresql-async) — async PostgreSQL via EV::Pg (no DBI)
+- [**DBIO::PostgreSQL**](https://metacpan.org/pod/DBIO::PostgreSQL) — introspection via pg_catalog, deploy via test-and-compare
+- [**DBIO::MySQL**](https://metacpan.org/pod/DBIO::MySQL) — MySQL and MariaDB support
+- [**DBIO::SQLite**](https://metacpan.org/pod/DBIO::SQLite) — SQLite support
+- [**DBIO::PostgreSQL::Async**](https://metacpan.org/pod/DBIO::PostgreSQL::Async) — async PostgreSQL via [EV::Pg](https://metacpan.org/pod/EV::Pg) (no DBI)
 
 ## Defining Result Classes
 
@@ -50,7 +51,7 @@ __PACKAGE__->has_many(cds => 'MyApp::Schema::Result::CD', 'artist_id');
 1;
 ```
 
-### DBIO::Candy (import-based sugar)
+### [DBIO::Candy](https://metacpan.org/pod/DBIO::Candy) (import-based sugar)
 
 ```perl
 package MyApp::Schema::Result::Artist;
@@ -63,36 +64,50 @@ has_many cds => 'MyApp::Schema::Result::CD', 'artist_id';
 1;
 ```
 
-### DBIO::Cake (DDL-like DSL)
+### [DBIO::Cake](https://metacpan.org/pod/DBIO::Cake) (DDL-like DSL)
 
 ```perl
 package MyApp::Schema::Result::Artist;
 use DBIO::Cake;
+
 table 'artists';
-col id   => integer, auto_inc;
-col name => varchar(100);
+col id     => integer, auto_inc;
+col name   => varchar(100);
+col bio    => text, null;
+col active => boolean, default(1);
+col tags   => array(text), null;
 primary_key 'id';
+unique artist_name => ['name'];
 has_many cds => 'MyApp::Schema::Result::CD', 'artist_id';
+1;
+```
+
+Cake with PostgreSQL-specific features:
+
+```perl
+package MyApp::Schema::Result::User;
+use DBIO::Cake -inflate_json;
+
+table 'users';
+col id        => uuid, default(\'gen_random_uuid()');
+col name      => varchar(100);
+col role      => enum(qw( admin moderator user guest ));
+col metadata  => jsonb, default('{}');
+col embedding => vector(1536);
+col tsv       => tsvector, null;
+col tags      => array(text), null;
+col created   => timestamp, default(\'now()');
+primary_key 'id';
 1;
 ```
 
 ## Migration from DBIx::Class
 
 ```perl
-# Before
-use DBIx::Class::Schema;
-# After
-use DBIO::Schema;
-
-# Before
-use DBIx::Class::Candy;
-# After
-use DBIO::Candy;
-
-# Before
-use DBIx::Class::ResultDDL qw/-V2/;
-# After
-use DBIO::Cake;
+# Before                              # After
+use DBIx::Class::Schema;              use DBIO::Schema;
+use DBIx::Class::Candy;               use DBIO::Candy;
+use DBIx::Class::ResultDDL qw/-V2/;   use DBIO::Cake;
 ```
 
 Most code works with a namespace search-and-replace. See individual
