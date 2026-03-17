@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Carp 'croak';
+use namespace::clean;
 
 =head1 DESCRIPTION
 

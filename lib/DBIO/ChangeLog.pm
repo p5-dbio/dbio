@@ -8,6 +8,7 @@ use base 'DBIO';
 
 use JSON::PP ();
 use Scalar::Util 'blessed';
+use namespace::clean;
 
 =head1 SYNOPSIS
 

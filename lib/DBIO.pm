@@ -104,6 +104,32 @@ compatible with L<DBIx::Class>, but some edges are still being refined as the
 split driver ecosystem settles down. Please report anything that looks wrong,
 surprising, or incomplete.
 
+=head1 KEY DIFFERENCES FROM DBIx::Class
+
+DBIO is a fork of L<DBIx::Class> with a clean break. If you are migrating
+code or porting workarounds, pay attention to these changes:
+
+=over 4
+
+=item * Namespace: C<DBIO::> replaces C<DBIx::Class::>
+
+=item * L<SQL::Abstract> replaces L<SQL::Abstract::Classic>
+
+=item * B<LIMIT/OFFSET>: The C<sql_limit_dialect> accessor, the string-based
+C<limit_dialect> dispatch, and the C<emulate_limit()> hook have been removed.
+Each database driver's SQLMaker now provides an
+L<apply_limit|DBIO::SQLMaker::ClassicExtensions/apply_limit> method instead.
+The default is C<LIMIT ? OFFSET ?>. If you had custom limit logic, override
+C<apply_limit> on your SQLMaker subclass.
+
+=item * L<SQL::Translator> is optional — being replaced by DB-specific
+deploy modules (e.g. L<DBIO::PostgreSQL::Deploy>)
+
+=item * L<DBIx::Class::TimeStamp> and L<DBIx::Class::Helpers> functionality
+integrated into core
+
+=back
+
 =head1 WHERE TO START READING
 
 See L<DBIO::Manual::DocMap> for the documentation map.

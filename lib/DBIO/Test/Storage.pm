@@ -53,7 +53,6 @@ Any test that only cares about I<what> SQL would be generated
 
 =cut
 
-__PACKAGE__->sql_limit_dialect('LimitOffset');
 __PACKAGE__->datetime_parser_type('DBIO::Test::DateTimeParser');
 
 __PACKAGE__->mk_group_accessors(simple => qw(

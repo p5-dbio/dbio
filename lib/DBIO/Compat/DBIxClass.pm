@@ -190,5 +190,6 @@ C<DBIO::Foo>.
 No files are written to disk. The compatibility layer exists entirely at
 runtime and does not create PAUSE-indexed shadow modules.
 
+=cut
 
 1;

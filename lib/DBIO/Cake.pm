@@ -344,11 +344,9 @@ sub timetz      { data_type => 'time with time zone', @_ }
 sub timestamptz { data_type => 'timestamp with time zone', @_ }
 sub interval    { data_type => 'interval', @_ }
 
-# Enum — takes values as args, but last args might be modifier pairs
+# Enum — all args are enum values (modifiers go outside via col)
 sub enum {
-  my @values;
-  push @values, shift while @_ && !ref($_[0]) && $_[0] !~ /^[a-z_]+$/ || (@_ >= 2 && $_[1] !~ /^[a-z_]+|^\d/);
-  data_type => 'enum', extra => { list => [@values] }, @_;
+  data_type => 'enum', extra => { list => [@_] };
 }
 
 # UUID

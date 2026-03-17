@@ -34,7 +34,7 @@ use base 'DBIO';
 use DBIO::Carp;
 use namespace::clean;
 
-__PACKAGE__->mk_group_accessors (simple => qw/quote_char name_sep limit_dialect/);
+__PACKAGE__->mk_group_accessors (simple => qw/quote_char name_sep/);
 
 =method _quoting_enabled
 
@@ -161,33 +161,9 @@ sub select {
 
   my ($sql, @bind);
   if ($limit) {
-    # this is legacy code-flow from SQLA::Limit, it is not set in stone
-
     ($sql, @bind) = $self->next::method ($table, $fields, $where);
 
-    my $limiter;
-
-    if( $limiter = $self->can ('emulate_limit') ) {
-      carp_unique(<<'__EOW__');
-Support for the legacy emulate_limit() mechanism inherited from
-SQL::Abstract::Limit has been deprecated, and will be removed at
-some future point, as it gets in the way of architectural and/or
-performance advances within DBIO. If your code uses this type of
-limit specification please file a GitHub issue at
-https://github.com/p5-dbio/dbio/issues and provide the source of
-your emulate_limit() implementation, so an acceptable upgrade-path
-can be devised
-__EOW__
-    }
-    else {
-      my $dialect = $self->limit_dialect
-        or $self->throw_exception( "Unable to generate SQL-limit - no limit dialect specified on $self" );
-
-      $limiter = $self->can ("_$dialect")
-        or $self->throw_exception(__PACKAGE__ . " does not implement the requested dialect '$dialect'");
-    }
-
-    $sql = $self->$limiter (
+    $sql = $self->apply_limit (
       $sql,
       { %{$rs_attrs||{}}, _selector_sql => $fields },
       $limit,
@@ -624,15 +600,21 @@ sub _where_op_multicolumn_in {
 }
 
 
-###
-### Code that mostly used to be in DBIC::SQLMaker::LimitDialects
-###
+=method apply_limit
 
-=method _LimitOffset
+  $sql = $self->apply_limit($sql, $rs_attrs, $rows, $offset);
+
+Applies LIMIT/OFFSET to a SELECT statement. The default implementation
+uses the SQL standard C<LIMIT ? OFFSET ?> syntax supported by PostgreSQL,
+SQLite, and most modern databases.
+
+Database drivers override this method to provide their own syntax. For
+example, MySQL uses C<LIMIT ?, ?> (offset-first), Oracle uses C<ROWNUM>,
+and SQL Server uses C<ROW_NUMBER() OVER()>.
 
 =cut
 
-sub _LimitOffset {
+sub apply_limit {
     my ( $self, $sql, $rs_attrs, $rows, $offset ) = @_;
     $sql .= $self->_parse_rs_attrs( $rs_attrs ) . " LIMIT ?";
     push @{$self->{limit_bind}}, [ $self->__rows_bindtype => $rows ];
@@ -643,26 +625,10 @@ sub _LimitOffset {
     return $sql;
 }
 
-=method _LimitXY
 
-=cut
+1;
 
-sub _LimitXY {
-    my ( $self, $sql, $rs_attrs, $rows, $offset ) = @_;
-    $sql .= $self->_parse_rs_attrs( $rs_attrs ) . " LIMIT ";
-    if ($offset) {
-      $sql .= '?, ';
-      push @{$self->{limit_bind}}, [ $self->__offset_bindtype => $offset ];
-    }
-    $sql .= '?';
-    push @{$self->{limit_bind}}, [ $self->__rows_bindtype => $rows ];
-
-    return $sql;
-}
-
-=method _RowNumberOver
-
-=cut
+__END__
 
 sub _RowNumberOver {
   my ($self, $sql, $rs_attrs, $rows, $offset ) = @_;

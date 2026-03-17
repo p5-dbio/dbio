@@ -8,6 +8,7 @@ use base 'DBIO';
 use Scalar::Util 'reftype';
 use Try::Tiny;
 use DBI ();
+use namespace::clean;
 
 __PACKAGE__->mk_group_accessors(simple => qw/
   maximum_lag

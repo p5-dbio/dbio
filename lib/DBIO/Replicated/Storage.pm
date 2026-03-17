@@ -8,6 +8,8 @@ use base 'DBIO::Storage::DBI';
 
 use Scalar::Util qw/blessed reftype weaken/;
 use List::Util ();
+use Sub::Name 'subname';
+use namespace::clean;
 
 __PACKAGE__->mk_group_accessors(simple => qw/
   pool_type
@@ -599,7 +601,7 @@ sub _merge_hashrefs {
 for my $method (@writer_methods) {
   no strict 'refs';
   my $orig = __PACKAGE__->can($method);
-  *{__PACKAGE__ . "::$method"} = sub {
+  *{__PACKAGE__ . "::$method"} = subname $method => sub {
       my $self = shift;
       return $orig->($self, @_) if !ref $self && $orig;
       my $handler = $self->write_handler;
@@ -610,7 +612,7 @@ for my $method (@writer_methods) {
 for my $method (@reader_methods) {
   no strict 'refs';
   my $orig = __PACKAGE__->can($method);
-  *{__PACKAGE__ . "::$method"} = sub {
+  *{__PACKAGE__ . "::$method"} = subname $method => sub {
       my $self = shift;
       return $orig->($self, @_) if !ref $self && $orig;
       my $handler = $self->read_handler;

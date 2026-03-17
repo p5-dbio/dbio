@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Scalar::Util 'reftype';
+use namespace::clean;
 
 sub new {
   my ($class, %args) = @_;

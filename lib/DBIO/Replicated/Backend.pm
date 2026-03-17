@@ -6,6 +6,7 @@ use warnings;
 
 use base 'DBIO';
 use Scalar::Util 'weaken';
+use namespace::clean;
 
 our $AUTOLOAD;
 

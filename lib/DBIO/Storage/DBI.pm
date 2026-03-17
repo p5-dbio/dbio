@@ -20,7 +20,7 @@ use namespace::clean;
 __PACKAGE__->cursor_class('DBIO::Storage::DBI::Cursor');
 
 __PACKAGE__->mk_group_accessors('inherited' => qw/
-  sql_limit_dialect sql_quote_char sql_name_sep
+  sql_quote_char sql_name_sep
 /);
 
 __PACKAGE__->mk_group_accessors('component_class' => qw/sql_maker_class datetime_parser_type/);
@@ -492,12 +492,6 @@ storage object.
 If set to a true value, this option will disable the caching of
 statement handles via L<DBI/prepare_cached>.
 
-=item limit_dialect
-
-Sets a specific SQL::Abstract::Limit-style limit dialect, overriding the
-default L</sql_limit_dialect> setting of the storage (if any). For a list
-of available limit dialects see L<DBIO::SQLMaker::LimitDialects>.
-
 =item quote_names
 
 When true automatically sets L</quote_char> and L</name_sep> to the characters
@@ -746,7 +740,7 @@ sub _normalize_connect_info {
     delete @attrs{@storage_opts} if @storage_opts;
 
   my @sql_maker_opts = grep exists $attrs{$_},
-    qw/limit_dialect quote_char name_sep quote_names/;
+    qw/quote_char name_sep quote_names/;
 
   @{ $info{sql_maker_options} }{@sql_maker_opts} =
     delete @attrs{@sql_maker_opts} if @sql_maker_opts;
@@ -985,25 +979,6 @@ sub sql_maker {
     my $sql_maker_class = $self->sql_maker_class;
 
     my %opts = %{$self->_sql_maker_opts||{}};
-    my $dialect =
-      $opts{limit_dialect}
-        ||
-      $self->sql_limit_dialect
-        ||
-      do {
-        my $s_class = (ref $self) || $self;
-        carp_unique (<<"__EOW__") if $self->_dbi_connect_info->[0];
-Your storage class ($s_class) does not set sql_limit_dialect and you
-have not supplied an explicit limit_dialect in your connection_info.
-DBIO will attempt to use the GenericSubQ dialect, which works on most
-databases but can be (and often is) painfully slow.
-Please file a GitHub issue against '$s_class' at
-https://github.com/p5-dbio/dbio/issues
-__EOW__
-
-        'GenericSubQ';
-      }
-    ;
 
     my ($quote_char, $name_sep);
 
@@ -1028,7 +1003,6 @@ __EOW__
     $self->_sql_maker($sql_maker_class->new(
       bindtype=>'columns',
       array_datatypes => 1,
-      limit_dialect => $dialect,
       ($quote_char ? (quote_char => $quote_char) : ()),
       name_sep => ($name_sep || '.'),
       %opts,
@@ -2894,15 +2868,6 @@ sub select_single {
   $sth->finish();
   return @row;
 }
-
-=head2 sql_limit_dialect
-
-This is an accessor for the default SQL limit dialect used by a particular
-storage driver. Can be overridden by supplying an explicit L</limit_dialect>
-to L<DBIO::Schema/connect>. For a list of available limit dialects
-see L<DBIO::SQLMaker::LimitDialects>.
-
-=cut
 
 sub _dbh_columns_info_for {
   my ($self, $dbh, $table) = @_;

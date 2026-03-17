@@ -557,7 +557,7 @@ sub _build_fake_storage_class {
     no strict 'refs';
     @{"${hybrid}::ISA"} = ('DBIO::Test::Storage', $storage_class);
     mro::set_mro($hybrid, 'c3');
-    for my $attr (qw(sql_limit_dialect sql_quote_char sql_name_sep)) {
+    for my $attr (qw(sql_quote_char sql_name_sep)) {
       my $val = $storage_class->$attr;
       $hybrid->$attr($val) if defined $val;
     }

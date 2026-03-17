@@ -6,6 +6,7 @@ use warnings;
 use base 'DBIO::Storage';
 
 use Carp 'croak';
+use namespace::clean;
 
 =head1 DESCRIPTION
 

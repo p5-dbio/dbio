@@ -6,6 +6,7 @@ use warnings;
 
 use base 'DBIO';
 use Scalar::Util 'blessed';
+use namespace::clean;
 
 __PACKAGE__->mk_group_accessors(simple => qw/
   auto_validate_every
