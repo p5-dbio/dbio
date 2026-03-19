@@ -12,7 +12,7 @@ use DBIO::Util 'detected_reinvoked_destructor';
 use namespace::clean;
 
 __PACKAGE__->mk_group_accessors('simple' =>
-    qw/storage args attrs sth/
+    qw/storage args attrs/
 );
 
 =head1 SYNOPSIS
@@ -202,6 +202,8 @@ sub all {
 
 Getter/setter for the underlying statement handle with process/thread safety
 checks.
+
+=cut
 
 sub sth {
   my $self = shift;

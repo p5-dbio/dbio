@@ -89,6 +89,30 @@ C<:DiffSQL> export support is preserved.
 
 =cut
 
+=method is_smoker
+
+Returns true if running under an automated smoker environment.
+
+=cut
+
+sub is_smoker {
+  return (
+    $ENV{AUTOMATED_TESTING}
+      && !$ENV{PERL5_CPANM_IS_RUNNING}
+      && !$ENV{RELEASE_TESTING}
+  ) ? 1 : 0;
+}
+
+=method is_plain
+
+Returns true if this is a plain user install (not smoker, not release testing).
+
+=cut
+
+sub is_plain {
+  return ( !__PACKAGE__->is_smoker && !$ENV{RELEASE_TESTING} ) ? 1 : 0;
+}
+
 sub import {
   my $self = shift;
 
@@ -239,7 +263,7 @@ sub init_schema {
       });
 
       $storage->connect_info([
-        'dbi:DBIOTest:master',
+        'dbi:DBIO:test:master',
         '',
         '',
         { AutoCommit => 1, %{ $args{connect_opts} || {} } },

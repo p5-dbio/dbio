@@ -10,7 +10,7 @@ our $src_count = 100;
 for (1 .. $src_count) {
   eval <<EOM or die $@;
 
-  package DBIOTest::NS::Stress::Schema::Result::T$_;
+  package DBIO::Test::NS::Stress::Schema::Result::T$_;
   use base qw/DBIO::Core/;
   __PACKAGE__->table($_);
   __PACKAGE__->add_columns (
@@ -24,7 +24,7 @@ EOM
 }
 
 {
-  package DBIOTest::NS::Stress::Schema;
+  package DBIO::Test::NS::Stress::Schema;
 
   use base qw/DBIO::Schema/;
 
@@ -36,13 +36,13 @@ EOM
   }
 }
 
-is (DBIOTest::NS::Stress::Schema->sources, 0, 'Start with no sources');
+is (DBIO::Test::NS::Stress::Schema->sources, 0, 'Start with no sources');
 
 
 note gettimeofday . ":\tload_namespaces start";
-DBIOTest::NS::Stress::Schema->load_namespaces;
+DBIO::Test::NS::Stress::Schema->load_namespaces;
 note gettimeofday . ":\tload_namespaces finished";
 
-is (DBIOTest::NS::Stress::Schema->sources, $src_count, 'All sources attached');
+is (DBIO::Test::NS::Stress::Schema->sources, $src_count, 'All sources attached');
 
 done_testing;

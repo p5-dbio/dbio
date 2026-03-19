@@ -20,14 +20,14 @@ my $sm = $schema->storage->sql_maker;
 
 {
   package # hideee
-    DBIOTest::SillyInt;
+    DBIO::Test::SillyInt;
 
   use overload
     fallback => 1,
     '0+' => sub { ${$_[0]} },
   ;
 }
-my $num = bless( \do { my $foo = 69 }, 'DBIOTest::SillyInt' );
+my $num = bless( \do { my $foo = 69 }, 'DBIO::Test::SillyInt' );
 
 is($num, 69, 'test overloaded object is "sane"');
 is("$num", 69, 'test overloaded object is "sane"');

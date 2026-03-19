@@ -9,23 +9,23 @@ use DBIO::Test::ForeignComponent;
 ok( DBIO::Test::ForeignComponent->foreign_test_method, 'foreign component' );
 
 #   Test for inject_base to filter out duplicates
-{   package DBIOTest::_InjectBaseTest;
+{   package DBIO::Test::_InjectBaseTest;
     use base qw/ DBIO /;
-    package DBIOTest::_InjectBaseTest::A;
-    package DBIOTest::_InjectBaseTest::B;
-    package DBIOTest::_InjectBaseTest::C;
+    package DBIO::Test::_InjectBaseTest::A;
+    package DBIO::Test::_InjectBaseTest::B;
+    package DBIO::Test::_InjectBaseTest::C;
 }
-DBIOTest::_InjectBaseTest->inject_base( 'DBIOTest::_InjectBaseTest', qw/
-    DBIOTest::_InjectBaseTest::A
-    DBIOTest::_InjectBaseTest::B
-    DBIOTest::_InjectBaseTest::B
-    DBIOTest::_InjectBaseTest::C
+DBIO::Test::_InjectBaseTest->inject_base( 'DBIO::Test::_InjectBaseTest', qw/
+    DBIO::Test::_InjectBaseTest::A
+    DBIO::Test::_InjectBaseTest::B
+    DBIO::Test::_InjectBaseTest::B
+    DBIO::Test::_InjectBaseTest::C
 /);
-is_deeply( \@DBIOTest::_InjectBaseTest::ISA,
+is_deeply( \@DBIO::Test::_InjectBaseTest::ISA,
     [qw/
-        DBIOTest::_InjectBaseTest::A
-        DBIOTest::_InjectBaseTest::B
-        DBIOTest::_InjectBaseTest::C
+        DBIO::Test::_InjectBaseTest::A
+        DBIO::Test::_InjectBaseTest::B
+        DBIO::Test::_InjectBaseTest::C
         DBIO
     /],
     'inject_base filters duplicates'

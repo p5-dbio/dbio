@@ -44,7 +44,7 @@ use warnings;
 
 {
   package #
-    DBIOTest::Schema::Foo${suffix};
+    DBIO::Test::Schema::Foo${suffix};
   use base 'DBIO::Core';
 
   __PACKAGE__->table('foo');
@@ -57,12 +57,12 @@ use warnings;
   __PACKAGE__->set_primary_key('fooid');
 
 
-  __PACKAGE__->has_many('foo_to_bar' => 'DBIOTest::Schema::FooToBar${suffix}' => 'bar');
+  __PACKAGE__->has_many('foo_to_bar' => 'DBIO::Test::Schema::FooToBar${suffix}' => 'bar');
   __PACKAGE__->many_to_many( foos => foo_to_bar => 'bar' );
 }
 {
   package #
-    DBIOTest::Schema::FooToBar${suffix};
+    DBIO::Test::Schema::FooToBar${suffix};
 
   use base 'DBIO::Core';
   __PACKAGE__->table('foo_to_bar');
@@ -74,12 +74,12 @@ use warnings;
       data_type => 'integer',
     },
   );
-  __PACKAGE__->belongs_to('foo' => 'DBIOTest::Schema::Foo${suffix}');
-  __PACKAGE__->belongs_to('bar' => 'DBIOTest::Schema::Foo${suffix}');
+  __PACKAGE__->belongs_to('foo' => 'DBIO::Test::Schema::Foo${suffix}');
+  __PACKAGE__->belongs_to('bar' => 'DBIO::Test::Schema::Foo${suffix}');
 }
 {
   package #
-    DBIOTest::Schema::Bar${suffix};
+    DBIO::Test::Schema::Bar${suffix};
 
   use base 'DBIO::Core';
 
@@ -92,7 +92,7 @@ use warnings;
   );
 
   __PACKAGE__->set_primary_key('barid');
-  __PACKAGE__->has_many('foo_to_bar' => 'DBIOTest::Schema::FooToBar${suffix}' => 'foo');
+  __PACKAGE__->has_many('foo_to_bar' => 'DBIO::Test::Schema::FooToBar${suffix}' => 'foo');
 
   __PACKAGE__->many_to_many( bars => foo_to_bar => 'foo' );
 

@@ -1964,10 +1964,14 @@ sub _format_for_trace {
 sub _query_start {
   my ( $self, $sql, $bind ) = @_;
 
-  $self->debugobj->query_start(
-    $sql,
-    $self->debug ? $self->_format_for_trace($bind) : (),
-  );
+  if ($self->debug) {
+    my @trace = $self->_format_for_trace($bind);
+    # Always pass at least one element when debug is on so that
+    # Statistics::query_start produces output even for no-bind queries
+    $self->debugobj->query_start($sql, @trace ? @trace : '');
+  } else {
+    $self->debugobj->query_start($sql);
+  }
 }
 
 sub _query_end {

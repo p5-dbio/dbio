@@ -163,6 +163,12 @@ sub loader_options {
     my $self = shift;
 
     my %args = (ref $_[0] eq 'HASH') ? %{$_[0]} : @_;
+
+    # Extract loader_class so _invoke_loader can find it via the accessor
+    if (my $lc = delete $args{loader_class}) {
+        $self->loader_class($lc);
+    }
+
     $self->_loader_args(\%args);
 
     $self;

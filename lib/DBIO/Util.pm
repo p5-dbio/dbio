@@ -27,11 +27,11 @@ BEGIN {
 
     UNSTABLE_DOLLARAT => ( "$]" < 5.013002 ) ? 1 : 0,
 
-    DBIOTEST => $INC{"DBIOTest/Util.pm"} ? 1 : 0,
+    DBIOTEST => $INC{"DBIO/Test.pm"} ? 1 : 0,
 
     # During 5.13 dev cycle HELEMs started to leak on copy
     # add an escape for these perls ON SMOKERS - a user will still get death
-    PEEPEENESS => ( $INC{"DBIOTest/RunMode.pm"} && eval { DBIOTest::RunMode->is_smoker } && ($] >= 5.013005 and $] <= 5.013006) ),
+    PEEPEENESS => ( $INC{"DBIO/Test.pm"} && eval { DBIO::Test->is_smoker } && ($] >= 5.013005 and $] <= 5.013006) ),
 
     SHUFFLE_UNORDERED_RESULTSETS => $ENV{DBIO_SHUFFLE_UNORDERED_RESULTSETS} ? 1 : 0,
 
@@ -58,7 +58,7 @@ BEGIN {
 
 # FIXME - this is not supposed to be here
 # Carp::Skip to the rescue soon
-use DBIO::Carp '^DBIO|^DBIOTest';
+use DBIO::Carp '^DBIO';
 
 use B ();
 use Carp 'croak';

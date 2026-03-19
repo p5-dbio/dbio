@@ -53,7 +53,7 @@ throws_ok {
 
 # Whacky useless exception class
 {
-    package DBIOTest::Exception;
+    package DBIO::Test::Exception;
     use overload '""' => \&stringify, fallback => 1;
     sub new {
         my $class = shift;
@@ -65,17 +65,17 @@ throws_ok {
         die $self->new(shift);
     }
     sub stringify {
-        "DBIOTest::Exception is handling this: " . shift->{msg};
+        "DBIO::Test::Exception is handling this: " . shift->{msg};
     }
 }
 
 # Try the exception class
-$schema->exception_action(sub { DBIOTest::Exception->throw(@_) });
+$schema->exception_action(sub { DBIO::Test::Exception->throw(@_) });
 throws_ok \&$throw,
-  qr/DBIOTest::Exception is handling this: $ex_regex/;
+  qr/DBIO::Test::Exception is handling this: $ex_regex/;
 
 # While we're at it, lets throw a custom exception through Storage::DBI
 throws_ok { $schema->storage->throw_exception('floob') }
-  qr/DBIOTest::Exception is handling this: floob/;
+  qr/DBIO::Test::Exception is handling this: floob/;
 
 done_testing;
