@@ -18,7 +18,7 @@ needs integration testing and cleanup.
 
 ## Core (lib/DBIO/Loader/)
 
-- [ ] Convert Base.pm from Class::Accessor::Grouped to Moo (NOT Moose -- it already uses C::A::G)
+- [ ] Clean up Base.pm accessors -- uses Class::Accessor::Grouped, simplify where possible
 - [ ] Remove RelBuilder::Compat/ legacy layers (v0_040 through v0_07) -- we start fresh
 - [ ] Remove Optional::Dependencies.pm usage from Base.pm -- DBIO has its own dep system
 - [ ] Update Base.pm code generation to emit `use DBIO::Candy` or `use DBIO::Cake` style classes (default to Cake)
