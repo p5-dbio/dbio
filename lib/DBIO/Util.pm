@@ -74,7 +74,9 @@ our @EXPORT_OK = qw(
   scope_guard is_exception detected_reinvoked_destructor emit_loud_diag
   quote_sub qsub perlstring serialize dump_value
   UNRESOLVABLE_CONDITION
-  dir_path file_path parent_dir slurp_file mkpath rmtree
+  dir_path file_path parent_dir slurp_file slurp_file_utf8 write_file mkpath rmtree
+  split_name dumper_squashed eval_package_without_redefine_warnings class_path
+  firstidx uniq apply array_eq
 );
 
 use constant UNRESOLVABLE_CONDITION => \ '1 = 0';
@@ -414,6 +416,104 @@ sub rmtree {
 }
 
 # --- End path helpers ---
+
+# --- Loader utilities (merged from DBIO::Loader::Utils) ---
+
+sub split_name {
+  require String::CamelCase;
+  my ($name, $v) = @_;
+  my $BY_NON_ALPHANUM = qr/[\W_]+/;
+  if ((not $v) || $v >= 8) {
+    return map split($BY_NON_ALPHANUM, $_), String::CamelCase::wordsplit($name);
+  }
+  my $BY_CASE_TRANSITION_V7 = qr/(?<=[[:lower:]\d])[\W_]*(?=[[:upper:]])|[\W_]+/;
+  my $is_camel_case = $name =~ /[[:upper:]]/ && $name =~ /[[:lower:]]/;
+  return split $is_camel_case ? $BY_CASE_TRANSITION_V7 : $BY_NON_ALPHANUM, $name;
+}
+
+sub dumper_squashed {
+  require Data::Dumper;
+  my $dd = Data::Dumper->new([]);
+  $dd->Terse(1)->Indent(0)->Useqq(1)->Deparse(1)->Quotekeys(0)->Sortkeys(1);
+  return $dd->Values([ $_[0] ])->Dump;
+}
+
+sub eval_package_without_redefine_warnings {
+  my ($pkg, $code) = @_;
+  local $SIG{__WARN__} = sigwarn_silencer(qr/^Subroutine \S+ redefined/);
+  my @delete_syms;
+  my $try_again = 1;
+  while ($try_again) {
+    eval $code;
+    if (my ($sym) = $@ =~ /^Subroutine (\S+) redefined/) {
+      delete $INC{ +class_path($pkg) };
+      push @delete_syms, $sym;
+      foreach my $sym (@delete_syms) {
+        no strict 'refs';
+        undef *{"${pkg}::${sym}"};
+      }
+    }
+    elsif ($@) {
+      die $@ if $@;
+    }
+    else {
+      $try_again = 0;
+    }
+  }
+}
+
+sub class_path {
+  my $class = shift;
+  my $class_path = $class;
+  $class_path =~ s{::}{/}g;
+  $class_path .= '.pm';
+  return $class_path;
+}
+
+sub slurp_file_utf8 {
+  open my $fh, '<:encoding(UTF-8)', $_[0]
+    or croak "Can't open '$_[0]' for reading: $!";
+  my $data = do { local $/; <$fh> };
+  close $fh;
+  $data =~ s/\x0d\x0a|\x0a/\n/g;
+  return $data;
+}
+
+sub write_file {
+  open my $fh, '>:encoding(UTF-8)', $_[0]
+    or croak "Can't open '$_[0]' for writing: $!";
+  print $fh $_[1];
+  close $fh;
+}
+
+sub firstidx (&@) {
+  my $f = shift;
+  foreach my $i (0..$#_) {
+    local *_ = \$_[$i];
+    return $i if $f->();
+  }
+  return -1;
+}
+
+sub uniq (@) {
+  my %seen;
+  grep { not $seen{$_}++ } @_;
+}
+
+sub apply (&@) {
+  my $action = shift;
+  $action->() foreach my @values = @_;
+  wantarray ? @values : $values[-1];
+}
+
+sub array_eq {
+  require List::Util;
+  no warnings 'uninitialized';
+  my ($l, $r) = @_;
+  return @$l == @$r && List::Util::all { $l->[$_] eq $r->[$_] } 0..$#$l;
+}
+
+# --- End loader utilities ---
 
 sub fail_on_internal_call {
   my ($fr, $argdesc);
