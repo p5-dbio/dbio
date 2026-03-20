@@ -16,31 +16,28 @@ needs integration testing and cleanup.
 - [x] POD footers updated to DBIO boilerplate (FURTHER QUESTIONS / COPYRIGHT AND LICENSE)
 - [x] Legacy DBIx::Class options rejected: use_moose, result_roles, result_roles_map (t/loader/01-legacy-options.t)
 - [x] Utils.pm merged into DBIO::Util -- Loader::Utils is now a thin re-export wrapper
-
-## Core (lib/DBIO/Loader/)
-
-- [ ] Clean up Base.pm accessors -- uses Class::Accessor::Grouped, simplify where possible
-- [ ] Remove RelBuilder::Compat/ legacy layers (v0_040 through v0_07) -- we start fresh
-- [ ] Remove Optional::Dependencies.pm usage from Base.pm -- DBIO has its own dep system
-- [ ] Update Base.pm code generation to emit `use DBIO::Candy` or `use DBIO::Cake` style classes (default to Cake)
-- [ ] Add DBIO::Loader to MetaNoIndex exclusions in dist.ini (currently NOT excluded, will be indexed)
+- [x] RelBuilder::Compat/ removed (v0_040, v0_05, v0_06, v0_07) -- DBIO starts fresh
+- [x] Removed unused Optional::Dependencies import from Base.pm
 
 ## Script
 
-- [ ] Create script/dbiodump (port from dbicdump -- does NOT exist yet)
-- [ ] Update to use DBIO::Loader instead of DBIx::Class::Schema::Loader
-- [ ] Add `--style=candy|cake|classic` option for choosing output format
+- [x] Create script/dbiodump (basic CLI with -o key=value options)
+- [ ] Add `--style=candy|cake|classic|moose` option for choosing output format
 - [ ] Default output format: Cake (most concise)
+
+## Code Generation
+
+- [ ] Add Cake output style to Base.pm code generation
+- [ ] Add Candy output style to Base.pm code generation
+- [ ] Keep classic (use base) and Moose styles as options
 
 ## Testing
 
 - [ ] Port loader_*.t tests from Schema::Loader distribution
 - [ ] Write core Loader tests using DBIO::Test::Storage mocks
 - [ ] Driver-specific loader tests go in driver distributions (dbio-sqlite, dbio-postgresql, dbio-mysql)
-- [ ] Core tests use DBIO::Test::Storage mocks only (no real DB in core)
 
 ## Future
 
-- [ ] Generate DBIO::Cake style by default (most concise)
 - [ ] Support pgvector, hstore, jsonb and other modern types in introspection
 - [ ] Support PostgreSQL enum introspection -> enum() in Cake output

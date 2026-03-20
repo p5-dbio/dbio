@@ -1,0 +1,71 @@
+#!/usr/bin/env perl
+# ABSTRACT: Dump a database schema to DBIO Result classes
+# PODNAME: dbiodump
+
+=head1 SYNOPSIS
+
+    dbiodump <schema_class> <dsn> <user> <password> [options]
+
+    dbiodump -o dump_directory=./lib \
+             -o components='["InflateColumn::DateTime"]' \
+             -o debug=1 \
+             My::Schema \
+             dbi:Pg:dbname=foo \
+             myuser \
+             mypassword
+
+=head1 DESCRIPTION
+
+C<dbiodump> connects to a database, introspects the schema, and generates
+DBIO Result class files using L<DBIO::Loader>.
+
+Options are given as C<-o key=value> pairs. Any option valid for
+L<DBIO::Loader::Base> can be passed this way.
+
+Common options:
+
+    -o dump_directory=./lib       Where to write the generated files
+    -o debug=1                    Show introspection progress
+    -o naming=v8                  Naming convention version
+    -o use_namespaces=1           Use Result:: namespace (default)
+    -o generate_pod=1             Generate POD documentation (default)
+    -o components='["TimeStamp"]' Components to load in generated classes
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Long;
+use JSON::PP ();
+
+my %opts;
+GetOptions(\%opts, 'o=s@');
+
+my %loader_opts;
+for my $o (@{ $opts{o} || [] }) {
+    my ($key, $val) = split /=/, $o, 2;
+    # Try to decode JSON values (for arrayrefs, hashrefs)
+    if ($val =~ /^\s*[\[\{]/) {
+        $val = JSON::PP->new->decode($val);
+    }
+    # Booleans and numbers
+    elsif ($val =~ /^\d+$/) {
+        $val = $val + 0;
+    }
+    $loader_opts{$key} = $val;
+}
+
+my ($schema_class, @connect_info) = @ARGV;
+
+die "Usage: dbiodump [-o key=value ...] <schema_class> <dsn> [user] [pass]\n"
+    unless $schema_class && @connect_info;
+
+$loader_opts{dump_directory} ||= './lib';
+
+eval "require DBIO::Loader" or die "Could not load DBIO::Loader: $@\n";
+
+DBIO::Loader::make_schema_at(
+    $schema_class,
+    \%loader_opts,
+    \@connect_info,
+);
