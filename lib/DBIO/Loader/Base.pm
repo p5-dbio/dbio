@@ -87,6 +87,7 @@ __PACKAGE__->mk_group_ro_accessors('simple', qw/
                                 uniq_to_primary
                                 quiet
                                 allow_extra_m2m_cols
+                                loader_style
 /);
 
 
@@ -2021,7 +2022,25 @@ sub _dump_to_dir {
         $src_text .= $self->_base_class_pod($result_base_class)
             unless $result_base_class eq 'DBIO::Core';
 
-        if ($self->use_moose) {
+        my $style = $self->loader_style || 'vanilla';
+
+        if ($style eq 'cake') {
+            $src_text = qq|use utf8;\n|
+                . qq|package $src_class;\n\n|
+                . qq|# Created by DBIO::Loader\n|
+                . qq|# DO NOT MODIFY THE FIRST PART OF THIS FILE\n\n|;
+            $src_text .= $self->_make_pod_heading($src_class);
+            $src_text .= qq|use DBIO::Cake;\n\n|;
+        }
+        elsif ($style eq 'candy') {
+            $src_text = qq|use utf8;\n|
+                . qq|package $src_class;\n\n|
+                . qq|# Created by DBIO::Loader\n|
+                . qq|# DO NOT MODIFY THE FIRST PART OF THIS FILE\n\n|;
+            $src_text .= $self->_make_pod_heading($src_class);
+            $src_text .= qq|use DBIO::Candy;\n\n|;
+        }
+        elsif ($self->use_moose) {
             $src_text.= qq|use Moose;\nuse MooseX::NonMoose;\nuse $autoclean;|;
 
             # these options 'use base' which is compile time
@@ -2909,13 +2928,148 @@ sub _dbic_stmt {
     # generate the pod for this statement, storing it with $self->_pod
     $self->_make_pod( $class, $method, @_ ) if $self->generate_pod;
 
-    my $args = dump(@_);
-    $args = '(' . $args . ')' if @_ < 2;
-    my $stmt = $method . $args . q{;};
+    my $style = $self->loader_style || 'vanilla';
 
-    warn qq|$class\->$stmt\n| if $self->debug;
-    $self->_raw_stmt($class, '__PACKAGE__->' . $stmt);
+    if ($style eq 'cake') {
+        $self->_dbic_stmt_cake($class, $method, @_);
+    }
+    elsif ($style eq 'candy') {
+        $self->_dbic_stmt_candy($class, $method, @_);
+    }
+    else {
+        my $args = dump(@_);
+        $args = '(' . $args . ')' if @_ < 2;
+        my $stmt = $method . $args . q{;};
+
+        warn qq|$class\->$stmt\n| if $self->debug;
+        $self->_raw_stmt($class, '__PACKAGE__->' . $stmt);
+    }
     return;
+}
+
+sub _dbic_stmt_cake {
+    my ($self, $class, $method, @args) = @_;
+
+    if ($method eq 'table') {
+        $self->_raw_stmt($class, "table " . dump($args[0]) . ";");
+    }
+    elsif ($method eq 'add_columns') {
+        # args come in pairs: name => \%info, name => \%info, ...
+        while (my ($name, $info) = splice @args, 0, 2) {
+            last unless defined $name;
+            my $cake_type = $self->_col_info_to_cake($info);
+            $self->_raw_stmt($class, "col $name => $cake_type;");
+        }
+    }
+    elsif ($method eq 'set_primary_key') {
+        $self->_raw_stmt($class, "primary_key " . dump(@args) . ";");
+    }
+    elsif ($method eq 'add_unique_constraint') {
+        my $name = shift @args;
+        my $cols = shift @args;
+        if (ref $name eq 'ARRAY') {
+            $self->_raw_stmt($class, "unique " . dump($name) . ";");
+        } else {
+            $self->_raw_stmt($class, "unique $name => " . dump($cols) . ";");
+        }
+    }
+    elsif ($method =~ /^(?:belongs_to|has_many|has_one|might_have|many_to_many)$/) {
+        my $args = dump(@args);
+        $self->_raw_stmt($class, "$method $args;");
+    }
+    elsif ($method eq 'load_components') {
+        # skip -- Cake handles components via import
+    }
+    else {
+        # fallback to vanilla style
+        my $args = dump(@args);
+        $args = '(' . $args . ')' if @args < 2;
+        $self->_raw_stmt($class, '__PACKAGE__->' . $method . $args . ';');
+    }
+}
+
+sub _dbic_stmt_candy {
+    my ($self, $class, $method, @args) = @_;
+
+    if ($method eq 'table') {
+        $self->_raw_stmt($class, "table " . dump($args[0]) . ";");
+    }
+    elsif ($method eq 'add_columns') {
+        while (my ($name, $info) = splice @args, 0, 2) {
+            last unless defined $name;
+            my $type = $info->{data_type} || 'text';
+            my %opts = %$info;
+            delete $opts{data_type};
+            delete $opts{accessor} if exists $opts{accessor} && $opts{accessor} eq $name;
+            if (keys %opts) {
+                $self->_raw_stmt($class, "has_column $name => '$type' => " . dump(\%opts) . ";");
+            } else {
+                $self->_raw_stmt($class, "has_column $name => '$type';");
+            }
+        }
+    }
+    elsif ($method eq 'set_primary_key') {
+        $self->_raw_stmt($class, "primary_key " . dump(@args) . ";");
+    }
+    elsif ($method eq 'add_unique_constraint') {
+        my $name = shift @args;
+        my $cols = shift @args;
+        if (ref $name eq 'ARRAY') {
+            $self->_raw_stmt($class, "unique_constraint " . dump($name) . ";");
+        } else {
+            $self->_raw_stmt($class, "unique_constraint $name => " . dump($cols) . ";");
+        }
+    }
+    elsif ($method =~ /^(?:belongs_to|has_many|has_one|might_have|many_to_many)$/) {
+        my $args = dump(@args);
+        $self->_raw_stmt($class, "$method $args;");
+    }
+    else {
+        my $args = dump(@args);
+        $args = '(' . $args . ')' if @args < 2;
+        $self->_raw_stmt($class, '__PACKAGE__->' . $method . $args . ';');
+    }
+}
+
+# Convert column info hash to Cake DSL string
+sub _col_info_to_cake {
+    my ($self, $info) = @_;
+    my $type = $info->{data_type} || 'text';
+    my @parts;
+
+    # Type with size
+    if ($info->{size} && $type =~ /^(?:varchar|char|bit|varbit|float|numeric|decimal|vector|halfvec|sparsevec)$/i) {
+        push @parts, "$type($info->{size})";
+    } elsif ($type =~ /^(?:serial|bigserial|smallserial)$/i) {
+        push @parts, $type;
+    } else {
+        push @parts, $type;
+    }
+
+    # Modifiers
+    push @parts, 'auto_inc' if $info->{is_auto_increment};
+    push @parts, 'null' if $info->{is_nullable};
+    push @parts, 'fk' if $info->{is_foreign_key};
+    push @parts, 'unsigned' if $info->{extra} && $info->{extra}{unsigned};
+    push @parts, 'on_create' if $info->{set_on_create};
+    push @parts, 'on_update' if $info->{set_on_update};
+
+    if (defined $info->{default_value}) {
+        my $def = $info->{default_value};
+        if (ref $def eq 'SCALAR') {
+            push @parts, "\\'" . $$def . "'";
+        } elsif (looks_like_number($def)) {
+            push @parts, "default($def)";
+        } else {
+            push @parts, "default('$def')";
+        }
+    }
+
+    if ($info->{retrieve_on_insert}) {
+        # Cake handles this automatically for uuid/serial, skip if redundant
+    }
+
+    return join ', ', @parts;
 }
 
 sub _make_pod_heading {

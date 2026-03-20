@@ -281,9 +281,11 @@ sub set_base {
 
    {
       no strict 'refs';
-      # This is more efficient than push for the new MRO
-      # at least until the new MRO is fixed
-      @{"$inheritor\::ISA"} = (@{"$inheritor\::ISA"} , $self->base($base));
+      # Idempotent: skip if already in @ISA (needed for Loader reload)
+      my @base = $self->base($base);
+      my %seen = map { $_ => 1 } @{"$inheritor\::ISA"};
+      my @new = grep { !$seen{$_} } @base;
+      @{"$inheritor\::ISA"} = (@{"$inheritor\::ISA"}, @new) if @new;
    }
 }
 

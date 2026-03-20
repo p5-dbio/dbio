@@ -6,30 +6,53 @@
 
     dbiodump <schema_class> <dsn> <user> <password> [options]
 
-    dbiodump -o dump_directory=./lib \
-             -o components='["InflateColumn::DateTime"]' \
+    # Classic style (default)
+    dbiodump My::Schema dbi:Pg:dbname=foo myuser mypassword
+
+    # Cake style (most concise)
+    dbiodump --style=cake My::Schema dbi:Pg:dbname=foo myuser mypassword
+
+    # Candy style
+    dbiodump --style=candy My::Schema dbi:Pg:dbname=foo myuser mypassword
+
+    # With extra options
+    dbiodump --style=cake \
+             -o dump_directory=./lib \
              -o debug=1 \
              My::Schema \
              dbi:Pg:dbname=foo \
-             myuser \
-             mypassword
+             myuser mypassword
 
 =head1 DESCRIPTION
 
 C<dbiodump> connects to a database, introspects the schema, and generates
 DBIO Result class files using L<DBIO::Loader>.
 
+=head2 Styles
+
+=over 4
+
+=item B<vanilla> (default)
+
+Traditional C<use base 'DBIO::Core'> with C<__PACKAGE__-E<gt>add_columns(...)>
+method calls.
+
+=item B<cake>
+
+Uses C<use DBIO::Cake> with DDL-like DSL: C<col name =E<gt> varchar(100);>
+
+=item B<candy>
+
+Uses C<use DBIO::Candy> with C<has_column name =E<gt> 'varchar' =E<gt> { size =E<gt> 100 };>
+
+=item B<moose>
+
+Uses C<use Moose> with C<extends> instead of C<use base>.
+
+=back
+
 Options are given as C<-o key=value> pairs. Any option valid for
 L<DBIO::Loader::Base> can be passed this way.
-
-Common options:
-
-    -o dump_directory=./lib       Where to write the generated files
-    -o debug=1                    Show introspection progress
-    -o naming=v8                  Naming convention version
-    -o use_namespaces=1           Use Result:: namespace (default)
-    -o generate_pod=1             Generate POD documentation (default)
-    -o components='["TimeStamp"]' Components to load in generated classes
 
 =cut
 
@@ -39,7 +62,7 @@ use Getopt::Long;
 use JSON::PP ();
 
 my %opts;
-GetOptions(\%opts, 'o=s@');
+GetOptions(\%opts, 'o=s@', 'style=s');
 
 my %loader_opts;
 for my $o (@{ $opts{o} || [] }) {
@@ -57,10 +80,20 @@ for my $o (@{ $opts{o} || [] }) {
 
 my ($schema_class, @connect_info) = @ARGV;
 
-die "Usage: dbiodump [-o key=value ...] <schema_class> <dsn> [user] [pass]\n"
+die "Usage: dbiodump [--style=cake|candy|vanilla|moose] [-o key=value ...] <schema_class> <dsn> [user] [pass]\n"
     unless $schema_class && @connect_info;
 
 $loader_opts{dump_directory} ||= './lib';
+
+if (my $style = $opts{style}) {
+    die "Unknown style '$style' -- use cake, candy, vanilla, or moose\n"
+        unless $style =~ /^(?:cake|candy|vanilla|moose)$/;
+    if ($style eq 'moose') {
+        $loader_opts{use_moose} = 1;
+    } else {
+        $loader_opts{loader_style} = $style;
+    }
+}
 
 eval "require DBIO::Loader" or die "Could not load DBIO::Loader: $@\n";
 

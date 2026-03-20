@@ -22,14 +22,14 @@ needs integration testing and cleanup.
 ## Script
 
 - [x] Create script/dbiodump (basic CLI with -o key=value options)
-- [ ] Add `--style=candy|cake|classic|moose` option for choosing output format
+- [ ] Add `--style=candy|cake|vanilla|moose` option for choosing output format
 - [ ] Default output format: Cake (most concise)
 
 ## Code Generation
 
 - [ ] Add Cake output style to Base.pm code generation
 - [ ] Add Candy output style to Base.pm code generation
-- [ ] Keep classic (use base) and Moose styles as options
+- [ ] Keep vanilla (use base) and Moose styles as options
 
 ## Testing
 
