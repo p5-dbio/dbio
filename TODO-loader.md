@@ -18,26 +18,19 @@ needs integration testing and cleanup.
 - [x] Utils.pm merged into DBIO::Util -- Loader::Utils is now a thin re-export wrapper
 - [x] RelBuilder::Compat/ removed (v0_040, v0_05, v0_06, v0_07) -- DBIO starts fresh
 - [x] Removed unused Optional::Dependencies import from Base.pm
-
-## Script
-
-- [x] Create script/dbiodump (basic CLI with -o key=value options)
-- [ ] Add `--style=candy|cake|vanilla|moose` option for choosing output format
-- [ ] Default output format: Cake (most concise)
-
-## Code Generation
-
-- [ ] Add Cake output style to Base.pm code generation
-- [ ] Add Candy output style to Base.pm code generation
-- [ ] Keep vanilla (use base) and Moose styles as options
+- [x] script/dbiodump with --style=cake|candy|vanilla|moose and -o key=value
+- [x] Cake output style in Base.pm code generation (col name => type modifiers)
+- [x] Candy output style in Base.pm code generation (has_column name => 'type' => { opts })
+- [x] Code generation tests (t/loader/02-code-generation.t) for all three styles
+- [x] Fixed DBIO::Candy::set_base idempotency bug (C3 merge failure on reload)
 
 ## Testing
 
 - [ ] Port loader_*.t tests from Schema::Loader distribution
-- [ ] Write core Loader tests using DBIO::Test::Storage mocks
 - [ ] Driver-specific loader tests go in driver distributions (dbio-sqlite, dbio-postgresql, dbio-mysql)
 
 ## Future
 
-- [ ] Support pgvector, hstore, jsonb and other modern types in introspection
-- [ ] Support PostgreSQL enum introspection -> enum() in Cake output
+- [ ] Default output format: Cake (most concise) -- currently vanilla
+- [ ] Support pgvector, hstore, jsonb and other modern types in introspection (dbio-postgresql)
+- [ ] Support PostgreSQL enum introspection -> enum() in Cake output (dbio-postgresql)
