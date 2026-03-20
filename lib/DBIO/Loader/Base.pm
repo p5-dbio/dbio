@@ -23,7 +23,6 @@ use Class::Inspector ();
 use Scalar::Util 'looks_like_number';
 use DBIO::Loader::Column;
 use DBIO::Loader::Utils qw/split_name dumper_squashed eval_package_without_redefine_warnings class_path slurp_file sigwarn_silencer firstidx uniq/;
-use DBIO::Optional::Dependencies ();
 use Try::Tiny;
 use DBIO ();
 use Encode qw/encode decode/;
@@ -1693,18 +1692,7 @@ sub _relbuilder {
     return if $self->{skip_relationships};
 
     return $self->{relbuilder} ||= do {
-        my $relbuilder_suff =
-            {qw{
-                v4  ::Compat::v0_040
-                v5  ::Compat::v0_05
-                v6  ::Compat::v0_06
-                v7  ::Compat::v0_07
-            }}
-            ->{$self->naming->{relationships}||$CURRENT_V} || '';
-
-        my $relbuilder_class = 'DBIO::Loader::RelBuilder'.$relbuilder_suff;
-        $self->ensure_class_loaded($relbuilder_class);
-        $relbuilder_class->new($self);
+        DBIO::Loader::RelBuilder->new($self);
     };
 }
 
