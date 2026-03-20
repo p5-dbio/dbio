@@ -3037,9 +3037,12 @@ sub _col_info_to_cake {
     my $type = $info->{data_type} || 'text';
     my @parts;
 
-    # Type with size
+    # Type with size (size can be scalar or arrayref for precision/scale)
     if ($info->{size} && $type =~ /^(?:varchar|char|bit|varbit|float|numeric|decimal|vector|halfvec|sparsevec)$/i) {
-        push @parts, "$type($info->{size})";
+        my $size = ref $info->{size} eq 'ARRAY'
+            ? join(',', @{$info->{size}})
+            : $info->{size};
+        push @parts, "$type($size)";
     } elsif ($type =~ /^(?:serial|bigserial|smallserial)$/i) {
         push @parts, $type;
     } else {
