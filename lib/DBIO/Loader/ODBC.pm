@@ -1,5 +1,5 @@
 package DBIO::Loader::ODBC;
-# ABSTRACT: ODBC proxy — detects backend and reblesses to driver-specific Loader
+# ABSTRACT: ODBC proxy -- detects backend and reblesses to driver-specific Loader
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ using C<< $dbh->get_info(17) >> and reblesses into the appropriate
 driver-specific Loader class (e.g. L<DBIO::MSSQL::Loader::ODBC>,
 L<DBIO::Firebird::Loader::ODBC>).
 
-No ODBC-specific introspection logic lives here — it is purely a dispatch proxy.
+No ODBC-specific introspection logic lives here -- it is purely a dispatch proxy.
 
 See L<DBIO::Loader::Base> for usage information.
 

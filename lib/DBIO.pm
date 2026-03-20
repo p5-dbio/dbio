@@ -122,7 +122,7 @@ L<apply_limit|DBIO::SQLMaker::ClassicExtensions/apply_limit> method instead.
 The default is C<LIMIT ? OFFSET ?>. If you had custom limit logic, override
 C<apply_limit> on your SQLMaker subclass.
 
-=item * L<SQL::Translator> is optional — being replaced by DB-specific
+=item * L<SQL::Translator> is optional -- being replaced by DB-specific
 deploy modules (e.g. L<DBIO::PostgreSQL::Deploy>)
 
 =item * L<DBIx::Class::TimeStamp> and L<DBIx::Class::Helpers> functionality
@@ -260,7 +260,7 @@ You can then use these classes in your application code:
   # Execute a joined query to get the cds.
   my @all_john_cds = $johns_rs->search_related('cds')->all;
 
-  # Joins are automatic — just reference the relationship in conditions:
+  # Joins are automatic -- just reference the relationship in conditions:
   my @rock_cds = $schema->resultset('CD')->search(
     { 'artist.name' => 'John Doe' }  # join added automatically
   )->all;
@@ -302,7 +302,7 @@ DBIO (DBI Objects) is a relational mapper for Perl built on top of L<DBI>. It
 combines an object model for rows and result classes with a resultset API for
 building queries without giving up database-native behavior.
 
-DBIO automatically discovers joins from search conditions — when you
+DBIO automatically discovers joins from search conditions -- when you
 reference a relationship in a condition (e.g. C<< 'artist.name' => 'Fred' >>),
 the required join is added without needing an explicit C<< join => >> attribute.
 

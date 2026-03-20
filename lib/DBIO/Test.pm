@@ -235,7 +235,7 @@ sub init_schema {
     }
   }
   else {
-    # Fake storage — no database needed
+    # Fake storage -- no database needed
     require DBIO::Test::Storage;
     $schema = DBIO::Test::Schema->connect(
       sub { }, # dummy connect coderef, Storage overrides everything

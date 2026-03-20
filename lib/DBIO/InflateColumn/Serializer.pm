@@ -88,7 +88,7 @@ The following serializer backends are included:
 =back
 
 The backend modules are loaded on demand. You must install the required
-serialization module separately — they are not hard dependencies of DBIO.
+serialization module separately -- they are not hard dependencies of DBIO.
 
 =head1 USAGE
 

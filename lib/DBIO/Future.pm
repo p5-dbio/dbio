@@ -10,7 +10,7 @@ use namespace::clean;
 =head1 DESCRIPTION
 
 Defines the interface contract that all DBIO-compatible Future objects
-must implement. This is B<not> a base class — async distributions bring
+must implement. This is B<not> a base class -- async distributions bring
 their own Future implementation (L<Future>, L<Mojo::Promise>, etc.).
 
 The interface is intentionally minimal to maximize compatibility across

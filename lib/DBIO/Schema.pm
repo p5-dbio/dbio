@@ -614,7 +614,7 @@ sub source {
   my @sources = sort keys %$sreg;
   my @suggestions;
   for my $s (@sources) {
-    # Simple edit distance check — suggest if name is close
+    # Simple edit distance check -- suggest if name is close
     my $dist = _simple_distance(lc $source_name, lc $s);
     push @suggestions, $s if $dist <= 3;
   }

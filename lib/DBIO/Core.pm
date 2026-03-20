@@ -118,25 +118,25 @@ These options work in C<add_columns> regardless of which style you use:
 
 =over 4
 
-=item C<data_type> — the SQL column type (C<'integer'>, C<'varchar'>, C<'jsonb'>, etc.)
+=item C<data_type> -- the SQL column type (C<'integer'>, C<'varchar'>, C<'jsonb'>, etc.)
 
-=item C<size> — type size (e.g. C<100> for C<varchar(100)>, C<1536> for C<vector(1536)>)
+=item C<size> -- type size (e.g. C<100> for C<varchar(100)>, C<1536> for C<vector(1536)>)
 
-=item C<is_nullable> — set to C<1> for nullable columns (default: C<0>)
+=item C<is_nullable> -- set to C<1> for nullable columns (default: C<0>)
 
-=item C<is_auto_increment> — set to C<1> for auto-increment columns
+=item C<is_auto_increment> -- set to C<1> for auto-increment columns
 
-=item C<default_value> — Perl scalar or C<\$sql_literal> for SQL defaults
+=item C<default_value> -- Perl scalar or C<\$sql_literal> for SQL defaults
 
-=item C<set_on_create> — set to C<1> to auto-populate on INSERT (e.g. timestamps)
+=item C<set_on_create> -- set to C<1> to auto-populate on INSERT (e.g. timestamps)
 
-=item C<set_on_update> — set to C<1> to auto-populate on UPDATE (e.g. C<updated_at>)
+=item C<set_on_update> -- set to C<1> to auto-populate on UPDATE (e.g. C<updated_at>)
 
-=item C<retrieve_on_insert> — set to C<1> to fetch the DB-generated value after INSERT (e.g. UUIDs)
+=item C<retrieve_on_insert> -- set to C<1> to fetch the DB-generated value after INSERT (e.g. UUIDs)
 
-=item C<serializer_class> — e.g. C<'JSON'> for automatic JSON inflate/deflate
+=item C<serializer_class> -- e.g. C<'JSON'> for automatic JSON inflate/deflate
 
-=item C<is_foreign_key> — set to C<1> to mark as a foreign key
+=item C<is_foreign_key> -- set to C<1> to mark as a foreign key
 
 =back
 

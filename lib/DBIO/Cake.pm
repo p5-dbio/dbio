@@ -98,7 +98,7 @@ sub import {
   strict->import;
   warnings->import;
 
-  # Set up inheritance — caller ISA DBIO::Core
+  # Set up inheritance -- caller ISA DBIO::Core
   {
     no strict 'refs';
     unless ($caller->isa('DBIO::Core')) {
@@ -210,10 +210,10 @@ sub col {
   }
 
   # Timestamp auto-behavior:
-  #   col created_at => timestamp;                → NOT NULL → set_on_create
-  #   col updated_at => timestamp on_update;      → NOT NULL + on_update → set_on_create + set_on_update
-  #   col deleted_at => timestamp null;            → nullable → no auto-set
-  #   col last_login => timestamp null, on_update; → nullable + on_update → only set_on_update
+  #   col created_at => timestamp;                -> NOT NULL -> set_on_create
+  #   col updated_at => timestamp on_update;      -> NOT NULL + on_update -> set_on_create + set_on_update
+  #   col deleted_at => timestamp null;            -> nullable -> no auto-set
+  #   col last_login => timestamp null, on_update; -> nullable + on_update -> only set_on_update
   my $dt = $info{data_type} || '';
   if ($dt =~ /^(?:datetime|timestamp|timestamp with(?:out)? time zone)$/) {
     if ($info{is_nullable}) {
@@ -238,7 +238,7 @@ sub col {
 # --- Column modifiers (return key-value pairs, pass through @_) ---
 # The @_ passthrough enables comma-free DDL syntax:
 #   col id => integer auto_inc;
-# Perl parses this as integer(auto_inc()) — auto_inc returns its pairs,
+# Perl parses this as integer(auto_inc()) -- auto_inc returns its pairs,
 # which become @_ for integer, which passes them through.
 
 sub null      { is_nullable => 1, @_ }
@@ -344,7 +344,7 @@ sub timetz      { data_type => 'time with time zone', @_ }
 sub timestamptz { data_type => 'timestamp with time zone', @_ }
 sub interval    { data_type => 'interval', @_ }
 
-# Enum — all args are enum values (modifiers go outside via col)
+# Enum -- all args are enum values (modifiers go outside via col)
 sub enum {
   data_type => 'enum', extra => { list => [@_] };
 }
@@ -445,7 +445,7 @@ sub unique {
   my $class = _caller_class();
 
   if (@args == 1 && ref $args[0] eq 'ARRAY') {
-    # unique \@cols — anonymous unique constraint
+    # unique \@cols -- anonymous unique constraint
     $class->add_unique_constraint($args[0]);
   }
   elsif (@args == 2 && !ref $args[0] && ref $args[1] eq 'ARRAY') {
@@ -713,10 +713,10 @@ Cake automatically sets sensible defaults based on column type and nullability.
 
 The behavior depends on nullability and the C<on_update> modifier:
 
-  col created_at => timestamp;                  # NOT NULL → set_on_create
-  col updated_at => timestamp on_update;        # NOT NULL → set_on_create + set_on_update
-  col deleted_at => timestamp null;             # nullable → no auto-set
-  col last_login => timestamp null, on_update;  # nullable → only set_on_update
+  col created_at => timestamp;                  # NOT NULL -> set_on_create
+  col updated_at => timestamp on_update;        # NOT NULL -> set_on_create + set_on_update
+  col deleted_at => timestamp null;             # nullable -> no auto-set
+  col last_login => timestamp null, on_update;  # nullable -> only set_on_update
 
 The logic: NOT NULL timestamp columns B<must> have a value on create, so
 C<set_on_create> is implied. Nullable columns don't need a value on create,
@@ -731,7 +731,7 @@ database-generated default (e.g. PostgreSQL's C<gen_random_uuid()>) is
 retrieved after INSERT:
 
   col id => uuid;
-  # → retrieve_on_insert => 1
+  # -> retrieve_on_insert => 1
 
 =head2 Scalar references as defaults
 
@@ -898,12 +898,12 @@ Sets the default value.
 
 =head2 on_create
 
-Explicitly set C<set_on_create>. Normally not needed — NOT NULL timestamp
+Explicitly set C<set_on_create>. Normally not needed -- NOT NULL timestamp
 columns get this automatically.
 
 =head2 on_update
 
-Set C<set_on_update> — the column value is refreshed on every row update.
+Set C<set_on_update> -- the column value is refreshed on every row update.
 
   col updated_at => timestamp on_update;
 
@@ -986,7 +986,7 @@ Equivalent to C<col updated_at =E<gt> timestamp on_update>.
 
   cols_updated_created;      # creates both created_at + updated_at
 
-Creates both timestamp columns in one call. The most common pattern —
+Creates both timestamp columns in one call. The most common pattern --
 just add this one line and you're done.
 
 =head1 INDEX SUPPORT

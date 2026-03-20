@@ -10,10 +10,10 @@ use namespace::clean;
 =head1 DESCRIPTION
 
 Defines the interface contract for connection pools used by
-L<DBIO::Storage::Async> drivers. This is an abstract base — concrete
+L<DBIO::Storage::Async> drivers. This is an abstract base -- concrete
 implementations live in async driver distributions.
 
-Sync storage (L<DBIO::Storage::DBI>) does not use a pool — it manages
+Sync storage (L<DBIO::Storage::DBI>) does not use a pool -- it manages
 a single connection directly. This interface is only relevant for async
 storage drivers that need to multiplex queries across multiple
 connections.

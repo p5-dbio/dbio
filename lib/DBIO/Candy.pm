@@ -594,4 +594,4 @@ These are proxy methods for L<DBIO::Timestamp> (loaded automatically):
 
  cols_updated_created;      # creates both at once
 
-The most common pattern — one line for both timestamp columns.
+The most common pattern -- one line for both timestamp columns.

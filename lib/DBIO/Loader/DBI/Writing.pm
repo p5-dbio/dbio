@@ -72,14 +72,16 @@ L<DBIO::SQLite::Loader> in L<DBIO::SQLite>).
 To import comments from the database you need to implement C<_table_comment>,
 C<_column_comment>
 
-=head1 AUTHORS
+=head1 FURTHER QUESTIONS?
 
-See L<DBIO::Loader/AUTHORS>.
+Check the list of L<additional DBIO resources|DBIO/GETTING HELP/SUPPORT>.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This library is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+This module is free software L<copyright|DBIO/COPYRIGHT AND LICENSE>
+by the L<DBIO authors|DBIO/AUTHORS>. You can
+redistribute it and/or modify it under the same terms as the
+L<DBIO library|DBIO/COPYRIGHT AND LICENSE>.
 
 =cut
 

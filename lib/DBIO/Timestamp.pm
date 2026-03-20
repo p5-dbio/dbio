@@ -156,11 +156,11 @@ always refreshes).
 
 =over 4
 
-=item C<col_created($name)> — adds a C<set_on_create> timestamp column (default: C<created_at>)
+=item C<col_created($name)> -- adds a C<set_on_create> timestamp column (default: C<created_at>)
 
-=item C<col_updated($name)> — adds a C<set_on_create + set_on_update> timestamp column (default: C<updated_at>)
+=item C<col_updated($name)> -- adds a C<set_on_create + set_on_update> timestamp column (default: C<updated_at>)
 
-=item C<cols_updated_created> — adds both in one call
+=item C<cols_updated_created> -- adds both in one call
 
 =back
 

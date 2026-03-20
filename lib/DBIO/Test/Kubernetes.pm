@@ -265,10 +265,10 @@ sub connection_info {
             $host = "$spec->{svc_name}.$ns.svc.cluster.local";
             $port = $spec->{port};
         } else {
-            # local mode — use port-forward ports
+            # local mode -- use port-forward ports
             $host = '127.0.0.1';
             $port = $self->{local_ports}{$db}
-                or croak "No local port for $db — call setup_port_forwards first";
+                or croak "No local port for $db -- call setup_port_forwards first";
         }
 
         $info{$db} = {

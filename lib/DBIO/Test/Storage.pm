@@ -312,7 +312,7 @@ sub _prepare_sth {
 
 Registers a mock result. When a query matches C<$sql_pattern> (string
 or regexp), the given rows are returned. Mocks are checked in LIFO
-order — later mocks override earlier ones. Each mock is consumed once
+order -- later mocks override earlier ones. Each mock is consumed once
 unless registered with L</mock_persistent>.
 
 =cut
@@ -330,7 +330,7 @@ sub mock {
 
 =method mock_persistent
 
-Like L</mock> but the mock is not consumed after matching — it keeps
+Like L</mock> but the mock is not consumed after matching -- it keeps
 returning the same rows for every matching query.
 
 =cut
@@ -360,7 +360,7 @@ sub _find_mock {
   my ($self, $sql) = @_;
   my $mocks = $self->_mock_results;
 
-  # LIFO search — last registered mock wins
+  # LIFO search -- last registered mock wins
   for my $i (reverse 0 .. $#$mocks) {
     if ($sql =~ $mocks->[$i]{pattern}) {
       my $mock = $mocks->[$i];

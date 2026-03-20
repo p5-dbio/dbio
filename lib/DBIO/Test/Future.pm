@@ -13,7 +13,7 @@ Just like L<DBIO::Test::Storage> provides a fake storage for testing SQL
 generation without a real database, C<DBIO::Test::Future> provides a fake
 Future that resolves immediately for testing async method signatures.
 
-All methods execute synchronously — C<then> chains run immediately,
+All methods execute synchronously -- C<then> chains run immediately,
 C<get> returns instantly, and C<is_ready> is always true.
 
 =head1 SYNOPSIS

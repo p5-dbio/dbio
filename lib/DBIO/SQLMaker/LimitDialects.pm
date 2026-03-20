@@ -1,4 +1,4 @@
-# Namespace squat — kept to prevent conflicts with the old
+# Namespace squat -- kept to prevent conflicts with the old
 # DBIx::Class::SQLMaker::LimitDialects CPAN distribution.
 package DBIO::SQLMaker::LimitDialects;
 # ABSTRACT: Reserved namespace (limit logic lives in driver SQLMakers)
@@ -22,9 +22,9 @@ provided by driver distributions:
 
 =over 4
 
-=item * L<DBIO::MySQL::SQLMaker> — C<LIMIT ?, ?>
+=item * L<DBIO::MySQL::SQLMaker> -- C<LIMIT ?, ?>
 
-=item * PostgreSQL, SQLite — use the default C<LIMIT ? OFFSET ?>
+=item * PostgreSQL, SQLite -- use the default C<LIMIT ? OFFSET ?>
 
 =back
 

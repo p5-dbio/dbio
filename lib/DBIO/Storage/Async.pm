@@ -18,17 +18,17 @@ Concrete implementations live in separate distributions:
 
 =over 4
 
-=item * L<DBIO::EV::Pg::Storage> — uses L<EV::Pg> (libpq, no DBI)
+=item * L<DBIO::EV::Pg::Storage> -- uses L<EV::Pg> (libpq, no DBI)
 
-=item * L<Net::Async::DBIO::Storage> — uses L<IO::Async>
+=item * L<Net::Async::DBIO::Storage> -- uses L<IO::Async>
 
-=item * L<Mojo::DBIO::Storage> — uses L<Mojo::IOLoop>
+=item * L<Mojo::DBIO::Storage> -- uses L<Mojo::IOLoop>
 
 =back
 
 =head1 SYNOPSIS
 
-  # Users don't instantiate this directly — use a concrete driver:
+  # Users don't instantiate this directly -- use a concrete driver:
   my $schema = MyApp::Schema->connect(
       'DBIO::EV::Pg',
       { host => 'localhost', dbname => 'myapp', pool_size => 10 },
@@ -126,7 +126,7 @@ sub txn_do_async { croak 'Subclass must override txn_do_async' }
   });
 
 Execute multiple queries in pipeline mode for reduced round-trips.
-Optional — not all async drivers support this. Default croaks.
+Optional -- not all async drivers support this. Default croaks.
 
 =cut
 
@@ -137,7 +137,7 @@ sub pipeline { croak 'Pipeline mode not supported by this storage driver' }
   $storage->listen($channel, sub { my ($channel, $payload, $pid) = @_; });
 
 Subscribe to database notifications (e.g. PostgreSQL LISTEN/NOTIFY).
-Optional — not all databases support this. Default croaks.
+Optional -- not all databases support this. Default croaks.
 
 =cut
 

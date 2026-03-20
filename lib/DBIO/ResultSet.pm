@@ -5005,7 +5005,7 @@ will automatically add the C<artist> join. You only need explicit C<join>
 when referencing relationships in C<select>, C<order_by>, or other
 attributes that are not part of the WHERE/HAVING conditions.
 
-  # Automatic — join is discovered from the condition:
+  # Automatic -- join is discovered from the condition:
   my $rs = $schema->resultset('CD')->search(
     { 'artist.name' => 'Nine Inch Nails' }
   );
