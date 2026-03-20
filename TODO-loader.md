@@ -15,6 +15,7 @@ needs integration testing and cleanup.
 - [x] DBI/Writing.pm updated with new naming convention
 - [x] POD footers updated to DBIO boilerplate (FURTHER QUESTIONS / COPYRIGHT AND LICENSE)
 - [x] Legacy DBIx::Class options rejected: use_moose, result_roles, result_roles_map (t/loader/01-legacy-options.t)
+- [x] Utils.pm merged into DBIO::Util -- Loader::Utils is now a thin re-export wrapper
 
 ## Core (lib/DBIO/Loader/)
 
@@ -22,7 +23,6 @@ needs integration testing and cleanup.
 - [ ] Remove RelBuilder::Compat/ legacy layers (v0_040 through v0_07) -- we start fresh
 - [ ] Remove Optional::Dependencies.pm usage from Base.pm -- DBIO has its own dep system
 - [ ] Update Base.pm code generation to emit `use DBIO::Candy` or `use DBIO::Cake` style classes (default to Cake)
-- [ ] Clean up Utils.pm -- remove unused functions: dumper, write_file, no_warnings, warnings_exist, warnings_exist_silent
 - [ ] Add DBIO::Loader to MetaNoIndex exclusions in dist.ini (currently NOT excluded, will be indexed)
 
 ## Script
