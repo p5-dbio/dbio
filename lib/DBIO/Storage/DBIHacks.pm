@@ -1,26 +1,5 @@
 package DBIO::Storage::DBIHacks;
-# ABSTRACT: Internal SQL analysis and rewrite utilities
-
-#
-# This module contains code supporting a battery of special cases and tests for
-# many corner cases pushing the envelope of what DBIO can do. When work on
-# these utilities began in mid 2009 (51a296b402c) it wasn't immediately obvious
-# that these pieces, despite their misleading on-first-sighe-flakiness, will
-# become part of the generic query rewriting machinery of DBIO, allowing it to
-# both generate and process queries representing incredibly complex sets with
-# reasonable efficiency.
-#
-# Now (end of 2019), more than 10 years later the routines in this class have
-# stabilized enough, and are meticulously covered with tests, to a point where
-# an effort to formalize them into user-facing APIs might be worthwhile.
-#
-# An implementor working on publicizing and/or replacing the routines with a
-# more modern SQL generation framework should keep in mind that pretty much all
-# existing tests are constructed on the basis of real-world code used in
-# production somewhere.
-#
-# Please hack on this responsibly ;)
-#
+# ABSTRACT: SQL analysis and query rewrite utilities
 
 use strict;
 use warnings;
@@ -36,15 +15,13 @@ use namespace::clean;
 
 =head1 DESCRIPTION
 
-Internal SQL analysis and rewrite helpers used by DBIO storage classes.
+SQL analysis and query rewrite helpers used by L<DBIO::Storage::DBI>. Handles
+join pruning, complex prefetch subquery generation, and alias/column resolution.
 
-=head1 METHODS
-
-#
-# This code will remove non-selecting/non-restricting joins from
-# {from} specs, aiding the RDBMS query optimizer
-#
 =method _prune_unused_joins
+
+Remove non-selecting/non-restricting joins from C<{from}> specs, aiding the
+RDBMS query optimizer.
 
 =cut
 
@@ -113,11 +90,10 @@ sub _prune_unused_joins {
   return ( \@newfrom, $new_aliastypes );
 }
 
-#
-# This is the code producing joined subqueries like:
-# SELECT me.*, other.* FROM ( SELECT me.* FROM ... ) JOIN other ON ...
-#
 =method _adjust_select_args_for_complex_prefetch
+
+Produce joined subqueries for complex prefetches, e.g.
+C<SELECT me.*, other.* FROM ( SELECT me.* FROM ... ) JOIN other ON ...>
 
 =cut
 

@@ -55,24 +55,5 @@ on 'test' => sub {
 };
 
 on 'develop' => sub {
-  requires 'Dist::Zilla';
-  requires 'Dist::Zilla::Plugin::VersionFromMainModule';
-  requires 'Dist::Zilla::Plugin::GatherDir';
-  requires 'Dist::Zilla::Plugin::PruneCruft';
-  requires 'Dist::Zilla::Plugin::MetaJSON';
-  requires 'Dist::Zilla::Plugin::MetaYAML';
-  requires 'Dist::Zilla::Plugin::MetaNoIndex';
-  requires 'Dist::Zilla::Plugin::MetaResources';
-  requires 'Dist::Zilla::Plugin::MetaProvides::Package';
-  requires 'Dist::Zilla::Plugin::Prereqs::FromCPANfile';
-  requires 'Dist::Zilla::Plugin::ExecDir';
-  requires 'Dist::Zilla::Plugin::PodWeaver';
-  requires 'Dist::Zilla::Plugin::ExtraTests';
-  requires 'Dist::Zilla::Plugin::MakeMaker::Awesome';
-  requires 'Dist::Zilla::Plugin::License';
-  requires 'Dist::Zilla::Plugin::Readme';
-  requires 'Dist::Zilla::Plugin::ManifestSkip';
-  requires 'Dist::Zilla::Plugin::Manifest';
-  requires 'Dist::Zilla::Plugin::MetaConfig';
-  requires 'Dist::Zilla::Plugin::Git';
+  requires 'Dist::Zilla::PluginBundle::DBIO';
 };

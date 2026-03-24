@@ -61,10 +61,6 @@ Delegates exception throwing to the configured C<storage>.
 
 Execute a coderef with configured retry and transaction behavior.
 
-=method _run
-
-Internal recursive worker for C<run>.
-
 =cut
 
 sub new {
