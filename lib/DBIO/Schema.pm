@@ -238,7 +238,7 @@ sub load_namespaces {
   my @to_register;
   {
     no warnings qw/redefine/;
-    local *Class::C3::reinitialize = sub { } if DBIO::_ENV_::OLD_MRO;
+    local *Class::C3::reinitialize = sub { } if DBIO::Util::OLD_MRO;
     use warnings qw/redefine/;
 
     # ensure classes are loaded and attached in inheritance order
@@ -294,7 +294,7 @@ sub load_namespaces {
         .'with no corresponding Result class';
   }
 
-  Class::C3->reinitialize if DBIO::_ENV_::OLD_MRO;
+  Class::C3->reinitialize if DBIO::Util::OLD_MRO;
 
   $class->register_class(@$_) for (@to_register);
 
@@ -378,7 +378,7 @@ sub load_classes {
   my @to_register;
   {
     no warnings qw/redefine/;
-    local *Class::C3::reinitialize = sub { } if DBIO::_ENV_::OLD_MRO;
+    local *Class::C3::reinitialize = sub { } if DBIO::Util::OLD_MRO;
     use warnings qw/redefine/;
 
     foreach my $prefix (keys %comps_for) {
@@ -397,7 +397,7 @@ sub load_classes {
       }
     }
   }
-  Class::C3->reinitialize if DBIO::_ENV_::OLD_MRO;
+  Class::C3->reinitialize if DBIO::Util::OLD_MRO;
 
   foreach my $to (@to_register) {
     $class->register_class(@$to);
@@ -963,7 +963,7 @@ sub compose_namespace {
 
   {
     no warnings qw/redefine/;
-    local *Class::C3::reinitialize = sub { } if DBIO::_ENV_::OLD_MRO;
+    local *Class::C3::reinitialize = sub { } if DBIO::Util::OLD_MRO;
     use warnings qw/redefine/;
 
     foreach my $source_name ($self->sources) {
@@ -991,7 +991,7 @@ sub compose_namespace {
       for qw(class source resultset);
   }
 
-  Class::C3->reinitialize() if DBIO::_ENV_::OLD_MRO;
+  Class::C3->reinitialize() if DBIO::Util::OLD_MRO;
 
   return $schema;
 }

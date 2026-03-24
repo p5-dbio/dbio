@@ -65,7 +65,7 @@ sub resolve {
     # vague error message as this is never supposed to happen
     "Unable to resolve moniker '%s' - please contact the dev team at %s",
     $_[0]->source_moniker,
-    DBIO::_ENV_::HELP_URL,
+    DBIO::Util::HELP_URL,
   ), 'full_stacktrace');
 }
 

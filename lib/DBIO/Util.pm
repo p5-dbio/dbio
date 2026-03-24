@@ -10,42 +10,39 @@ use constant SPURIOUS_VERSION_CHECK_WARNINGS => (
     : 0
 );
 
+use Config;
+
+use constant {
+  BROKEN_FORK => ($^O eq 'MSWin32') ? 1 : 0,
+
+  BROKEN_GOTO => ($] < '5.008003') ? 1 : 0,
+
+  HAS_ITHREADS => $Config{useithreads} ? 1 : 0,
+
+  UNSTABLE_DOLLARAT => ( "$]" < 5.013002 ) ? 1 : 0,
+
+  DBIOTEST => $INC{"DBIO/Test.pm"} ? 1 : 0,
+
+  PEEPEENESS => ( $INC{"DBIO/Test.pm"} && eval { DBIO::Test->is_smoker } && ($] >= 5.013005 and $] <= 5.013006) ),
+
+  SHUFFLE_UNORDERED_RESULTSETS => $ENV{DBIO_SHUFFLE_UNORDERED_RESULTSETS} ? 1 : 0,
+
+  ASSERT_NO_INTERNAL_WANTARRAY => $ENV{DBIO_ASSERT_NO_INTERNAL_WANTARRAY} ? 1 : 0,
+
+  ASSERT_NO_INTERNAL_INDIRECT_CALLS => $ENV{DBIO_ASSERT_NO_INTERNAL_INDIRECT_CALLS} ? 1 : 0,
+
+  STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE => $ENV{DBIO_STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE} ? 1 : 0,
+
+  IV_SIZE => $Config{ivsize},
+
+  OS_NAME => $^O,
+
+  HELP_URL => 'https://github.com/p5-dbio/dbio/issues',
+
+  DEVREL => ( ($DBIO::VERSION || '') =~ /_/) ? 1 : 0,
+};
+
 BEGIN {
-  package # hide from pause
-    DBIO::_ENV_;
-
-  use Config;
-
-  use constant {
-
-    # but of course
-    BROKEN_FORK => ($^O eq 'MSWin32') ? 1 : 0,
-
-    BROKEN_GOTO => ($] < '5.008003') ? 1 : 0,
-
-    HAS_ITHREADS => $Config{useithreads} ? 1 : 0,
-
-    UNSTABLE_DOLLARAT => ( "$]" < 5.013002 ) ? 1 : 0,
-
-    DBIOTEST => $INC{"DBIO/Test.pm"} ? 1 : 0,
-
-    # During 5.13 dev cycle HELEMs started to leak on copy
-    # add an escape for these perls ON SMOKERS - a user will still get death
-    PEEPEENESS => ( $INC{"DBIO/Test.pm"} && eval { DBIO::Test->is_smoker } && ($] >= 5.013005 and $] <= 5.013006) ),
-
-    SHUFFLE_UNORDERED_RESULTSETS => $ENV{DBIO_SHUFFLE_UNORDERED_RESULTSETS} ? 1 : 0,
-
-    ASSERT_NO_INTERNAL_WANTARRAY => $ENV{DBIO_ASSERT_NO_INTERNAL_WANTARRAY} ? 1 : 0,
-
-    ASSERT_NO_INTERNAL_INDIRECT_CALLS => $ENV{DBIO_ASSERT_NO_INTERNAL_INDIRECT_CALLS} ? 1 : 0,
-
-    STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE => $ENV{DBIO_STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE} ? 1 : 0,
-
-    IV_SIZE => $Config{ivsize},
-
-    OS_NAME => $^O,
-  };
-
   if ($] < 5.009_005) {
     require MRO::Compat;
     constant->import( OLD_MRO => 1 );
@@ -199,7 +196,7 @@ sub scope_guard (&) {
   sub DESTROY {
     &DBIO::Util::detected_reinvoked_destructor;
 
-    local $@ if DBIO::_ENV_::UNSTABLE_DOLLARAT;
+    local $@ if DBIO::Util::UNSTABLE_DOLLARAT;
 
     eval {
       $_[0]->[0]->();

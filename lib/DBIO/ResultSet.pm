@@ -296,7 +296,7 @@ sub new {
   my $class = shift;
 
   if (ref $class) {
-    DBIO::_ENV_::ASSERT_NO_INTERNAL_INDIRECT_CALLS and fail_on_internal_call;
+    DBIO::Util::ASSERT_NO_INTERNAL_INDIRECT_CALLS and fail_on_internal_call;
     return $class->new_result(@_);
   }
 
@@ -387,7 +387,7 @@ sub search {
   my $rs = $self->search_rs( @_ );
 
   if (wantarray) {
-    DBIO::_ENV_::ASSERT_NO_INTERNAL_WANTARRAY and my $sog = fail_on_internal_wantarray;
+    DBIO::Util::ASSERT_NO_INTERNAL_WANTARRAY and my $sog = fail_on_internal_wantarray;
     return $rs->all;
   }
   elsif (defined wantarray) {
@@ -944,7 +944,7 @@ sub _build_unique_cond {
     '_build_unique_cond is a private method, and moreover is about to go '
   . 'away. Please contact the development team at %s if you believe you '
   . 'have a genuine use for this method, in order to discuss alternatives.',
-    DBIO::_ENV_::HELP_URL,
+    DBIO::Util::HELP_URL,
   ;
 
   my ($self, $constraint_name, $cond, $croak_on_null) = @_;
@@ -1457,7 +1457,7 @@ sub _construct_results {
       $unrolled_non_null_cols_to_check = join (',', @$check_non_null_cols);
 
       utf8::upgrade($unrolled_non_null_cols_to_check)
-        if DBIO::_ENV_::STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE;
+        if DBIO::Util::STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE;
     }
 
     my $next_cref =
@@ -2965,7 +2965,7 @@ L</new>.
 
 sub create {
   #my ($self, $col_data) = @_;
-  DBIO::_ENV_::ASSERT_NO_INTERNAL_INDIRECT_CALLS and fail_on_internal_call;
+  DBIO::Util::ASSERT_NO_INTERNAL_INDIRECT_CALLS and fail_on_internal_call;
   return shift->new_result(shift)->insert;
 }
 

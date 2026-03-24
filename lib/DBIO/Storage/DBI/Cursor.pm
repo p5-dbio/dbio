@@ -68,7 +68,7 @@ Returns a new L<DBIO::Storage::DBI::Cursor> object.
       attrs => $attrs,
     }, ref $class || $class;
 
-    if (DBIO::_ENV_::HAS_ITHREADS) {
+    if (DBIO::Util::HAS_ITHREADS) {
 
       # quick "garbage collection" pass - prevents the registry
       # from slowly growing with a bunch of undef-valued keys
@@ -187,7 +187,7 @@ sub all {
   (undef, $sth) = $self->storage->_select( @{$self->{args}} );
 
   (
-    DBIO::_ENV_::SHUFFLE_UNORDERED_RESULTSETS
+    DBIO::Util::SHUFFLE_UNORDERED_RESULTSETS
       and
     ! $self->{attrs}{order_by}
       and
@@ -212,16 +212,16 @@ sub sth {
     delete @{$self}{qw/_pos _done _pid _intra_thread/};
 
     $self->{sth} = $_[0];
-    $self->{_pid} = $$ if ! DBIO::_ENV_::BROKEN_FORK and $_[0];
+    $self->{_pid} = $$ if ! DBIO::Util::BROKEN_FORK and $_[0];
   }
   elsif ($self->{sth} and ! $self->{_done}) {
 
     my $invalidate_handle_reason;
 
-    if (DBIO::_ENV_::HAS_ITHREADS and $self->{_intra_thread} ) {
+    if (DBIO::Util::HAS_ITHREADS and $self->{_intra_thread} ) {
       $invalidate_handle_reason = 'Multi-thread';
     }
-    elsif (!DBIO::_ENV_::BROKEN_FORK and $self->{_pid} != $$ ) {
+    elsif (!DBIO::Util::BROKEN_FORK and $self->{_pid} != $$ ) {
       $invalidate_handle_reason = 'Multi-process';
     }
 

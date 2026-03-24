@@ -27,6 +27,10 @@ requires 'SQL::Abstract', '2.000001';
 requires 'Sub::Exporter', '0.982';
 requires 'Try::Tiny', '0.07';
 
+# DateTime support (used by InflateColumn::DateTime)
+requires 'DateTime', '0.55';
+requires 'DateTime::Format::Strptime', '1.2';
+
 # Optional: DBIO::Candy -autotable pluralization
 recommends 'Lingua::EN::Inflect', '0';
 

@@ -145,7 +145,7 @@ for my $meth (keys %$storage_accessor_idx, qw(
       $_[0]->_determine_driver;
 
       # work around http://rt.perl.org/rt3/Public/Bug/Display.html?id=35878
-      goto $_[0]->can(%2$s) unless DBIO::_ENV_::BROKEN_GOTO;
+      goto $_[0]->can(%2$s) unless DBIO::Util::BROKEN_GOTO;
 
       my $cref = $_[0]->can(%2$s);
       goto $cref;
@@ -257,7 +257,7 @@ sub new {
 sub DESTROY {
   return if &detected_reinvoked_destructor;
 
-  $_[0]->_verify_pid unless DBIO::_ENV_::BROKEN_FORK;
+  $_[0]->_verify_pid unless DBIO::Util::BROKEN_FORK;
   # some databases spew warnings on implicit disconnect
   local $SIG{__WARN__} = sub {};
   $_[0]->_dbh(undef);
@@ -931,7 +931,7 @@ sub connected {
 }
 
 sub _seems_connected {
-  $_[0]->_verify_pid unless DBIO::_ENV_::BROKEN_FORK;
+  $_[0]->_verify_pid unless DBIO::Util::BROKEN_FORK;
 
   ($_[0]->_dbh || return 0)->FETCH('Active');
 }
@@ -964,7 +964,7 @@ sub dbh {
 
 # this is the internal "get dbh or connect (don't check)" method
 sub _get_dbh {
-  $_[0]->_verify_pid unless DBIO::_ENV_::BROKEN_FORK;
+  $_[0]->_verify_pid unless DBIO::Util::BROKEN_FORK;
   $_[0]->_dbh || $_[0]->_populate_dbh;
 }
 
@@ -1026,7 +1026,7 @@ sub _populate_dbh {
 
   $_[0]->_dbh($_[0]->_connect);
 
-  $_[0]->_conn_pid($$) unless DBIO::_ENV_::BROKEN_FORK; # on win32 these are in fact threads
+  $_[0]->_conn_pid($$) unless DBIO::Util::BROKEN_FORK; # on win32 these are in fact threads
 
   $_[0]->_determine_driver;
 
@@ -1055,7 +1055,7 @@ sub _run_connection_actions {
 
   my $sqlac_like;
   if(
-    DBIO::_ENV_::DEVREL
+    DBIO::Util::DEVREL
       and
     ($ENV{DBIODEVREL_SWAPOUT_SQLAC_WITH} || $ENV{DBICDEVREL_SWAPOUT_SQLAC_WITH})
       and
@@ -1403,7 +1403,7 @@ sub _determine_driver {
 
     $self->_driver_determined(1);
 
-    Class::C3->reinitialize() if DBIO::_ENV_::OLD_MRO;
+    Class::C3->reinitialize() if DBIO::Util::OLD_MRO;
 
     $self->_init; # run driver-specific initializations
 
@@ -1663,7 +1663,7 @@ sub connect_call_rebase_sqlmaker {
       $self->inject_base( $synthetic_class, $old_class, $requested_base_class );
 
       Class::C3->reinitialize
-        if DBIO::_ENV_::OLD_MRO;
+        if DBIO::Util::OLD_MRO;
     }
   }
 
@@ -2325,7 +2325,7 @@ sub insert_bulk {
     'insert_bulk() should have never been exposed as a public method and '
   . 'calling it is depecated as of Aug 2014. If you believe having a genuine '
   . 'use for this method please contact the development team via '
-  . DBIO::_ENV_::HELP_URL
+  . DBIO::Util::HELP_URL
   );
 
   return '0E0' unless @{$_[3]||[]};

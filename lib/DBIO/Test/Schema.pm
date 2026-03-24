@@ -99,7 +99,7 @@ sub capture_executed_sql_bind {
   # hack around API to get raw bind values
   no warnings 'redefine';
   local *DBIO::Storage::DBI::_format_for_trace = sub { $_[1] };
-  Class::C3->reinitialize if DBIO::_ENV_::OLD_MRO;
+  Class::C3->reinitialize if DBIO::Util::OLD_MRO;
 
   local $self->storage->{debugcb};
   local $self->storage->{debugobj} = my $tracer_obj = DBIO::Test::SQLTracerObj->new;

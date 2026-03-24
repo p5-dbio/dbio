@@ -440,7 +440,7 @@ sub func {
   my $cursor = $self->func_rs($function)->cursor;
 
   if( wantarray ) {
-    DBIO::_ENV_::ASSERT_NO_INTERNAL_WANTARRAY and my $sog = fail_on_internal_wantarray;
+    DBIO::Util::ASSERT_NO_INTERNAL_WANTARRAY and my $sog = fail_on_internal_wantarray;
     return map { $_->[ 0 ] } $cursor->all;
   }
 

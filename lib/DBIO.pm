@@ -14,14 +14,6 @@ our $VERSION;
 # this ones version, whether that be s.c.o. or Module::Metadata, etc
 $VERSION = '0.900000';
 
-{
-  package
-    DBIO::_ENV_;
-
-  require constant;
-  constant->import( DEVREL => ( ($DBIO::VERSION =~ /_/) ? 1 : 0 ) );
-}
-
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
 use DBIO::Util;
@@ -71,12 +63,6 @@ sub _attr_cache {
     %$cache,
     %{ $self->maybe::next::method || {} },
   };
-}
-
-# *DO NOT* change this URL nor the identically named =head1 below
-# it is linked throughout the ecosystem
-sub DBIO::_ENV_::HELP_URL () {
-  'https://github.com/p5-dbio/dbio/issues'
 }
 
 1;
