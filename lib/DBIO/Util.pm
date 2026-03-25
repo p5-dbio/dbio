@@ -13,7 +13,7 @@ use constant SPURIOUS_VERSION_CHECK_WARNINGS => (
 use Config;
 
 use constant {
-  BROKEN_FORK => ($^O eq 'MSWin32') ? 1 : 0,
+  IS_WINDOWS => ($^O eq 'MSWin32') ? 1 : 0,
 
   BROKEN_GOTO => ($] < '5.008003') ? 1 : 0,
 
@@ -38,18 +38,21 @@ use constant {
   OS_NAME => $^O,
 
   HELP_URL => 'https://github.com/p5-dbio/dbio/issues',
-
-  DEVREL => ( ($DBIO::VERSION || '') =~ /_/) ? 1 : 0,
 };
+
+# Exportable subs for common constants
+sub is_windows () { $^O eq 'MSWin32' ? 1 : 0 }
+sub is_dev_release () { ($DBIO::VERSION || '') =~ /_/ ? 1 : 0 }
+sub old_mro () { $] < 5.009_005 ? 1 : 0 }
+sub help_url () { 'https://github.com/p5-dbio/dbio/issues' }
+sub unstable_dollar_at () { "$]" < 5.013002 ? 1 : 0 }
 
 BEGIN {
   if ($] < 5.009_005) {
     require MRO::Compat;
-    constant->import( OLD_MRO => 1 );
   }
   else {
     require mro;
-    constant->import( OLD_MRO => 0 );
   }
 }
 
@@ -68,12 +71,13 @@ our @EXPORT_OK = qw(
   sigwarn_silencer modver_gt_or_eq modver_gt_or_eq_and_lt
   fail_on_internal_wantarray fail_on_internal_call
   refdesc refcount hrefaddr
-  scope_guard is_exception detected_reinvoked_destructor emit_loud_diag
+  scope_guard is_exception emit_loud_diag
   quote_sub qsub perlstring serialize dump_value
   UNRESOLVABLE_CONDITION
   dir_path file_path parent_dir slurp_file slurp_file_utf8 write_file mkpath rmtree
   split_name dumper_squashed eval_package_without_redefine_warnings class_path
   firstidx uniq apply array_eq
+  is_windows is_dev_release old_mro help_url unstable_dollar_at
 );
 
 use constant UNRESOLVABLE_CONDITION => \ '1 = 0';
@@ -194,9 +198,7 @@ sub scope_guard (&) {
     DBIO::Util::ScopeGuard;
 
   sub DESTROY {
-    &DBIO::Util::detected_reinvoked_destructor;
-
-    local $@ if DBIO::Util::UNSTABLE_DOLLARAT;
+    local $@ if DBIO::Util::unstable_dollar_at();
 
     eval {
       $_[0]->[0]->();
@@ -259,53 +261,6 @@ sub is_exception ($) {
   return $not_blank;
 }
 
-{
-  my $destruction_registry = {};
-
-  sub CLONE {
-    $destruction_registry = { map
-      { defined $_ ? ( refaddr($_) => $_ ) : () }
-      values %$destruction_registry
-    };
-  }
-
-  # This is almost invariably invoked from within DESTROY
-  # throwing exceptions won't work
-  sub detected_reinvoked_destructor {
-
-    # quick "garbage collection" pass - prevents the registry
-    # from slowly growing with a bunch of undef-valued keys
-    defined $destruction_registry->{$_} or delete $destruction_registry->{$_}
-      for keys %$destruction_registry;
-
-    if (! length ref $_[0]) {
-      printf STDERR '%s() expects a blessed reference %s',
-        (caller(0))[3],
-        Carp::longmess,
-      ;
-      return undef; # don't know wtf to do
-    }
-    elsif (! defined $destruction_registry->{ my $addr = refaddr($_[0]) } ) {
-      weaken( $destruction_registry->{$addr} = $_[0] );
-      return 0;
-    }
-    else {
-      carp_unique ( sprintf (
-        'Preventing *MULTIPLE* DESTROY() invocations on %s - an *EXTREMELY '
-      . 'DANGEROUS* condition which is *ALMOST CERTAINLY GLOBAL* within your '
-      . 'application, affecting *ALL* classes without active protection against '
-      . 'this. Diagnose and fix the root cause ASAP!!!%s',
-      refdesc $_[0],
-        ( ( $INC{'Devel/StackTrace.pm'} and ! do { local $@; eval { Devel::StackTrace->VERSION(2) } } )
-          ? " (likely culprit Devel::StackTrace\@@{[ Devel::StackTrace->VERSION ]} found in %INC, http://is.gd/D_ST_refcap)"
-          : ''
-        )
-      ));
-
-      return 1;
-    }
-  }
-}
 
 sub modver_gt_or_eq ($$) {
   my ($mod, $ver) = @_;

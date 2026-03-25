@@ -1779,7 +1779,7 @@ sub _resolve_condition {
 #    '_resolve_condition is a private method, and moreover is about to go '
 #  . 'away. Please contact the development team at %s if you believe you '
 #  . 'have a genuine use for this method, in order to discuss alternatives.',
-#    DBIO::Util::HELP_URL,
+#    help_url,
 #  ;
 
 #######################

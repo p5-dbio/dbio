@@ -120,8 +120,6 @@ sub local_umask {
 {
   package DBIO::Test::Util::UmaskGuard;
   sub DESTROY {
-    &DBIO::Util::detected_reinvoked_destructor;
-
     local ($@, $!);
     eval { defined (umask ${$_[0]}) or die };
     warn ( "Unable to reset old umask ${$_[0]}: " . ($!||'Unknown error') )

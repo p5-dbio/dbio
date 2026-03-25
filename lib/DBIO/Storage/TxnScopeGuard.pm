@@ -6,7 +6,7 @@ use warnings;
 use Try::Tiny;
 use Scalar::Util qw(weaken blessed refaddr);
 use DBIO;
-use DBIO::Util qw(is_exception detected_reinvoked_destructor);
+use DBIO::Util qw(is_exception is_windows);
 use DBIO::Carp;
 use namespace::clean;
 
@@ -84,14 +84,12 @@ sub rollback {
 }
 
 sub DESTROY {
-  return if &detected_reinvoked_destructor;
-
   my $self = shift;
 
   return if $self->{inactivated};
 
   # if our dbh is not ours anymore, the $dbh weakref will go undef
-  $self->{storage}->_verify_pid unless DBIO::Util::BROKEN_FORK;
+  $self->{storage}->_verify_pid unless is_windows;
   return unless $self->{dbh};
 
   my $exception = $@ if (

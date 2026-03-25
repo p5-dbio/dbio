@@ -75,7 +75,7 @@ EOW
 
     my $meth_name = join '::', $class, $meth;
     *$meth_name = subname $meth_name, sub {
-      DBIO::Util::ASSERT_NO_INTERNAL_WANTARRAY and my $sog = fail_on_internal_wantarray;
+      assert_no_internal_wantarray and my $sog = fail_on_internal_wantarray;
       my $self = shift;
       my $rs = $self->$rs_meth( @_ );
       return (wantarray ? $rs->all : $rs);

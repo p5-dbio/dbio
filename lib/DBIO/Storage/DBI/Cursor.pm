@@ -8,7 +8,7 @@ use base 'DBIO::Cursor';
 
 use Try::Tiny;
 use Scalar::Util qw(refaddr weaken);
-use DBIO::Util 'detected_reinvoked_destructor';
+use DBIO::Util qw(is_windows);
 use namespace::clean;
 
 __PACKAGE__->mk_group_accessors('simple' =>
@@ -68,7 +68,7 @@ Returns a new L<DBIO::Storage::DBI::Cursor> object.
       attrs => $attrs,
     }, ref $class || $class;
 
-    if (DBIO::Util::HAS_ITHREADS) {
+    if (has_ithreads) {
 
       # quick "garbage collection" pass - prevents the registry
       # from slowly growing with a bunch of undef-valued keys
@@ -187,7 +187,7 @@ sub all {
   (undef, $sth) = $self->storage->_select( @{$self->{args}} );
 
   (
-    DBIO::Util::SHUFFLE_UNORDERED_RESULTSETS
+    shuffle_unordered_resultsets
       and
     ! $self->{attrs}{order_by}
       and
@@ -212,16 +212,16 @@ sub sth {
     delete @{$self}{qw/_pos _done _pid _intra_thread/};
 
     $self->{sth} = $_[0];
-    $self->{_pid} = $$ if ! DBIO::Util::BROKEN_FORK and $_[0];
+    $self->{_pid} = $$ if ! is_windows and $_[0];
   }
   elsif ($self->{sth} and ! $self->{_done}) {
 
     my $invalidate_handle_reason;
 
-    if (DBIO::Util::HAS_ITHREADS and $self->{_intra_thread} ) {
+    if (has_ithreads and $self->{_intra_thread} ) {
       $invalidate_handle_reason = 'Multi-thread';
     }
-    elsif (!DBIO::Util::BROKEN_FORK and $self->{_pid} != $$ ) {
+    elsif (!is_windows and $self->{_pid} != $$ ) {
       $invalidate_handle_reason = 'Multi-process';
     }
 
@@ -255,8 +255,6 @@ Ensures active statement handles are finished during object destruction.
 =cut
 
 sub DESTROY {
-  return if &detected_reinvoked_destructor;
-
   $_[0]->__finish_sth if $_[0]->{sth};
 }
 

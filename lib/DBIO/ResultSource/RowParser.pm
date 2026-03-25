@@ -144,7 +144,7 @@ sub _mk_row_parser {
   };
 
   utf8::upgrade($src)
-    if DBIO::Util::STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE;
+    if stresstest_utf8_upgrade_generated_collapser_source;
 
   return (
     $args->{eval} ? ( eval "sub $src" || die $@ ) : $src,
