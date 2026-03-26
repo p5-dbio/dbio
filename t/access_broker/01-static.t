@@ -14,4 +14,37 @@ can_ok('DBIO::AccessBroker', qw(
   connect_info_for
 ));
 
+# Static broker tests
+use_ok('DBIO::AccessBroker::Static');
+
+# Construct with DSN
+my $broker = DBIO::AccessBroker::Static->new(
+  dsn      => 'dbi:SQLite:dbname=:memory:',
+  username => '',
+  password => '',
+);
+ok $broker, 'Static broker constructor';
+isa_ok $broker, 'DBIO::AccessBroker';
+
+# connect_info_for returns same info for read and write
+my $write_info = $broker->connect_info_for('write');
+my $read_info  = $broker->connect_info_for('read');
+is_deeply $write_info, $read_info, 'read and write return same info';
+is $write_info->[0], 'dbi:SQLite:dbname=:memory:', 'DSN correct';
+
+# needs_refresh is always false
+ok !$broker->needs_refresh, 'static never needs refresh';
+
+# dbh_for returns a live handle
+my $dbh = $broker->dbh_for('write');
+ok $dbh, 'got a dbh';
+ok $dbh->ping, 'dbh is alive';
+
+# Same handle for read and write
+my $dbh2 = $broker->dbh_for('read');
+is $dbh2, $dbh, 'read and write share the same handle';
+
+# Cleanup
+$broker->disconnect;
+
 done_testing;
