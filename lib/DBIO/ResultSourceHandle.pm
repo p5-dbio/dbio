@@ -6,6 +6,7 @@ use warnings;
 
 use base qw/DBIO/;
 
+use DBIO::Util qw(help_url);
 use Try::Tiny;
 use namespace::clean;
 
