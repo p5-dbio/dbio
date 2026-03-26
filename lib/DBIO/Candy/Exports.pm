@@ -4,7 +4,7 @@ package DBIO::Candy::Exports;
 use strict;
 use warnings;
 
-use Sub::Name ();
+use Sub::Util ();
 
 our %methods;
 our %aliases;
@@ -19,7 +19,7 @@ use Sub::Exporter -setup => {
 
 # Sub::Exporter generates an anonymous import; name it so
 # t/55namespaces_cleaned.t can verify it
-Sub::Name::subname('DBIO::Candy::Exports::import', \&import);
+Sub::Util::set_subname('DBIO::Candy::Exports::import', \&import);
 
 1;
 

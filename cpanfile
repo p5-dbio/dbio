@@ -11,7 +11,7 @@ requires 'perl', '5.008001';
 requires 'DBI', '1.57';
 
 # XS (or XS-dependent) libs
-requires 'Sub::Name', '0.04';
+requires 'Sub::Util', '1.40';
 
 # pure-perl (FatPack-able) libs
 requires 'Class::Accessor::Grouped', '0.10012';

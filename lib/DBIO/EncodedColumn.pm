@@ -8,7 +8,7 @@ use base qw/DBIO/;
 
 use Digest ();
 use MIME::Base64 ();
-use SQL::Abstract::Util 'is_literal_value';
+use DBIO::Util qw(is_literal_value);
 use namespace::clean;
 
 __PACKAGE__->load_components(qw/FilterColumn/);

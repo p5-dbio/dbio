@@ -9,7 +9,7 @@ use mro 'c3';
 
 use Scalar::Util 'blessed';
 use DBIO::Util qw(UNRESOLVABLE_CONDITION serialize dump_value);
-use SQL::Abstract::Util qw(is_plain_value is_literal_value);
+use DBIO::Util qw(is_plain_value is_literal_value);
 use DBIO::Carp;
 use namespace::clean;
 

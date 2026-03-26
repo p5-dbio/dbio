@@ -9,7 +9,7 @@ use base qw/DBIO/;
 use Scalar::Util 'blessed';
 use Try::Tiny;
 use DBIO::Carp;
-use SQL::Abstract::Util 'is_literal_value';
+use DBIO::Util qw(is_literal_value);
 
 ###
 ### Internal method

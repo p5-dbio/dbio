@@ -6,6 +6,7 @@ use warnings;
 no warnings 'qw';
 
 use base 'DBIO::Schema';
+use DBIO::Util qw(old_mro);
 
 =head1 DESCRIPTION
 

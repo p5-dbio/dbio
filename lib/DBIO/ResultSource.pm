@@ -11,7 +11,7 @@ use DBIO::ResultSourceHandle;
 
 use DBIO::Carp;
 use DBIO::Util 'UNRESOLVABLE_CONDITION';
-use SQL::Abstract::Util 'is_literal_value';
+use DBIO::Util qw(is_literal_value);
 use Devel::GlobalDestruction;
 use Try::Tiny;
 use Scalar::Util qw/blessed weaken isweak/;

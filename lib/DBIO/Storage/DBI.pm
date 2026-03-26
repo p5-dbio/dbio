@@ -12,7 +12,7 @@ use DBIO::Carp;
 use Scalar::Util qw/refaddr weaken reftype blessed/;
 use Context::Preserve 'preserve_context';
 use Try::Tiny;
-use SQL::Abstract::Util qw(is_plain_value is_literal_value);
+use DBIO::Util qw(is_plain_value is_literal_value);
 use DBIO::Util qw(quote_sub perlstring serialize dump_value sigwarn_silencer is_windows is_dev_release old_mro help_url);
 use namespace::clean;
 

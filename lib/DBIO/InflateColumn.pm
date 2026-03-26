@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use base 'DBIO::Row';
-use SQL::Abstract::Util 'is_literal_value';
+use DBIO::Util qw(is_literal_value);
 use namespace::clean;
 
 =head1 SYNOPSIS

@@ -9,6 +9,8 @@ use DBIO::ResultSetColumn;
 use Scalar::Util qw/blessed weaken reftype/;
 use DBIO::Util qw(
   fail_on_internal_wantarray fail_on_internal_call UNRESOLVABLE_CONDITION
+  assert_no_internal_wantarray assert_no_internal_indirect_calls
+  help_url stresstest_utf8_upgrade_generated_collapser_source
 );
 use Try::Tiny;
 
@@ -4412,9 +4414,9 @@ Shortcut for C<< ->search(undef, { rows => ... }) >>.
 {
   my $orig_rows = __PACKAGE__->can('rows');
   no warnings 'redefine';
-  require Sub::Name;
+  require Sub::Util;
 
-  *rows = Sub::Name::subname rows => sub {
+  *rows = Sub::Util::set_subname rows => sub {
     if (@_ > 1) {
       return $_[0]->search(undef, { rows => $_[1] });
     }

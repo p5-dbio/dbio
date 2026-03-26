@@ -6,7 +6,7 @@ use warnings;
 
 use base 'DBIO';
 use DBIO::Carp;
-use DBIO::Util 'fail_on_internal_wantarray';
+use DBIO::Util qw(fail_on_internal_wantarray assert_no_internal_wantarray);
 use namespace::clean;
 
 =head1 SYNOPSIS

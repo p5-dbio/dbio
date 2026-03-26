@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 use DBIO::Carp;
-use Sub::Name 'subname';
+use Sub::Util 'set_subname';
 use Scalar::Util 'blessed';
-use DBIO::Util 'fail_on_internal_wantarray';
+use DBIO::Util qw(fail_on_internal_wantarray assert_no_internal_wantarray);
 use namespace::clean;
 
 our %_pod_inherit_config =

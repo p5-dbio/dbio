@@ -12,6 +12,7 @@ use DBIO::ResultSource::RowParser::Util qw(
   assemble_simple_parser
   assemble_collapsing_parser
 );
+use DBIO::Util qw(stresstest_utf8_upgrade_generated_collapser_source);
 
 use namespace::clean;
 

@@ -4,7 +4,7 @@ package DBIO::Relationship::Accessor;
 use strict;
 use warnings;
 use DBIO::Carp;
-use DBIO::Util qw(quote_sub perlstring);
+use DBIO::Util qw(quote_sub perlstring fail_on_internal_wantarray assert_no_internal_wantarray);
 use namespace::clean;
 
 our %_pod_inherit_config =

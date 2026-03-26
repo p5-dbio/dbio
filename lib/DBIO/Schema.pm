@@ -9,7 +9,7 @@ use base 'DBIO';
 use DBIO::Carp;
 use Try::Tiny;
 use Scalar::Util qw/weaken blessed/;
-use DBIO::Util qw(refcount quote_sub is_exception scope_guard);
+use DBIO::Util qw(refcount quote_sub is_exception scope_guard old_mro);
 use Devel::GlobalDestruction;
 use namespace::clean;
 

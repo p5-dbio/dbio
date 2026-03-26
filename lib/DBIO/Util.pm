@@ -47,6 +47,12 @@ sub old_mro () { $] < 5.009_005 ? 1 : 0 }
 sub help_url () { 'https://github.com/p5-dbio/dbio/issues' }
 sub unstable_dollar_at () { "$]" < 5.013002 ? 1 : 0 }
 
+sub assert_no_internal_wantarray () { $DBIO::Util::ASSERT_NO_INTERNAL_WANTARRAY }
+sub assert_no_internal_indirect_calls () { $DBIO::Util::ASSERT_NO_INTERNAL_INDIRECT_CALLS }
+
+# Functions to access constants (lowercase aliases for export)
+sub stresstest_utf8_upgrade_generated_collapser_source () { $DBIO::Util::STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE }
+
 BEGIN {
   if ($] < 5.009_005) {
     require MRO::Compat;
@@ -78,6 +84,9 @@ our @EXPORT_OK = qw(
   split_name dumper_squashed eval_package_without_redefine_warnings class_path
   firstidx uniq apply array_eq
   is_windows is_dev_release old_mro help_url unstable_dollar_at
+  is_plain_value is_literal_value
+  assert_no_internal_wantarray assert_no_internal_indirect_calls
+  stresstest_utf8_upgrade_generated_collapser_source
 );
 
 use constant UNRESOLVABLE_CONDITION => \ '1 = 0';
@@ -466,6 +475,65 @@ sub array_eq {
 }
 
 # --- End loader utilities ---
+
+# --- From SQL::Abstract::Util (moved here to remove dependency) ---
+
+sub is_literal_value ($) {
+    ref $_[0] eq 'SCALAR'                                     ? [ ${$_[0]} ]
+  : ( ref $_[0] eq 'REF' and ref ${$_[0]} eq 'ARRAY' )        ? [ @${ $_[0] } ]
+  : undef;
+}
+
+# FIXME XSify - this can be done so much more efficiently
+sub is_plain_value ($) {
+  my $val = shift;
+
+  return \($val) unless length ref $val;
+
+  # HASH with -value key
+  if (ref $val eq 'HASH' and keys %$val == 1 and exists $val->{-value}) {
+    return \($val->{-value});
+  }
+
+  # Check for blessed object
+  my $blessed = Scalar::Util::blessed($val) or return undef;
+
+  my $isa = mro::get_linear_isa($blessed);
+
+  # Check for stringification
+  for my $pkg (@$isa) {
+    my $glob = \*{ "${pkg}::(\"\"" };
+    return \($val) if defined *$glob{CODE};
+  }
+
+  # Check for nummification/boolification with fallback
+  my $has_numeric_overload = grep {
+    defined *{ "${_}::(0+" }{CODE}
+  } @$isa;
+
+  my $has_bool_overload = grep {
+    defined *{ "${_}::(bool" }{CODE}
+  } @$isa;
+
+  if ($has_numeric_overload or $has_bool_overload) {
+    # Check fallback
+    my $has_fallback = grep {
+      defined *{ "${_}::()" }{CODE}
+    } @$isa;
+
+    my $fallback_val = do {
+      no strict 'refs';
+      ${ "${blessed}::()" }
+    };
+
+    # If no fallback or fallback is true, it's a plain value
+    if (!$has_fallback or !defined $fallback_val or $fallback_val) {
+      return \($val);
+    }
+  }
+
+  return undef;
+}
 
 sub fail_on_internal_call {
   my ($fr, $argdesc);

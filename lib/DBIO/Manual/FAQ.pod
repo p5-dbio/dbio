@@ -631,14 +631,14 @@ L<Method::Signatures::Simple> way:
 The dirty way:
 
     package Your::Schema::Group;
-    use Sub::Name;
+    use Sub::Util 'set_subname';
 
     # ... declare columns ...
 
     __PACKAGE__->has_many('group_servers', 'Your::Schema::GroupServer', 'group_id');
     __PACKAGE__->many_to_many('servers', 'group_servers', 'server');
 
-    *servers = subname servers => sub {
+    *servers = set_subname servers => sub {
         my $self = shift;
         return $self->result_source->schema->resultset('Server')->search({ ... });
     };
