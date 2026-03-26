@@ -2,42 +2,41 @@
 use strict;
 use warnings;
 use Test::More;
-use DBI;
 
 use_ok('DBIO::AccessBroker::ReadWrite');
 
-# Setup: two SQLite in-memory DBs (simulating primary + replica)
+# Setup: primary + two replicas
 my $broker = DBIO::AccessBroker::ReadWrite->new(
   write => {
-    dsn => 'dbi:SQLite:dbname=:memory:',
-    username => '', password => '',
+    dsn => 'dbi:Pg:host=primary', username => 'writer', password => 'pw',
   },
   read => [
-    { dsn => 'dbi:SQLite:dbname=:memory:', username => '', password => '' },
-    { dsn => 'dbi:SQLite:dbname=:memory:', username => '', password => '' },
+    { dsn => 'dbi:Pg:host=replica1', username => 'reader1', password => 'pw' },
+    { dsn => 'dbi:Pg:host=replica2', username => 'reader2', password => 'pw' },
   ],
 );
 
 ok $broker, 'ReadWrite broker constructor';
 isa_ok $broker, 'DBIO::AccessBroker';
 
-# Write always returns the same handle
-my $write1 = $broker->dbh_for('write');
-my $write2 = $broker->dbh_for('write');
-is $write1, $write2, 'write handle is stable';
+# Write always returns primary info
+my $write1 = $broker->connect_info_for('write');
+my $write2 = $broker->connect_info_for('write');
+is $write1->[0], 'dbi:Pg:host=primary', 'write DSN is primary';
+is $write1->[1], 'writer', 'write username';
+is_deeply $write1, $write2, 'write info is stable';
 
-# Read returns handles (round-robin)
-my $read1 = $broker->dbh_for('read');
-my $read2 = $broker->dbh_for('read');
-ok $read1, 'got read handle 1';
-ok $read2, 'got read handle 2';
+# Read round-robins through replicas
+my $read1 = $broker->connect_info_for('read');
+my $read2 = $broker->connect_info_for('read');
+is $read1->[0], 'dbi:Pg:host=replica1', 'first read is replica1';
+is $read2->[0], 'dbi:Pg:host=replica2', 'second read is replica2';
 
-# Round-robin cycles back to first replica
-my $read3 = $broker->dbh_for('read');
-is $read3, $read1, 'round-robin cycles back to first replica';
+# Third call cycles back to first replica
+my $read3 = $broker->connect_info_for('read');
+is $read3->[0], 'dbi:Pg:host=replica1', 'round-robin cycles back';
 
-# Write and read are different handles
-isnt $write1, $read1, 'write and read are different handles';
+# Write and read are different
+isnt $write1->[0], $read1->[0], 'write and read are different DSNs';
 
-$broker->disconnect;
 done_testing;

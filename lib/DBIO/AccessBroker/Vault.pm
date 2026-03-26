@@ -51,8 +51,6 @@ sub needs_refresh {
 sub refresh {
   my ($self) = @_;
   $self->_fetch_credentials;
-  # Clear cached handles so next dbh_for() reconnects with new creds
-  $self->_handles({});
 }
 
 1;

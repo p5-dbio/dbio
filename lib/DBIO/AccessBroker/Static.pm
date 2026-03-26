@@ -24,12 +24,6 @@ sub connect_info_for {
   return [$self->dsn, $self->username, $self->password, $self->dbi_attrs];
 }
 
-# Static: same handle for read and write
-sub dbh_for {
-  my ($self, $mode) = @_;
-  return $self->SUPER::dbh_for('write');  # Always use single handle
-}
-
 sub needs_refresh { 0 }
 
 1;
