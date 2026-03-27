@@ -86,7 +86,13 @@ sub rollback {
 sub DESTROY {
   my $self = shift;
 
+  if ($self->{_destroy_invoked}++) {
+    carp 'Preventing *MULTIPLE* DESTROY() invocations on DBIO::Storage::TxnScopeGuard';
+    return;
+  }
+
   return if $self->{inactivated};
+  $self->{inactivated} = 1;
 
   # if our dbh is not ours anymore, the $dbh weakref will go undef
   $self->{storage}->_verify_pid unless is_windows;
