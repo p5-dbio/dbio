@@ -54,4 +54,12 @@ sub refresh {
   $self->_fetch_credentials;
 }
 
+sub has_rotating_credentials { 1 }
+
 1;
+
+=head1 DESCRIPTION
+
+Vault-backed brokers rotate credentials over time and are therefore not
+transaction-safe by default. See
+L<DBIO::AccessBroker/TRANSACTION SAFETY>.

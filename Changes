@@ -4,6 +4,7 @@ Revision history for DBIO
     * New Features
         - Add first-class AccessBroker support via Schema->connect($broker)
         - Refresh broker-derived DBI connect info on reconnect
+        - Add transaction-safety metadata and unsafe broker transaction guards
 
     * Changes
         - Normalize +Absolute::Storage names in Schema->connection

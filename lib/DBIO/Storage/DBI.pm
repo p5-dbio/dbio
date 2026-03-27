@@ -1801,6 +1801,9 @@ sub _connect {
 }
 
 sub txn_begin {
+  $_[0]->_assert_transaction_safe_access_broker;
+  local $_[0]->{_access_broker_txn_safety_checked} = 1;
+
   # this means we have not yet connected and do not know the AC status
   # (e.g. coderef $dbh), need a full-fledged connection check
   if (! defined $_[0]->_dbh_autocommit) {

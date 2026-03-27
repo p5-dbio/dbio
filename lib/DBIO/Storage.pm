@@ -275,6 +275,7 @@ an entire code block to be executed transactionally.
 sub txn_begin {
   my $self = shift;
   $self->_throw_deferred_rollback if $self->deferred_rollback;
+  $self->_assert_transaction_safe_access_broker;
 
   if($self->transaction_depth == 0) {
     $self->debugobj->txn_begin()
@@ -286,6 +287,38 @@ sub txn_begin {
   }
   $self->{transaction_depth}++;
 
+}
+
+sub _assert_transaction_safe_access_broker {
+  my $self = shift;
+
+  return if $self->{_access_broker_txn_safety_checked};
+  return if $self->transaction_depth;
+
+  my $broker = $self->access_broker or return;
+  return if $broker->is_transaction_safe;
+
+  my @reasons;
+  push @reasons, 'read/write routing' if $broker->has_read_write_routing;
+  push @reasons, 'credential rotation' if $broker->has_rotating_credentials;
+  my $reason = @reasons
+    ? join(' and ', @reasons)
+    : 'broker-specific transaction safety constraints';
+
+  if ($ENV{DBIO_ALLOW_UNSAFE_BROKER_TRANSACTIONS}) {
+    carp sprintf(
+      'Starting a transaction with unsafe AccessBroker %s via override: %s',
+      ref($broker) || $broker,
+      $reason,
+    );
+    return;
+  }
+
+  $self->throw_exception(sprintf(
+    'Refusing to start a transaction with unsafe AccessBroker %s: %s can break transactional consistency',
+    ref($broker) || $broker,
+    $reason,
+  ));
 }
 
 =head2 txn_commit

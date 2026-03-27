@@ -71,6 +71,18 @@ sub needs_refresh { 0 }
 # Perform credential rotation
 sub refresh { }
 
+# Does this broker route reads and writes differently?
+sub has_read_write_routing { 0 }
+
+# Does this broker rotate credentials over time?
+sub has_rotating_credentials { 0 }
+
+# Can transactions safely run through this broker without an explicit override?
+sub is_transaction_safe {
+  my $self = shift;
+  return $self->has_read_write_routing || $self->has_rotating_credentials ? 0 : 1;
+}
+
 # Check refresh and return connect info — legacy convenience for DBI-shaped
 # callers or brokers already attached to a storage.
 sub current_connect_info_for {
@@ -175,6 +187,43 @@ C<Storage::Async> (async/Future-based). It handles:
 
 =back
 
+=head1 TRANSACTION SAFETY
+
+Transactions and broker-level routing/credential rotation are not equivalent
+concepts.
+
+DBIO therefore distinguishes between:
+
+=over 4
+
+=item * C<has_read_write_routing()> — reads and writes may land on different endpoints
+
+=item * C<has_rotating_credentials()> — new connections may need refreshed credentials
+
+=item * C<is_transaction_safe()> — DBIO may start a transaction through this broker without an explicit override
+
+=back
+
+The default implementation treats brokers as transaction-safe only when they do
+neither routing nor credential rotation.
+
+This means:
+
+=over 4
+
+=item * L<DBIO::AccessBroker::Static> is transaction-safe
+
+=item * L<DBIO::AccessBroker::ReadWrite> is not transaction-safe by default
+
+=item * L<DBIO::AccessBroker::Vault> is not transaction-safe by default
+
+=back
+
+Starting a transaction through a broker marked as unsafe will throw by default.
+If you intentionally want to allow this, set
+C<DBIO_ALLOW_UNSAFE_BROKER_TRANSACTIONS=1>. DBIO will then proceed, but emit a
+warning on transaction start.
+
 =head1 SUBCLASSING
 
 Implement these methods:
@@ -188,6 +237,12 @@ Implement these methods:
 =item C<needs_refresh()> — Return true if credentials should be rotated
 
 =item C<refresh()> — Perform credential rotation
+
+=item C<has_read_write_routing()> — Return true if the broker routes reads and writes differently
+
+=item C<has_rotating_credentials()> — Return true if credentials rotate across connections
+
+=item C<is_transaction_safe()> — Return true if DBIO may open transactions through this broker
 
 =back
 

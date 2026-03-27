@@ -27,3 +27,8 @@ sub connect_info_for {
 sub needs_refresh { 0 }
 
 1;
+
+=head1 DESCRIPTION
+
+Static brokers keep a single set of connection details and are transaction-safe
+by default. See L<DBIO::AccessBroker/TRANSACTION SAFETY>.

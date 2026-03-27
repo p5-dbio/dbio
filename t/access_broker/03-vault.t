@@ -36,6 +36,9 @@ is $info->[1], 'dynamic-user-1', 'first credentials from vault';
 
 # needs_refresh is false (just fetched)
 ok !$broker->needs_refresh, 'no refresh needed after fetch';
+ok !$broker->has_read_write_routing, 'vault broker has no read/write routing';
+ok $broker->has_rotating_credentials, 'vault broker declares rotating credentials';
+ok !$broker->is_transaction_safe, 'vault broker is not transaction safe by default';
 
 # At exactly refresh_margin before expiry: still not ready
 $broker->_expires_at(time() + $broker->refresh_margin + 1);

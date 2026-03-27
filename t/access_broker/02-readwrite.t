@@ -38,5 +38,8 @@ is $read3->[0], 'dbi:Pg:host=replica1', 'round-robin cycles back';
 
 # Write and read are different
 isnt $write1->[0], $read1->[0], 'write and read are different DSNs';
+ok $broker->has_read_write_routing, 'read/write broker declares routing';
+ok !$broker->has_rotating_credentials, 'read/write broker has no rotating credentials';
+ok !$broker->is_transaction_safe, 'read/write broker is not transaction safe by default';
 
 done_testing;

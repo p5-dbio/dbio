@@ -42,4 +42,12 @@ sub connect_info_for {
   return $infos->[$idx];
 }
 
+sub has_read_write_routing { 1 }
+
 1;
+
+=head1 DESCRIPTION
+
+Read/write brokers route reads and writes to different endpoints and are
+therefore not transaction-safe by default. See
+L<DBIO::AccessBroker/TRANSACTION SAFETY>.

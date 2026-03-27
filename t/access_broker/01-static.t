@@ -10,6 +10,9 @@ use_ok('DBIO::AccessBroker');
 can_ok('DBIO::AccessBroker', qw(
   connect_info_for
   connect_info_for_storage
+  has_read_write_routing
+  has_rotating_credentials
+  is_transaction_safe
   needs_refresh
   refresh
   current_connect_info_for
@@ -36,6 +39,9 @@ is $write_info->[0], 'dbi:SQLite:dbname=:memory:', 'DSN correct';
 
 # needs_refresh is always false
 ok !$broker->needs_refresh, 'static never needs refresh';
+ok !$broker->has_read_write_routing, 'static broker has no read/write routing';
+ok !$broker->has_rotating_credentials, 'static broker has no rotating credentials';
+ok $broker->is_transaction_safe, 'static broker is transaction safe';
 
 # current_connect_info_for is convenience (checks refresh + returns info)
 my $current = $broker->current_connect_info_for('write');
