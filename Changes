@@ -1,6 +1,17 @@
 Revision history for DBIO
 
 {{$NEXT}}
+    * New Features
+        - Add first-class AccessBroker support via Schema->connect($broker)
+        - Refresh broker-derived DBI connect info on reconnect
+
+    * Changes
+        - Normalize +Absolute::Storage names in Schema->connection
+        - Restore DBIO::_ENV_ compatibility aliases while moving internal callers to DBIO::Util helpers
+
+    * Fixes
+        - Prevent repeated TxnScopeGuard DESTROY invocations from attempting a second rollback
+
     * Breaking Changes
         - Namespace: DBIx::Class → DBIO (use DBIO:: instead of DBIx::Class::)
         - Remove SQL::Abstract::Classic (use SQL::Abstract directly)
@@ -2187,4 +2198,3 @@ Revision history for DBIO
 
 0.01    2005-08-08 17:10:00
         - initial release
-

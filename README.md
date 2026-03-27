@@ -19,11 +19,26 @@ A modern fork of [DBIx::Class](https://metacpan.org/pod/DBIx::Class).
 ## Core Features
 
 - **Replicated Storage** — master/slave replication via [DBIO::Replicated](https://metacpan.org/pod/DBIO::Replicated)
+- **Access Brokers** — `Schema->connect($broker)` with rotating credentials and storage-native connect info via [DBIO::AccessBroker](https://metacpan.org/pod/DBIO::AccessBroker)
 - **Change Tracking** — automatic insert/update/delete logging via [DBIO::ChangeLog](https://metacpan.org/pod/DBIO::ChangeLog)
 - **Async Interface** — `all_async`, `first_async`, `count_async`, `create_async`
   return [Futures](https://metacpan.org/pod/DBIO::Future); async drivers
   (e.g. [DBIO-PostgreSQL-Async](https://metacpan.org/pod/DBIO::PostgreSQL::Async))
   bypass DBI entirely
+
+## Brokered Connections
+
+```perl
+use DBIO::AccessBroker::Static;
+
+my $broker = DBIO::AccessBroker::Static->new(
+    dsn      => 'dbi:Pg:dbname=myapp;host=db',
+    username => 'app',
+    password => 'secret',
+);
+
+my $schema = MyApp::Schema->connect($broker);
+```
 
 ## Database Drivers (separate distributions)
 
