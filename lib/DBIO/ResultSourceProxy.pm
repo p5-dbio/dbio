@@ -94,7 +94,7 @@ for my $method_to_proxy (qw/
   has_relationship
 /) {
   quote_sub __PACKAGE__."::$method_to_proxy", sprintf( <<'EOC', $method_to_proxy );
-    assert_no_internal_indirect_calls and DBIO::Util::fail_on_internal_call;
+    DBIO::Util::assert_no_internal_indirect_calls() and DBIO::Util::fail_on_internal_call;
     shift->result_source_instance->%s (@_);
 EOC
 

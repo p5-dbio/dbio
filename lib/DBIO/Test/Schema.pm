@@ -7,6 +7,7 @@ no warnings 'qw';
 
 use base 'DBIO::Schema';
 use DBIO::Util qw(old_mro);
+use namespace::clean;
 
 =head1 DESCRIPTION
 

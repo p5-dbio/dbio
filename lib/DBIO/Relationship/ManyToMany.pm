@@ -64,7 +64,7 @@ EOW
     $rel_attrs->{alias} ||= $f_rel;
 
     my $rs_meth_name = join '::', $class, $rs_meth;
-    *$rs_meth_name = subname $rs_meth_name, sub {
+    *$rs_meth_name = set_subname $rs_meth_name, sub {
       my $self = shift;
       my $attrs = @_ > 1 && ref $_[$#_] eq 'HASH' ? pop(@_) : {};
       my $rs = $self->search_related($rel)->search_related(
@@ -74,7 +74,7 @@ EOW
     };
 
     my $meth_name = join '::', $class, $meth;
-    *$meth_name = subname $meth_name, sub {
+    *$meth_name = set_subname $meth_name, sub {
       assert_no_internal_wantarray and my $sog = fail_on_internal_wantarray;
       my $self = shift;
       my $rs = $self->$rs_meth( @_ );
@@ -82,7 +82,7 @@ EOW
     };
 
     my $add_meth_name = join '::', $class, $add_meth;
-    *$add_meth_name = subname $add_meth_name, sub {
+    *$add_meth_name = set_subname $add_meth_name, sub {
       my $self = shift;
       @_ > 0 or $self->throw_exception(
         "${add_meth} needs an object or hashref"
@@ -113,7 +113,7 @@ EOW
     };
 
     my $set_meth_name = join '::', $class, $set_meth;
-    *$set_meth_name = subname $set_meth_name, sub {
+    *$set_meth_name = set_subname $set_meth_name, sub {
       my $self = shift;
       @_ > 0 or $self->throw_exception(
         "{$set_meth} needs a list of objects or hashrefs"
@@ -131,7 +131,7 @@ EOW
     };
 
     my $remove_meth_name = join '::', $class, $remove_meth;
-    *$remove_meth_name = subname $remove_meth_name, sub {
+    *$remove_meth_name = set_subname $remove_meth_name, sub {
       my ($self, $obj) = @_;
       $self->throw_exception("${remove_meth} needs an object")
         unless blessed ($obj);
