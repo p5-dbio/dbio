@@ -20,7 +20,10 @@ use DBIO::Storage::TxnScopeGuard;
 use Try::Tiny;
 use namespace::clean;
 
-__PACKAGE__->mk_group_accessors(simple => qw/debug schema transaction_depth deferred_rollback auto_savepoint savepoints/);
+__PACKAGE__->mk_group_accessors(simple => qw/
+  debug schema transaction_depth deferred_rollback auto_savepoint savepoints
+  access_broker access_broker_mode
+/);
 __PACKAGE__->mk_group_accessors(component_class => 'cursor_class');
 
 __PACKAGE__->cursor_class('DBIO::Cursor');
@@ -83,6 +86,56 @@ sub set_schema {
   my ($self, $schema) = @_;
   $self->schema($schema);
   weaken $self->{schema} if ref $self->{schema};
+}
+
+=head2 set_access_broker
+
+Attach an L<DBIO::AccessBroker> instance to this storage and set the
+default broker mode (defaults to C<write>).
+
+=cut
+
+sub set_access_broker {
+  my ($self, $broker, $mode) = @_;
+
+  $self->throw_exception('set_access_broker() requires a broker object')
+    unless blessed($broker);
+
+  $self->throw_exception(
+    'set_access_broker() requires a DBIO::AccessBroker instance'
+  ) unless $broker->isa('DBIO::AccessBroker');
+
+  $self->access_broker($broker);
+  $self->access_broker_mode($mode || 'write');
+  $broker->set_storage($self);
+
+  return $self;
+}
+
+=head2 clear_access_broker
+
+Detach any currently attached broker from this storage.
+
+=cut
+
+sub clear_access_broker {
+  my $self = shift;
+  $self->access_broker(undef);
+  $self->access_broker_mode(undef);
+  return $self;
+}
+
+=head2 current_access_broker_connect_info
+
+Return the current storage-native connect info for the requested mode.
+
+=cut
+
+sub current_access_broker_connect_info {
+  my ($self, $mode) = @_;
+  my $broker = $self->access_broker or return;
+  $mode ||= $self->access_broker_mode || 'write';
+  return $broker->current_connect_info_for_storage($self, $mode);
 }
 
 =head2 connected

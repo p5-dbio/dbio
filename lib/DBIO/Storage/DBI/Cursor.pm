@@ -8,7 +8,7 @@ use base 'DBIO::Cursor';
 
 use Try::Tiny;
 use Scalar::Util qw(refaddr weaken);
-use DBIO::Util qw(is_windows);
+use DBIO::Util qw(has_ithreads is_windows shuffle_unordered_resultsets);
 use namespace::clean;
 
 __PACKAGE__->mk_group_accessors('simple' =>

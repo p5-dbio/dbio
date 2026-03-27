@@ -867,9 +867,10 @@ sub connection {
 
   my ($storage_class, $args) = ref $self->storage_type
     ? $self->_normalize_storage_type($self->storage_type)
-    : $self->storage_type
+    : ($self->storage_type, undef)
   ;
 
+  $storage_class =~ s/^\+//;
   $storage_class =~ s/^::/DBIO::Storage::/;
 
   try {

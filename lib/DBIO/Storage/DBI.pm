@@ -144,11 +144,7 @@ for my $meth (keys %$storage_accessor_idx, qw(
     ) {
       $_[0]->_determine_driver;
 
-      # work around http://rt.perl.org/rt3/Public/Bug/Display.html?id=35878
-      goto $_[0]->can(%2$s) unless BROKEN_GOTO;
-
-      my $cref = $_[0]->can(%2$s);
-      goto $cref;
+      goto $_[0]->can(%2$s);
     }
 
     goto $orig;
@@ -615,8 +611,17 @@ sub connect_info {
 
   $self->_connect_info($info); # copy for _connect_info
 
-  $info = $self->_normalize_connect_info($info)
-    if ref $info eq 'ARRAY';
+  if ($self->_is_access_broker_connect_info($info)) {
+    $self->set_access_broker($info->[0], 'write');
+    $info = $self->_normalize_connect_info(
+      $self->_current_dbi_connect_info($self->access_broker_mode)
+    );
+  }
+  else {
+    $self->clear_access_broker;
+    $info = $self->_normalize_connect_info($info)
+      if ref $info eq 'ARRAY';
+  }
 
   my %attrs = (
     %{ $self->_default_dbi_connect_attributes || {} },
@@ -667,6 +672,24 @@ sub connect_info {
   $self->_dbio_connect_attributes (\%attrs);
 
   return $self->_connect_info;
+}
+
+sub _is_access_broker_connect_info {
+  my ($self, $info) = @_;
+
+  return 0 unless ref $info eq 'ARRAY' && @$info == 1;
+  return 0 unless blessed($info->[0]);
+
+  return $info->[0]->isa('DBIO::AccessBroker');
+}
+
+sub _current_dbi_connect_info {
+  my ($self, $mode) = @_;
+
+  my $connect_info = $self->current_access_broker_connect_info($mode);
+  return $connect_info if $connect_info;
+
+  return $self->_dbi_connect_info;
 }
 
 sub _dbi_connect_info {
@@ -1672,6 +1695,24 @@ sub connect_call_rebase_sqlmaker {
 
 sub _connect {
   my $self = shift;
+
+  if ($self->access_broker) {
+    my $info = $self->_normalize_connect_info(
+      $self->_current_dbi_connect_info($self->access_broker_mode)
+    );
+
+    my %attrs = (
+      %{ $self->_default_dbi_connect_attributes || {} },
+      %{ $info->{attributes} || {} },
+    );
+
+    my @args = @{ $info->{arguments} };
+
+    push @args, \%attrs if keys %attrs and ref $args[0] ne 'CODE';
+
+    $self->_dbi_connect_info(\@args);
+    $self->_dbio_connect_attributes(\%attrs);
+  }
 
   my $info = $self->_dbi_connect_info;
 

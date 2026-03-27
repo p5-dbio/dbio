@@ -4,54 +4,51 @@ package DBIO::Util;
 use warnings;
 use strict;
 
-use constant SPURIOUS_VERSION_CHECK_WARNINGS => (
-  ( $ENV{DBIO_TEST_VERSION_WARNS_INDISCRIMINATELY} || $] < 5.010 )
-    ? 1
-    : 0
-);
-
 use Config;
 
-use constant {
-  IS_WINDOWS => ($^O eq 'MSWin32') ? 1 : 0,
-
-  BROKEN_GOTO => ($] < '5.008003') ? 1 : 0,
-
-  HAS_ITHREADS => $Config{useithreads} ? 1 : 0,
-
-  UNSTABLE_DOLLARAT => ( "$]" < 5.013002 ) ? 1 : 0,
-
-  DBIOTEST => $INC{"DBIO/Test.pm"} ? 1 : 0,
-
-  PEEPEENESS => ( $INC{"DBIO/Test.pm"} && eval { DBIO::Test->is_smoker } && ($] >= 5.013005 and $] <= 5.013006) ),
-
-  SHUFFLE_UNORDERED_RESULTSETS => $ENV{DBIO_SHUFFLE_UNORDERED_RESULTSETS} ? 1 : 0,
-
-  ASSERT_NO_INTERNAL_WANTARRAY => $ENV{DBIO_ASSERT_NO_INTERNAL_WANTARRAY} ? 1 : 0,
-
-  ASSERT_NO_INTERNAL_INDIRECT_CALLS => $ENV{DBIO_ASSERT_NO_INTERNAL_INDIRECT_CALLS} ? 1 : 0,
-
-  STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE => $ENV{DBIO_STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE} ? 1 : 0,
-
-  IV_SIZE => $Config{ivsize},
-
-  OS_NAME => $^O,
-
-  HELP_URL => 'https://github.com/p5-dbio/dbio/issues',
-};
-
-# Exportable subs for common constants
-sub is_windows () { $^O eq 'MSWin32' ? 1 : 0 }
-sub is_dev_release () { ($DBIO::VERSION || '') =~ /_/ ? 1 : 0 }
-sub old_mro () { $] < 5.009_005 ? 1 : 0 }
-sub help_url () { 'https://github.com/p5-dbio/dbio/issues' }
+# All configuration as lowercase functions — safe in quote_sub/eval contexts
+# when called fully qualified (DBIO::Util::func_name())
+sub spurious_version_check_warnings () {
+  ( $ENV{DBIO_TEST_VERSION_WARNS_INDISCRIMINATELY} || $] < 5.010 ) ? 1 : 0
+}
+sub is_windows ()      { $^O eq 'MSWin32' ? 1 : 0 }
+sub is_dev_release ()  { ($DBIO::VERSION || '') =~ /_/ ? 1 : 0 }
+sub old_mro ()         { $] < 5.009_005 ? 1 : 0 }
+sub has_ithreads ()    { $Config{useithreads} ? 1 : 0 }
 sub unstable_dollar_at () { "$]" < 5.013002 ? 1 : 0 }
+sub dbiotest ()        { $INC{"DBIO/Test.pm"} ? 1 : 0 }
+sub peepeeness ()      { $INC{"DBIO/Test.pm"} && eval { DBIO::Test->is_smoker } && ($] >= 5.013005 and $] <= 5.013006) }
+sub shuffle_unordered_resultsets () { $ENV{DBIO_SHUFFLE_UNORDERED_RESULTSETS} ? 1 : 0 }
+sub assert_no_internal_wantarray () { $ENV{DBIO_ASSERT_NO_INTERNAL_WANTARRAY} ? 1 : 0 }
+sub assert_no_internal_indirect_calls () { $ENV{DBIO_ASSERT_NO_INTERNAL_INDIRECT_CALLS} ? 1 : 0 }
+sub stresstest_utf8_upgrade_generated_collapser_source () { $ENV{DBIO_STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE} ? 1 : 0 }
+sub iv_size ()         { $Config{ivsize} }
+sub os_name ()         { $^O }
+sub help_url ()        { 'https://github.com/p5-dbio/dbio/issues' }
 
-sub assert_no_internal_wantarray () { $DBIO::Util::ASSERT_NO_INTERNAL_WANTARRAY }
-sub assert_no_internal_indirect_calls () { $DBIO::Util::ASSERT_NO_INTERNAL_INDIRECT_CALLS }
+{
+  package DBIO::_ENV_;
+  use strict;
+  use warnings;
 
-# Functions to access constants (lowercase aliases for export)
-sub stresstest_utf8_upgrade_generated_collapser_source () { $DBIO::Util::STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE }
+  sub SPURIOUS_VERSION_CHECK_WARNINGS () { DBIO::Util::spurious_version_check_warnings() }
+  sub IS_WINDOWS ()      { DBIO::Util::is_windows() }
+  sub OLD_MRO ()         { DBIO::Util::old_mro() }
+  sub BROKEN_GOTO ()     { 0 }
+  sub HAS_ITHREADS ()    { DBIO::Util::has_ithreads() }
+  sub UNSTABLE_DOLLARAT () { DBIO::Util::unstable_dollar_at() }
+  sub DBIOTEST ()        { DBIO::Util::dbiotest() }
+  sub PEEPEENESS ()      { DBIO::Util::peepeeness() }
+  sub SHUFFLE_UNORDERED_RESULTSETS () { DBIO::Util::shuffle_unordered_resultsets() }
+  sub ASSERT_NO_INTERNAL_WANTARRAY () { DBIO::Util::assert_no_internal_wantarray() }
+  sub ASSERT_NO_INTERNAL_INDIRECT_CALLS () { DBIO::Util::assert_no_internal_indirect_calls() }
+  sub STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE () {
+    DBIO::Util::stresstest_utf8_upgrade_generated_collapser_source()
+  }
+  sub IV_SIZE ()         { DBIO::Util::iv_size() }
+  sub OS_NAME ()         { DBIO::Util::os_name() }
+  sub HELP_URL ()        { DBIO::Util::help_url() }
+}
 
 BEGIN {
   if ($] < 5.009_005) {
@@ -84,6 +81,8 @@ our @EXPORT_OK = qw(
   split_name dumper_squashed eval_package_without_redefine_warnings class_path
   firstidx uniq apply array_eq
   is_windows is_dev_release old_mro help_url unstable_dollar_at
+  has_ithreads dbiotest peepeeness shuffle_unordered_resultsets
+  iv_size os_name spurious_version_check_warnings
   is_plain_value is_literal_value
   assert_no_internal_wantarray assert_no_internal_indirect_calls
   stresstest_utf8_upgrade_generated_collapser_source
@@ -281,7 +280,7 @@ sub modver_gt_or_eq ($$) {
     if ! defined $ver or $ver =~ /[^0-9\.\_]/;
 
   local $SIG{__WARN__} = sigwarn_silencer( qr/\Qisn't numeric in subroutine entry/ )
-    if SPURIOUS_VERSION_CHECK_WARNINGS;
+    if spurious_version_check_warnings;
 
   croak "$mod does not seem to provide a version (perhaps it never loaded)"
     unless $mod->VERSION;
@@ -500,35 +499,36 @@ sub is_plain_value ($) {
 
   my $isa = mro::get_linear_isa($blessed);
 
-  # Check for stringification
-  for my $pkg (@$isa) {
-    my $glob = \*{ "${pkg}::(\"\"" };
-    return \($val) if defined *$glob{CODE};
-  }
+  {
+    no strict 'refs';
 
-  # Check for nummification/boolification with fallback
-  my $has_numeric_overload = grep {
-    defined *{ "${_}::(0+" }{CODE}
-  } @$isa;
+    # Check for stringification
+    for my $pkg (@$isa) {
+      my $glob = \*{ "${pkg}::(\"\"" };
+      return \($val) if defined *$glob{CODE};
+    }
 
-  my $has_bool_overload = grep {
-    defined *{ "${_}::(bool" }{CODE}
-  } @$isa;
-
-  if ($has_numeric_overload or $has_bool_overload) {
-    # Check fallback
-    my $has_fallback = grep {
-      defined *{ "${_}::()" }{CODE}
+    # Check for nummification/boolification with fallback
+    my $has_numeric_overload = grep {
+      defined *{ "${_}::(0+" }{CODE}
     } @$isa;
 
-    my $fallback_val = do {
-      no strict 'refs';
-      ${ "${blessed}::()" }
-    };
+    my $has_bool_overload = grep {
+      defined *{ "${_}::(bool" }{CODE}
+    } @$isa;
 
-    # If no fallback or fallback is true, it's a plain value
-    if (!$has_fallback or !defined $fallback_val or $fallback_val) {
-      return \($val);
+    if ($has_numeric_overload or $has_bool_overload) {
+      # Check fallback
+      my $has_fallback = grep {
+        defined *{ "${_}::()" }{CODE}
+      } @$isa;
+
+      my $fallback_val = ${ "${blessed}::()" };
+
+      # If no fallback or fallback is true, it's a plain value
+      if (!$has_fallback or !defined $fallback_val or $fallback_val) {
+        return \($val);
+      }
     }
   }
 

@@ -9,9 +9,11 @@ use_ok('DBIO::AccessBroker');
 # Verify it's a class with the right interface
 can_ok('DBIO::AccessBroker', qw(
   connect_info_for
+  connect_info_for_storage
   needs_refresh
   refresh
   current_connect_info_for
+  current_connect_info_for_storage
 ));
 
 # Static broker tests

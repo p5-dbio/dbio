@@ -4,13 +4,18 @@ package DBIO::AccessBroker;
 use strict;
 use warnings;
 use Carp qw(croak);
+use Scalar::Util qw(blessed);
+use namespace::clean;
 
 # Storage-agnostic: works with both Storage::DBI and Storage::Async.
-# The primary interface is connect_info_for($mode) which returns
-# connection parameters. Each Storage type decides HOW to connect.
+# The primary interface is connect_info_for_storage($storage, $mode), which
+# returns storage-native connection parameters. Legacy connect_info_for($mode)
+# remains available for DBI-shaped broker subclasses.
 #
 # Subclasses must implement:
-#   connect_info_for($mode) — returns [$dsn, $user, $pass, \%attrs] for 'read' or 'write'
+#   connect_info_for_storage($storage, $mode) — returns storage-native
+#                                               connect info for 'read' or 'write'
+#   connect_info_for($mode) — legacy DBI-shaped connect info
 #   needs_refresh()         — returns true if credentials need rotation
 #   refresh()               — perform credential rotation
 
@@ -33,10 +38,31 @@ sub set_storage {
   $self->_storage($storage);
 }
 
-# Primary interface: return [$dsn, $user, $pass, \%attrs] for a mode
-# This is what Storage::DBI and Storage::Async both consume.
+# Legacy DBI-shaped interface retained for built-in brokers and compatibility.
 sub connect_info_for {
   croak ref($_[0]) . " must implement connect_info_for()";
+}
+
+# Primary storage-aware interface. Built-in brokers can often derive
+# storage-native info from the legacy DBI-shaped form, so we provide that
+# bridge here.
+sub connect_info_for_storage {
+  my ($self, $storage, $mode) = @_;
+  $mode //= 'write';
+
+  my $connect_info = $self->connect_info_for($mode);
+
+  return $connect_info if blessed($storage) && $storage->isa('DBIO::Storage::DBI');
+
+  if (blessed($storage) && $storage->isa('DBIO::PostgreSQL::Async::Storage')) {
+    return [ $self->_pg_async_connect_info_from_dbi_info($connect_info), {} ];
+  }
+
+  croak sprintf(
+    "%s can not derive connect info for storage %s",
+    ref($self) || $self,
+    (blessed($storage) ? ref($storage) : 'unknown'),
+  );
 }
 
 # Do credentials need rotation?
@@ -45,14 +71,52 @@ sub needs_refresh { 0 }
 # Perform credential rotation
 sub refresh { }
 
-# Check refresh and return connect info — convenience for Storage consumers
+# Check refresh and return connect info — legacy convenience for DBI-shaped
+# callers or brokers already attached to a storage.
 sub current_connect_info_for {
   my ($self, $mode) = @_;
   $mode //= 'write';
   if ($self->needs_refresh) {
     $self->refresh;
   }
-  return $self->connect_info_for($mode);
+  return $self->_storage
+    ? $self->connect_info_for_storage($self->_storage, $mode)
+    : $self->connect_info_for($mode);
+}
+
+# Check refresh and return storage-native connect info.
+sub current_connect_info_for_storage {
+  my ($self, $storage, $mode) = @_;
+  $mode //= 'write';
+  if ($self->needs_refresh) {
+    $self->refresh;
+  }
+  return $self->connect_info_for_storage($storage, $mode);
+}
+
+sub _pg_async_connect_info_from_dbi_info {
+  my ($self, $connect_info) = @_;
+
+  my ($dsn, $user, $pass, $attrs) = @{ $connect_info || [] };
+  my ($params) = ($dsn || '') =~ /^dbi:Pg:(.+)$/i;
+
+  croak sprintf(
+    "%s can not derive async PostgreSQL conninfo from DSN '%s'",
+    ref($self) || $self,
+    (defined $dsn ? $dsn : ''),
+  ) unless defined $params;
+
+  my %conninfo = map {
+    my ($key, $value) = split /=/, $_, 2;
+    $key => $value;
+  } grep { length $_ } split /;/, $params;
+
+  $conninfo{user} = $user if defined $user && length $user;
+  $conninfo{password} = $pass if defined $pass && length $pass;
+  $conninfo{pool_size} = $attrs->{pool_size}
+    if ref($attrs) eq 'HASH' && exists $attrs->{pool_size};
+
+  return \%conninfo;
 }
 
 1;
@@ -69,9 +133,8 @@ DBIO::AccessBroker - Connection routing and credential lifecycle for DBIO
         dsn => 'dbi:Pg:dbname=myapp',
         username => 'app', password => 'secret',
     );
-    # Storage gets connect info — works with DBI and Async
-    my $info = $broker->current_connect_info_for('write');
-    # → ['dbi:Pg:dbname=myapp', 'app', 'secret', {}]
+    # Storage gets storage-native connect info
+    my $info = $broker->current_connect_info_for_storage($schema->storage, 'write');
 
     # ReadWrite — read replicas + write primary
     use DBIO::AccessBroker::ReadWrite;
@@ -82,7 +145,7 @@ DBIO::AccessBroker - Connection routing and credential lifecycle for DBIO
             { dsn => 'dbi:Pg:host=replica2', username => 'ro', password => 'pw' },
         ],
     );
-    $broker->connect_info_for('read');   # round-robins through replicas
+    $broker->connect_info_for('read');   # legacy DBI-shaped connect info
     $broker->connect_info_for('write');  # always returns primary
 
     # Vault — rotating credentials from OpenBao/Vault
@@ -94,14 +157,8 @@ DBIO::AccessBroker - Connection routing and credential lifecycle for DBIO
         ttl       => 3600,         # credentials valid for 1 hour
         refresh_margin => 900,     # refresh 15 min before expiry
     );
-    # current_connect_info_for auto-refreshes when TTL approaches
-    $broker->current_connect_info_for('write');  # fresh creds every time
-
-    # Integration with DBIO (via coderef-connect, works today)
-    my $schema = MyApp::Schema->connect(sub {
-        my $info = $broker->current_connect_info_for('write');
-        DBI->connect(@$info);
-    });
+    # DBIO can now connect directly with a broker
+    my $schema = MyApp::Schema->connect($broker);
 
 =head1 DESCRIPTION
 
@@ -124,7 +181,9 @@ Implement these methods:
 
 =over 4
 
-=item C<connect_info_for($mode)> — Return C<[$dsn, $user, $pass, \%attrs]> for 'read' or 'write'
+=item C<connect_info_for_storage($storage, $mode)> — Return storage-native connect info for 'read' or 'write'
+
+=item C<connect_info_for($mode)> — Optional legacy DBI-shaped connect info
 
 =item C<needs_refresh()> — Return true if credentials should be rotated
 

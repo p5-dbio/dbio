@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 use base 'DBIO::AccessBroker';
+use namespace::clean;
 
 __PACKAGE__->mk_group_accessors('simple' => qw(
   vault dsn dbi_attrs cred_path ttl refresh_margin
