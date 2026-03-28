@@ -8,7 +8,7 @@ use base 'DBIO::Storage::DBI';
 
 use Scalar::Util qw/blessed reftype weaken/;
 use List::Util ();
-use Sub::Util 'set_set_subname';
+use Sub::Util 'set_subname';
 use namespace::clean;
 
 __PACKAGE__->mk_group_accessors(simple => qw/
