@@ -6,8 +6,8 @@ use warnings;
 use lib '.';
 use MyApp::Schema;
 
-use Path::Class 'file';
-my $db_fn = file($INC{'MyApp/Schema.pm'})->dir->parent->file('db/example.db');
+use DBIO::Util qw(file_path parent_dir);
+my $db_fn = file_path(parent_dir(parent_dir($INC{"MyApp/Schema.pm"})), "db", "example.db");
 
 my $schema = MyApp::Schema->connect("dbi:SQLite:$db_fn");
 

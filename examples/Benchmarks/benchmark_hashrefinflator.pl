@@ -130,21 +130,21 @@ $schema->resultset ('Artist')->create({
 
 # get what data to feed during benchmarks
 {
-  package _BENCH_::DBIC::InflateResult::Trap;
+  package _BENCH_::DBIO::InflateResult::Trap;
   sub inflate_result { shift; return \@_ }
 }
 my %bench_dataset = (
   simple => do {
     my $rs = $schema->resultset ('Artist')->search ({}, {
       prefetch => { cds => 'tracks' },
-      result_class => '_BENCH_::DBIC::InflateResult::Trap',
+      result_class => '_BENCH_::DBIO::InflateResult::Trap',
     });
     [ $rs->all ];
   },
   complex => do {
     my $rs = $schema->resultset ('Artist')->search ({}, {
       prefetch => { cds => [ { tracks => { cd_single => [qw/artist genre tracks/] } }, 'genre' ] },
-      result_class => '_BENCH_::DBIC::InflateResult::Trap',
+      result_class => '_BENCH_::DBIO::InflateResult::Trap',
     });
     [ $rs->all ];
   },

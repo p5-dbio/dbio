@@ -52,7 +52,7 @@ my $us_and_sqlt = $s->resultset('Distribution')->search (
     join => [qw/deps deps/],
     order_by => 'me.author',
     select => [ 'me.distribution', 'me.author', map { "$_.phase" } (qw/deps deps_2/)],
-    as => [qw/dist_name dist_author req_dbic_at req_sqlt_at/],
+    as => [qw/dist_name dist_author req_dbio_at req_sqlt_at/],
     result_class => 'DBIO::ResultClass::HashRefInflator',
   },
 );

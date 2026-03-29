@@ -7,9 +7,9 @@ use Benchmark qw/cmpthese/;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 use DBIO::Test::Schema;
-use DBIO::ResultClass::HashRefInflator;  # older dbic didn't load it
+use DBIO::ResultClass::HashRefInflator;
 
-printf "Benchmarking DBIC version %s\n", DBIO->VERSION;
+printf "Benchmarking DBIO version %s\n", DBIO->VERSION;
 
 my $schema = DBIO::Test::Schema->connect ('dbi:SQLite::memory:');
 $schema->deploy;
