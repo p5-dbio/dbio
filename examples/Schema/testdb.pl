@@ -4,14 +4,21 @@ use warnings;
 use strict;
 
 use lib '.';
-use MyApp::Schema;
+
+# Usage: testdb.pl [SchemaVanilla|SchemaCandy|SchemaCake]
+# Defaults to SchemaVanilla
+my $schema_name = $ARGV[0] // 'SchemaVanilla';
+my $schema_class = "MyApp::$schema_name";
+my $inc_key = "MyApp/$schema_name.pm";
+
+require $inc_key;
 
 use DBIO::Util qw(file_path parent_dir);
-my $db_fn = file_path(parent_dir(parent_dir($INC{"MyApp/Schema.pm"})), "db", "example.db");
+my $db_fn = file_path(parent_dir(parent_dir($INC{$inc_key})), "db", "example.db");
 
 # for other DSNs, e.g. MySql, see the perldoc for the relevant dbd
 # driver, e.g perldoc L<DBD::mysql>.
-my $schema = MyApp::Schema->connect("dbi:SQLite:$db_fn");
+my $schema = $schema_class->connect("dbi:SQLite:$db_fn");
 
 get_tracks_by_cd('Bad');
 get_tracks_by_artist('Michael Jackson');

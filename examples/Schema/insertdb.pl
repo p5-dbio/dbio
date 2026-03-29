@@ -4,12 +4,19 @@ use strict;
 use warnings;
 
 use lib '.';
-use MyApp::Schema;
+
+# Usage: insertdb.pl [SchemaVanilla|SchemaCandy|SchemaCake]
+# Defaults to SchemaVanilla
+my $schema_name = $ARGV[0] // 'SchemaVanilla';
+my $schema_class = "MyApp::$schema_name";
+my $inc_key = "MyApp/$schema_name.pm";
+
+require $inc_key;
 
 use DBIO::Util qw(file_path parent_dir);
-my $db_fn = file_path(parent_dir(parent_dir($INC{"MyApp/Schema.pm"})), "db", "example.db");
+my $db_fn = file_path(parent_dir(parent_dir($INC{$inc_key})), "db", "example.db");
 
-my $schema = MyApp::Schema->connect("dbi:SQLite:$db_fn");
+my $schema = $schema_class->connect("dbi:SQLite:$db_fn");
 
 my @artists = (['Michael Jackson'], ['Eminem']);
 $schema->populate('Artist', [
@@ -18,8 +25,8 @@ $schema->populate('Artist', [
 ]);
 
 my %albums = (
-    'Thriller' => 'Michael Jackson',
-    'Bad' => 'Michael Jackson',
+    'Thriller'              => 'Michael Jackson',
+    'Bad'                   => 'Michael Jackson',
     'The Marshall Mathers LP' => 'Eminem',
 );
 
