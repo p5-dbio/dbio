@@ -1,3 +1,7 @@
+DBIO is a fork of DBIx::Class. This distribution contains code originally
+developed by the DBIx::Class Authors and is now maintained by the DBIO Authors.
+The original DBIx::Class license applies:
+
 This is free software; you can redistribute it and/or modify it under the
 same terms as the Perl5 (v5.0.0 ~ v5.20.0) programming language system
 itself: under the terms of either:
