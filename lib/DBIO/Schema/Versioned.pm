@@ -1,61 +1,3 @@
-package DBIO::Version::Table;
-use base 'DBIO::Core';
-use strict;
-use warnings;
-
-__PACKAGE__->table('dbix_class_schema_versions');
-
-__PACKAGE__->add_columns
-    ( 'version' => {
-        'data_type' => 'VARCHAR',
-        'is_auto_increment' => 0,
-        'default_value' => undef,
-        'is_foreign_key' => 0,
-        'name' => 'version',
-        'is_nullable' => 0,
-        'size' => '10'
-        },
-      'installed' => {
-          'data_type' => 'VARCHAR',
-          'is_auto_increment' => 0,
-          'default_value' => undef,
-          'is_foreign_key' => 0,
-          'name' => 'installed',
-          'is_nullable' => 0,
-          'size' => '20'
-          },
-      );
-__PACKAGE__->set_primary_key('version');
-
-package DBIO::Version::TableCompat;
-use base 'DBIO::Core';
-__PACKAGE__->table('SchemaVersions');
-
-__PACKAGE__->add_columns
-    ( 'Version' => {
-        'data_type' => 'VARCHAR',
-        },
-      'Installed' => {
-          'data_type' => 'VARCHAR',
-          },
-      );
-__PACKAGE__->set_primary_key('Version');
-
-package DBIO::Version;
-use base 'DBIO::Schema';
-use strict;
-use warnings;
-
-__PACKAGE__->register_class('Table', 'DBIO::Version::Table');
-
-package DBIO::VersionCompat;
-use base 'DBIO::Schema';
-use strict;
-use warnings;
-
-__PACKAGE__->register_class('TableCompat', 'DBIO::Version::TableCompat');
-
-
 # ---------------------------------------------------------------------------
 
 =head1 SYNOPSIS
@@ -195,6 +137,8 @@ use warnings;
 use base 'DBIO::Schema';
 
 use DBIO::Carp;
+use DBIO::Version;
+use DBIO::VersionCompat;
 use Time::HiRes qw/gettimeofday/;
 use Try::Tiny;
 use Scalar::Util 'weaken';

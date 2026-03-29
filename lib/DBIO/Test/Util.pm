@@ -4,6 +4,8 @@ package DBIO::Test::Util;
 use warnings;
 use strict;
 
+use DBIO::Test::Util::UmaskGuard;
+
 # this noop trick initializes the STDOUT, so that the TAP::Harness
 # issued IO::Select->can_read calls (which are blocking wtf wtf wtf)
 # keep spinning and scheduling jobs
@@ -116,15 +118,6 @@ sub local_umask {
   die "Setting umask failed: $!" unless defined $old_umask;
 
   return bless \$old_umask, 'DBIO::Test::Util::UmaskGuard';
-}
-{
-  package DBIO::Test::Util::UmaskGuard;
-  sub DESTROY {
-    local ($@, $!);
-    eval { defined (umask ${$_[0]}) or die };
-    warn ( "Unable to reset old umask ${$_[0]}: " . ($!||'Unknown error') )
-      if ($@ || $!);
-  }
 }
 
 sub stacktrace {

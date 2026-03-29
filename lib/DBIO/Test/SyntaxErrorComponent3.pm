@@ -1,4 +1,4 @@
-package DBIOErrorTest::SyntaxError;
+package DBIO::Test::SyntaxErrorComponent3;
 # ABSTRACT: Test component with intentional syntax error
 
 use strict;
