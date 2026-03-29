@@ -26,30 +26,6 @@ sub iv_size ()         { $Config{ivsize} }
 sub os_name ()         { $^O }
 sub help_url ()        { 'https://github.com/p5-dbio/dbio/issues' }
 
-{
-  package DBIO::_ENV_;
-  use strict;
-  use warnings;
-
-  sub SPURIOUS_VERSION_CHECK_WARNINGS () { DBIO::Util::spurious_version_check_warnings() }
-  sub IS_WINDOWS ()      { DBIO::Util::is_windows() }
-  sub OLD_MRO ()         { DBIO::Util::old_mro() }
-  sub BROKEN_GOTO ()     { 0 }
-  sub HAS_ITHREADS ()    { DBIO::Util::has_ithreads() }
-  sub UNSTABLE_DOLLARAT () { DBIO::Util::unstable_dollar_at() }
-  sub DBIOTEST ()        { DBIO::Util::dbiotest() }
-  sub PEEPEENESS ()      { DBIO::Util::peepeeness() }
-  sub SHUFFLE_UNORDERED_RESULTSETS () { DBIO::Util::shuffle_unordered_resultsets() }
-  sub ASSERT_NO_INTERNAL_WANTARRAY () { DBIO::Util::assert_no_internal_wantarray() }
-  sub ASSERT_NO_INTERNAL_INDIRECT_CALLS () { DBIO::Util::assert_no_internal_indirect_calls() }
-  sub STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE () {
-    DBIO::Util::stresstest_utf8_upgrade_generated_collapser_source()
-  }
-  sub IV_SIZE ()         { DBIO::Util::iv_size() }
-  sub OS_NAME ()         { DBIO::Util::os_name() }
-  sub HELP_URL ()        { DBIO::Util::help_url() }
-}
-
 BEGIN {
   if ($] < 5.009_005) {
     require MRO::Compat;

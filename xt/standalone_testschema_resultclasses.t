@@ -3,8 +3,9 @@ use strict;
 
 BEGIN { delete @ENV{qw(DBIO_TEST_VERSION_WARNS_INDISCRIMINATELY DBICTEST_VERSION_WARNS_INDISCRIMINATELY)} }
 
+use Config;
 use DBIO::Util 'sigwarn_silencer';
-use if DBIO::_ENV_::BROKEN_FORK, 'threads';
+use if !$Config{d_fork}, 'threads';
 
 use Test::More;
 use File::Find;
@@ -31,7 +32,7 @@ find({
 
     return unless ( -f $_ and $_ =~ /\.pm$/ );
 
-    if (DBIO::_ENV_::BROKEN_FORK) {
+    if (!$Config{d_fork}) {
       # older perls crash if threads are spawned way too quickly, sleep for 100 msecs
       my $t = threads->create(sub { $worker->($_) });
       sleep 0.1;

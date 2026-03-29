@@ -8,7 +8,7 @@ Revision history for DBIO
 
     * Changes
         - Normalize +Absolute::Storage names in Schema->connection
-        - Restore DBIO::_ENV_ compatibility aliases while moving internal callers to DBIO::Util helpers
+        - Remove DBIO::_ENV_ pseudo-package; all callers now use DBIO::Util helpers directly
 
     * Fixes
         - Prevent repeated TxnScopeGuard DESTROY invocations from attempting a second rollback

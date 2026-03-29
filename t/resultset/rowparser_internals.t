@@ -752,7 +752,7 @@ my $deparser;
 sub is_same_src { SKIP: {
 
   skip "Skipping comparison of unicode-posioned source", 1
-    if DBIO::_ENV_::STRESSTEST_UTF8_UPGRADE_GENERATED_COLLAPSER_SOURCE;
+    if DBIO::Util::stresstest_utf8_upgrade_generated_collapser_source();
 
   $deparser ||= B::Deparse->new;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
