@@ -89,3 +89,28 @@ are used most often.
 =item L<DBIO::InflateColumn> - Making objects out of your column values.
 
 =back
+
+=head1 Examples and benchmarks
+
+The F<examples/> directory in the distribution contains runnable code:
+
+=over 4
+
+=item F<examples/Schema/> - Artist/CD/Track schema in Vanilla, Candy, and Cake
+style with F<insertdb.pl> and F<testdb.pl>. Pass the schema name as an
+argument: C<perl testdb.pl SchemaCandy>
+
+=item F<examples/Benchmarks/benchmark_datafetch.pl> - Row fetch performance
+using L<DBIO::ResultClass::HashRefInflator>.
+
+=item F<examples/Benchmarks/benchmark_hashrefinflator.pl> - HashRefInflator
+implementation comparison.
+
+=item F<examples/Benchmarks/benchmark_row_destroy.pl> - Demonstrates the
+performance gain from not carrying the DBIx::Class registry C<DESTROY> on
+every row object.
+
+=item F<examples/MiscTools/determine_cpan_joint_deps.pl> - Find shared
+dependencies between CPAN distributions using L<DBIO::Schema::Loader>.
+
+=back
