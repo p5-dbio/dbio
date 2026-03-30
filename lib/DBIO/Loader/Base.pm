@@ -2978,7 +2978,17 @@ sub _dbic_stmt_cake {
         $self->_raw_stmt($class, "$method $args;");
     }
     elsif ($method eq 'load_components') {
-        # skip -- Cake handles components via import
+        # DBIO::Cake's import already loads Timestamp (and optionally
+        # InflateColumn::DateTime).  Any other components (e.g. PostgreSQL::Result)
+        # must still be loaded explicitly so their methods are available.
+        my @cake_native = qw( Timestamp InflateColumn::DateTime );
+        my %skip = map { $_ => 1 } @cake_native;
+        my @extra = grep { !$skip{$_} } @args;
+        if (@extra) {
+            my $args = dump(@extra);
+            $args = '(' . $args . ')' if @extra < 2;
+            $self->_raw_stmt($class, '__PACKAGE__->load_components' . $args . ';');
+        }
     }
     else {
         # fallback to vanilla style
@@ -3037,16 +3047,28 @@ sub _col_info_to_cake {
     my $type = $info->{data_type} || 'text';
     my @parts;
 
+    # Strip schema qualification (e.g. "myschema.vector" -> "vector")
+    $type =~ s/^\w+\.//;
+
     # Type with size (size can be scalar or arrayref for precision/scale)
+    my $type_str;
     if ($info->{size} && $type =~ /^(?:varchar|char|bit|varbit|float|numeric|decimal|vector|halfvec|sparsevec)$/i) {
         my $size = ref $info->{size} eq 'ARRAY'
             ? join(',', @{$info->{size}})
             : $info->{size};
-        push @parts, "$type($size)";
+        $type_str = "$type($size)";
     } elsif ($type =~ /^(?:serial|bigserial|smallserial)$/i) {
-        push @parts, $type;
+        $type_str = $type;
     } else {
-        push @parts, $type;
+        $type_str = $type;
+    }
+
+    # Quote types that aren't valid Perl barewords/calls
+    # (array types like text[], multi-word types like "timestamp with time zone")
+    if ($type_str =~ /[\s\[\]]/) {
+        push @parts, "'$type_str'";
+    } else {
+        push @parts, $type_str;
     }
 
     # Modifiers
@@ -3060,7 +3082,15 @@ sub _col_info_to_cake {
     if (defined $info->{default_value}) {
         my $def = $info->{default_value};
         if (ref $def eq 'SCALAR') {
-            push @parts, "\\'" . $$def . "'";
+            my $expr = $$def;
+            # Use \q{} when the expression contains single quotes or :: (PostgreSQL
+            # cast operator), which would break \'...' single-quote wrapping.
+            # q{} handles nested braces correctly so '{}'::text[] works fine.
+            if ($expr =~ /[':]/) {
+                push @parts, "\\q{$expr}";
+            } else {
+                push @parts, "\\'" . $expr . "'";
+            }
         } elsif (looks_like_number($def)) {
             push @parts, "default($def)";
         } else {
