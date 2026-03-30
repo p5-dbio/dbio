@@ -5,6 +5,14 @@ use Test::More;
 plan skip_all => "Skipping finicky test on older perl"
   if "$]" < 5.008005;
 
+# This test must run via 'dzil test', not 'prove xt/' directly —
+# PodWeaver must have already processed the source files.
+do {
+  my $sample = do { local (@ARGV, $/) = 'lib/DBIO/Admin.pm'; <> };
+  plan skip_all => 'Run via dzil test — PodWeaver must process files first (prove xt/ not supported)'
+    unless $sample =~ /^=head1 (?:ATTRIBUTES|METHODS)/m;
+};
+
 require DBIO;
 unless ( DBIO::Optional::Dependencies->req_ok_for ('test_podcoverage') ) {
   my $missing = DBIO::Optional::Dependencies->req_missing_for ('test_podcoverage');
@@ -141,32 +149,6 @@ my $exceptions = {
 
 # deprecated / backcompat stuff
     'DBIO::Serialize::Storable'              => { skip => 1 },
-
-# PodWeaver-processed modules — =method/=attr directives not visible
-# to Pod::Coverage in raw source; passes via dzil test (post-PodWeaver)
-    'DBIO::Admin'                            => { skip => 1 },
-    'DBIO::Cake'                             => { skip => 1 },
-    'DBIO::Candy'                            => { skip => 1 },
-    'DBIO::Candy::Exports'                   => { skip => 1 },
-    'DBIO::ChangeLog*'                       => { skip => 1 },
-    'DBIO::Compat::*'                        => { skip => 1 },
-    'DBIO::Core'                             => { skip => 1 },
-    'DBIO::Cursor'                           => { skip => 1 },
-    'DBIO::EncodedColumn'                    => { skip => 1 },
-    'DBIO::Exception'                        => { skip => 1 },
-    'DBIO::Future'                           => { skip => 1 },
-    'DBIO::InflateColumn*'                   => { skip => 1 },
-    'DBIO::PK'                               => { skip => 1 },
-    'DBIO::Relationship::Base'               => { skip => 1 },
-    'DBIO::Replicated*'                      => { skip => 1 },
-    'DBIO::ResultClass::HashRefInflator'     => { skip => 1 },
-    'DBIO::ResultSourceProxy::Table'         => { skip => 1 },
-    'DBIO::Schema::ChangeLog'               => { skip => 1 },
-    'DBIO::Schema::PopulateMore'            => { skip => 1 },
-    'DBIO::Storage::Async'                   => { skip => 1 },
-    'DBIO::Storage::Pool'                    => { skip => 1 },
-    'DBIO::Timestamp'                        => { skip => 1 },
-    'DBIO::UUIDColumns'                      => { skip => 1 },
 
 # test infrastructure — not public API
     'DBIO::Test*'                            => { skip => 1 },
