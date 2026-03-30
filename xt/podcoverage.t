@@ -2,8 +2,6 @@ use warnings;
 use strict;
 
 use Test::More;
-use lib qw(maint/.Generated_Pod/lib);
-
 plan skip_all => "Skipping finicky test on older perl"
   if "$]" < 5.008005;
 

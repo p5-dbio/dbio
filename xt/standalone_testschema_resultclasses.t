@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-BEGIN { delete @ENV{qw(DBIO_TEST_VERSION_WARNS_INDISCRIMINATELY DBICTEST_VERSION_WARNS_INDISCRIMINATELY)} }
+BEGIN { delete $ENV{DBIO_TEST_VERSION_WARNS_INDISCRIMINATELY} }
 
 use Config;
 use DBIO::Util 'sigwarn_silencer';

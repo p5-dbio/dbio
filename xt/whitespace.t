@@ -25,7 +25,7 @@ unless ( DBIO::Optional::Dependencies->req_ok_for ('test_whitespace') ) {
   *Test::NoTabs::_is_perl_module = $is_pm;
 }
 
-my @pl_targets = qw/t xt lib script examples maint/;
+my @pl_targets = qw/t xt lib script examples/;
 Test::EOL::all_perl_files_ok({ trailing_whitespace => 1 }, @pl_targets);
 Test::NoTabs::all_perl_files_ok(@pl_targets);
 

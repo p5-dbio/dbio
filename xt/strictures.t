@@ -44,8 +44,6 @@ find({
     m/\.(?: pm | pl | t )$ /ix or return;
 
     return if m{^(?:
-      maint/Makefile.PL.inc/.+                         # all the maint inc snippets are auto-strictured
-        |
       lib/DBIO/Test/Util/OverrideRequire.pm            # no strictures by design (load order sensitive)
     )$}x;
 
@@ -63,6 +61,6 @@ find({
     );
   },
   no_chdir => 1,
-}, (qw(lib t examples maint)) );
+}, (qw(lib t examples)) );
 
 done_testing;

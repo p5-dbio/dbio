@@ -20,8 +20,6 @@ require Test::Pod;
 # these — skip files that need PodWeaver processing.
 
 my @dirs = ('lib');
-my $generated_pod_dir = 'maint/.Generated_Pod';
-push @dirs, $generated_pod_dir if -d $generated_pod_dir;
 
 my @files;
 find({ wanted => sub {
