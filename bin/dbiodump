@@ -54,6 +54,33 @@ Uses C<use Moose> with C<extends> instead of C<use base>.
 Options are given as C<-o key=value> pairs. Any option valid for
 L<DBIO::Loader::Base> can be passed this way.
 
+=head1 OPTIONS
+
+=over 4
+
+=item B<--style=STYLE>
+
+Generated code style. One of C<vanilla> (default), C<cake>, C<candy>, or
+C<moose>. See L</DESCRIPTION> above for a description of each style.
+
+=item B<-o key=value>
+
+Pass an option directly to L<DBIO::Loader::Base>. May be given multiple
+times. Values that look like JSON objects or arrays are decoded automatically.
+Numeric values are coerced to numbers. Examples:
+
+    -o dump_directory=./lib
+    -o debug=1
+    -o components=["DBIO::InflateColumn::DateTime"]
+
+Any option accepted by L<DBIO::Loader::Base> may be set this way.
+
+=back
+
+=head1 SEE ALSO
+
+L<DBIO::Loader>, L<DBIO::Loader::Base>, L<dbioadmin>
+
 =cut
 
 use strict;

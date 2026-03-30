@@ -90,6 +90,20 @@ are used most often.
 
 =back
 
+=head1 Command-line tools
+
+=over 4
+
+=item L<dbioadmin> - Schema administration: deploy, upgrade, create DDL diffs,
+and run select/insert/update/delete against a live schema. Thin CLI frontend
+for L<DBIO::Admin>.
+
+=item L<dbiodump> - Connect to a database, introspect the schema, and generate
+DBIO Result class files. Supports Vanilla, Candy, and Cake output styles.
+Uses L<DBIO::Loader>.
+
+=back
+
 =head1 Examples and benchmarks
 
 The F<examples/> directory in the distribution contains runnable code:

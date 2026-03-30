@@ -25,7 +25,7 @@ use namespace::clean;
 
 =head1 DESCRIPTION
 
-Administrative helper used by C<bin/dbioadmin>.
+Administrative helper used by L<dbioadmin>.
 
 Supported operations:
 
@@ -42,6 +42,10 @@ Supported operations:
 =item * C<select>, C<insert>, C<update>, C<delete>
 
 =back
+
+=head1 SEE ALSO
+
+L<dbioadmin>, L<DBIO::Schema>
 
 =head1 MODES
 
