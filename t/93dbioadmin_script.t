@@ -3,9 +3,9 @@ use warnings;
 
 use Test::More;
 
-my $script = 'script/dbioadmin';
-ok(-f $script, 'script/dbioadmin exists');
-ok(-x $script, 'script/dbioadmin is executable');
+my $script = 'bin/dbioadmin';
+ok(-f $script, 'bin/dbioadmin exists');
+ok(-x $script, 'bin/dbioadmin is executable');
 
 my $cmd = "$^X -Ilib $script --help 2>&1";
 my $out = `$cmd`;
