@@ -25,7 +25,7 @@ use namespace::clean;
 
 =head1 DESCRIPTION
 
-Administrative helper used by C<script/dbioadmin>.
+Administrative helper used by C<bin/dbioadmin>.
 
 Supported operations:
 
