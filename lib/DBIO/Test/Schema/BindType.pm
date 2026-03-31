@@ -27,7 +27,7 @@ __PACKAGE__->add_columns(
     is_nullable => 1,
   },
   'a_memo' => {
-    data_type => 'memo',
+    data_type => 'mediumtext',
     is_nullable => 1,
   },
 );

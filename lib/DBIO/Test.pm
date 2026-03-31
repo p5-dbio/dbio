@@ -316,6 +316,14 @@ sub deploy_schema {
   # Fake storage doesn't need deployment
   return if __PACKAGE__->_uses_fake_storage($schema);
 
+  # MySQL/MariaDB have no transactional DDL and no IF NOT EXISTS on all
+  # statement types, so use add_drop_table to avoid "table already exists"
+  # errors when multiple tests deploy the same schema in sequence.
+  unless (exists $args->{add_drop_table}) {
+    my $driver = eval { $schema->storage->dbh->{Driver}{Name} } // '';
+    $args->{add_drop_table} = 1 if $driver =~ /^(?:mysql|MariaDB)$/i;
+  }
+
   $schema->deploy($args);
 }
 

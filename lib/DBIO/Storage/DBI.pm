@@ -639,7 +639,12 @@ sub connect_info {
       . 'this warning.'
     ) if ! $attrs{AutoCommit} and ! $ENV{DBIO_UNSAFE_AUTOCOMMIT_OK};
 
-    push @args, \%attrs if keys %attrs;
+    # Strip DBIO-private attrs before passing to DBI->connect.
+    # ignore_version is consumed by DBIO::Schema::Versioned, not by the DBD.
+    my %dbi_attrs = %attrs;
+    delete @dbi_attrs{qw( ignore_version )};
+
+    push @args, \%dbi_attrs if keys %dbi_attrs;
   }
 
   # this is the authoritative "always an arrayref" thing fed to DBI->connect
@@ -1708,7 +1713,13 @@ sub _connect {
 
     my @args = @{ $info->{arguments} };
 
-    push @args, \%attrs if keys %attrs and ref $args[0] ne 'CODE';
+    # _dbio_connect_attributes keeps the full set (including DBIO-private
+    # keys like ignore_version) for introspection by upper layers.
+    # _dbi_connect_info must only contain attrs that DBI/DBD understands.
+    my %dbi_attrs = %attrs;
+    delete @dbi_attrs{qw( ignore_version )};
+
+    push @args, \%dbi_attrs if keys %dbi_attrs and ref $args[0] ne 'CODE';
 
     $self->_dbi_connect_info(\@args);
     $self->_dbio_connect_attributes(\%attrs);
