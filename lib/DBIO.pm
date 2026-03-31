@@ -214,6 +214,10 @@ modules
 =item * L<DBIx::Class::TimeStamp> and L<DBIx::Class::Helpers> functionality
 integrated into core
 
+=item * Native driver distributions for each database (L<DBIO::PostgreSQL>,
+L<DBIO::MySQL>, L<DBIO::SQLite>) replace the monolithic DBIx::Class storage
+layer; SQL::Translator is no longer required for schema management
+
 =back
 
 =head1 GETTING HELP

@@ -44,6 +44,7 @@ my $schema = MyApp::Schema->connect($broker);
 
 - [**DBIO::PostgreSQL**](https://metacpan.org/pod/DBIO::PostgreSQL) — introspection via pg_catalog, deploy via test-and-compare
 - [**DBIO::MySQL**](https://metacpan.org/pod/DBIO::MySQL) — MySQL and MariaDB support
+  (requires [DBD::mysql](https://metacpan.org/pod/DBD::mysql) **or** [DBD::MariaDB](https://metacpan.org/pod/DBD::MariaDB) — install the one that matches your server)
 - [**DBIO::SQLite**](https://metacpan.org/pod/DBIO::SQLite) — SQLite support
 - [**DBIO::PostgreSQL::Async**](https://metacpan.org/pod/DBIO::PostgreSQL::Async) — async PostgreSQL via [EV::Pg](https://metacpan.org/pod/EV::Pg) (no DBI)
 
