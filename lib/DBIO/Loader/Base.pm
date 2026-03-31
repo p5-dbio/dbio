@@ -3050,6 +3050,14 @@ sub _col_info_to_cake {
     # Strip schema qualification (e.g. "myschema.vector" -> "vector")
     $type =~ s/^\w+\.//;
 
+    # enum/set: emit as function call with values, e.g. enum('foo','bar')
+    if ($type =~ /^(?:enum|set)$/i && $info->{extra}{list}) {
+        my @vals = map { "'$_'" } @{ $info->{extra}{list} };
+        push @parts, lc($type) . '(' . join(', ', @vals) . ')';
+        # skip the rest of the type handling
+        goto MODIFIERS;
+    }
+
     # Type with size (size can be scalar or arrayref for precision/scale)
     my $type_str;
     if ($info->{size} && $type =~ /^(?:varchar|char|bit|varbit|float|numeric|decimal|vector|halfvec|sparsevec)$/i) {
@@ -3071,6 +3079,7 @@ sub _col_info_to_cake {
         push @parts, $type_str;
     }
 
+    MODIFIERS:
     # Modifiers
     push @parts, 'auto_inc' if $info->{is_auto_increment};
     push @parts, 'null' if $info->{is_nullable};

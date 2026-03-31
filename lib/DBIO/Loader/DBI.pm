@@ -55,9 +55,10 @@ sub new {
         my $driver = $self->dbh->{Driver}->{Name};
 
         my %driver_loader = (
-            Pg      => 'DBIO::PostgreSQL::Loader',
-            mysql   => 'DBIO::MySQL::Loader',
-            SQLite  => 'DBIO::SQLite::Loader',
+            Pg        => 'DBIO::PostgreSQL::Loader',
+            mysql     => 'DBIO::MySQL::Loader',
+            MariaDB   => 'DBIO::MySQL::Loader',
+            SQLite    => 'DBIO::SQLite::Loader',
             DB2     => 'DBIO::DB2::Loader',
             Oracle  => 'DBIO::Oracle::Loader',
             Sybase  => 'DBIO::Sybase::Loader',

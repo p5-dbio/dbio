@@ -18,7 +18,7 @@ my @col_types = qw(
   blob tinyblob mediumblob longblob bytea
   boolean bool
   date datetime timestamp time timetz timestamptz interval
-  enum uuid json jsonb xml hstore
+  enum set uuid json jsonb xml hstore
   array
   money
   vector halfvec sparsevec bit varbit
@@ -344,9 +344,12 @@ sub timetz      { data_type => 'time with time zone', @_ }
 sub timestamptz { data_type => 'timestamp with time zone', @_ }
 sub interval    { data_type => 'interval', @_ }
 
-# Enum -- all args are enum values (modifiers go outside via col)
+# Enum/Set -- all args are the allowed values (modifiers go outside via col)
 sub enum {
   data_type => 'enum', extra => { list => [@_] };
+}
+sub set {
+  data_type => 'set', extra => { list => [@_] };
 }
 
 # UUID
