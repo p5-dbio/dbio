@@ -316,12 +316,24 @@ sub deploy_schema {
   # Fake storage doesn't need deployment
   return if __PACKAGE__->_uses_fake_storage($schema);
 
+  my $driver = eval { $schema->storage->dbh->{Driver}{Name} } // '';
+
   # MySQL/MariaDB have no transactional DDL and no IF NOT EXISTS on all
   # statement types, so use add_drop_table to avoid "table already exists"
   # errors when multiple tests deploy the same schema in sequence.
   unless (exists $args->{add_drop_table}) {
-    my $driver = eval { $schema->storage->dbh->{Driver}{Name} } // '';
     $args->{add_drop_table} = 1 if $driver =~ /^(?:mysql|MariaDB)$/i;
+  }
+
+  # MySQL 8 strict mode (NO_ZERO_DATE / NO_ZERO_IN_DATE) rejects '0000-00-00'
+  # which the test suite uses to verify datetime_undef_if_invalid behaviour.
+  # Strip those modes from the session so the tests work as intended.
+  if ($driver =~ /^(?:mysql|MariaDB)$/i) {
+    eval {
+      $schema->storage->dbh->do(
+        q{SET SESSION sql_mode = REPLACE(REPLACE(@@SESSION.sql_mode,'NO_ZERO_DATE',''),'NO_ZERO_IN_DATE','')}
+      );
+    };
   }
 
   $schema->deploy($args);
