@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::Moo::Result::Artist;
+package DBIO::Test::Schema::Moo::Result::Artist;
 # ABSTRACT: Moo-enabled test result class for the artist table
 
 use DBIO::Moo;

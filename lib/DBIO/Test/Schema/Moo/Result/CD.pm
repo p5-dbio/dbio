@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::Moo::Result::CD;
+package DBIO::Test::Schema::Moo::Result::CD;
 # ABSTRACT: Moo-enabled test result class for the cd table
 
 use DBIO::Moo;

@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::Moose::Result::CD;
+package DBIO::Test::Schema::Moose::Result::CD;
 # ABSTRACT: Moose-enabled test result class for the cd table
 
 use DBIO::Moose;

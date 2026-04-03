@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::Moose::Result::Artist;
+package DBIO::Test::Schema::Moose::Result::Artist;
 # ABSTRACT: Moose-enabled test result class for the artist table
 
 use DBIO::Moose;
