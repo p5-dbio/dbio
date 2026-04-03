@@ -104,6 +104,7 @@ subtest 'Artist has custom ResultSet' => sub {
     'artist resultset is custom class' );
   can_ok( $artist_rs, 'by_name' );
   can_ok( $artist_rs, 'order_by_name' );
+  is( $artist_rs->default_limit, 100, "Moose attr on custom ResultSet" );
 };
 
 subtest 'CD uses default ResultSet' => sub {

@@ -1,10 +1,12 @@
 package DBIO::Test::Schema::MooCake::ResultSet::Artist;
-# ABSTRACT: Custom MooCake-schema ResultSet for the artist source
+# ABSTRACT: Custom Moo-based ResultSet for the MooCake artist source
 
-use strict;
-use warnings;
+use Moo;
+extends 'DBIO::ResultSet';
 
-use base 'DBIO::ResultSet';
+sub FOREIGNBUILDARGS { my ($class, @args) = @_; return @args }
+
+has default_limit => ( is => 'rw', lazy => 1, default => sub { 100 } );
 
 sub by_name {
   my ($self, $name) = @_;

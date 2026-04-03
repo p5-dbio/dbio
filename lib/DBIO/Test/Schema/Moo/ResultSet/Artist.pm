@@ -1,10 +1,15 @@
 package DBIO::Test::Schema::Moo::ResultSet::Artist;
-# ABSTRACT: Custom Moo-schema ResultSet for the artist source
+# ABSTRACT: Custom Moo-based ResultSet for the artist source
 
-use strict;
-use warnings;
+use Moo;
+extends 'DBIO::ResultSet';
 
-use base 'DBIO::ResultSet';
+# For Moo extending a non-Moo class: pass constructor args through unchanged.
+# DBIO::ResultSet::new takes ($source_handle, \%attrs) — no filtering needed.
+sub FOREIGNBUILDARGS { my ($class, @args) = @_; return @args }
+
+# ResultSet-level Moo attribute
+has default_limit => ( is => 'rw', lazy => 1, default => sub { 100 } );
 
 sub by_name {
   my ($self, $name) = @_;
