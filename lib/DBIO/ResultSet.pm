@@ -1337,7 +1337,7 @@ sub _construct_results {
           or
         $aliastypes->{premultiplied}{$sel_alias}
       ) {
-        $multiplied_selectors->{$_} = 1 for values %{$aliastypes->{selecting}{$sel_alias}{-seen_columns}}
+        $multiplied_selectors->{$_} = 1 for keys %{$aliastypes->{selecting}{$sel_alias}{-seen_columns}}
       }
     }
 
