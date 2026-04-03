@@ -24,8 +24,10 @@ sub import {
 
   # Override MooseX::NonMoose's default FOREIGNBUILDARGS with one that
   # filters pure-Moose attributes out of the DBIO constructor call.
-  no strict 'refs';
-  *{"${caller}::FOREIGNBUILDARGS"} = \&_foreignbuildargs;
+  # We must register via the Moose metaclass (not just the glob) so that
+  # make_immutable's inlined constructor sees our version, not the
+  # MooseX::NonMoose pass-through that was installed earlier.
+  $caller->meta->add_method( FOREIGNBUILDARGS => \&_foreignbuildargs );
 }
 
 sub _foreignbuildargs {
