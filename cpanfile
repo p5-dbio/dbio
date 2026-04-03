@@ -37,6 +37,11 @@ recommends 'Lingua::EN::Inflect', '0';
 # Recommended for stronger salt generation in DBIO::EncodedColumn.
 recommends 'Crypt::URandom', '0';
 
+# Optional OO framework integration (only needed if you use DBIO::Moo or DBIO::Moose)
+suggests 'Moo', '2.000';
+suggests 'MooseX::NonMoose', '0.26';
+suggests 'Moose', '2.0';
+
 on 'test' => sub {
   requires 'File::Temp', '0.22';
   requires 'Test::Deep', '0.101';
