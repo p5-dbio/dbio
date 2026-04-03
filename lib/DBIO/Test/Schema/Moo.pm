@@ -4,7 +4,11 @@ package DBIO::Test::Schema::Moo;
 use strict;
 use warnings;
 
-use base 'DBIO::Schema';
+use Moo;
+extends 'DBIO::Schema';
+
+# Schema-level Moo attribute — demonstrates Moo on the schema class itself
+has verbose => ( is => 'rw', lazy => 1, default => sub { 0 } );
 
 __PACKAGE__->load_classes(
   { 'DBIO::Test::Schema::Moo' => [qw( Result::Artist Result::CD )] }

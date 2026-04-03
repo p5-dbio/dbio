@@ -9,6 +9,7 @@ __PACKAGE__->add_columns(
   name => { data_type => 'varchar', size => 100, is_nullable => 0 },
 );
 __PACKAGE__->set_primary_key('id');
+__PACKAGE__->resultset_class('DBIO::Test::Schema::Moo::ResultSet::Artist');
 
 __PACKAGE__->has_many(
   cds => 'DBIO::Test::Schema::Moo::Result::CD', 'artist_id'

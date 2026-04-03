@@ -130,4 +130,32 @@ subtest 'CD: inflate_result lazy full_title' => sub {
   is( $cd->rating,     0,              'lazy default on CD inflate_result' );
 };
 
+# -----------------------------------------------------------------------
+# Custom ResultSet — Artist has one, CD uses the default
+# -----------------------------------------------------------------------
+
+subtest 'custom ResultSet class on Artist' => sub {
+  isa_ok( $artist_rs, 'DBIO::Test::Schema::Moose::ResultSet::Artist',
+    'resultset() returns custom class' );
+  can_ok( $artist_rs, 'by_name' );
+  can_ok( $artist_rs, 'order_by_name' );
+};
+
+subtest 'CD uses default ResultSet (no custom class)' => sub {
+  isa_ok( $cd_rs, 'DBIO::ResultSet', 'CD resultset is a DBIO::ResultSet' );
+  ok( !$cd_rs->isa('DBIO::Test::Schema::Moose::ResultSet::CD'),
+    'CD has no custom ResultSet class' );
+};
+
+subtest 'schema verbose Moose attr' => sub {
+  is( $schema->verbose, 0, 'verbose defaults to 0' );
+  $schema->verbose(1);
+  is( $schema->verbose, 1, 'verbose rw attr writable' );
+};
+
+subtest 'schema make_immutable is safe' => sub {
+  ok( DBIO::Test::Schema::Moose->meta->is_immutable,
+    'schema class itself is immutable' );
+};
+
 done_testing;
