@@ -81,9 +81,9 @@ sub import {
     elsif ($arg =~ /^-(\w+)$/ && _resolve_driver_defaults($1)) {
       # Driver shortcut: -Pg, -MySQL, -SQLite etc.
       # Uses the DBIO::Storage::DBI driver registry to find the storage class,
-      # derives the CakeDefaults class from it, and merges its defaults.
-      my $defaults_class = _resolve_driver_defaults($1);
-      my %driver_opts = $defaults_class->cake_defaults;
+      # calls cake_defaults() on it to get driver-recommended options.
+      my $storage_class = _resolve_driver_defaults($1);
+      my %driver_opts = $storage_class->cake_defaults;
       @opts{keys %driver_opts} = values %driver_opts;
     }
     elsif ($arg eq '-inflate_datetime') {
@@ -151,22 +151,14 @@ sub import {
 
 sub _resolve_driver_defaults {
   my ($driver_name) = @_;
-  my $defaults_class;
 
-  # Step 1: Try the DBIO::Storage::DBI driver registry (Pg → DBIO::PostgreSQL::Storage)
-  {
-    require DBIO::Storage::DBI;
-    if (my $storage_class = DBIO::Storage::DBI->driver_storage_class($driver_name)) {
-      (my $base = $storage_class) =~ s/::Storage(?:::.*)?$//;
-      $defaults_class = "${base}::CakeDefaults";
-    }
-  }
+  # Look up the storage class from the DBIO::Storage::DBI driver registry
+  require DBIO::Storage::DBI;
+  my $storage_class = DBIO::Storage::DBI->driver_storage_class($driver_name)
+    or return;
 
-  # Step 2: Fall back to DBIO::{Name}::CakeDefaults directly
-  $defaults_class //= "DBIO::${driver_name}::CakeDefaults";
-
-  eval "require $defaults_class; 1" or return;
-  return $defaults_class if $defaults_class->can('cake_defaults');
+  eval "require $storage_class; 1" or return;
+  return $storage_class if $storage_class->can('cake_defaults');
   return;
 }
 
