@@ -1348,6 +1348,11 @@ sub register_driver {
   $_driver_registry{$driver_name} = $storage_class;
 }
 
+sub driver_storage_class {
+  my ($class, $driver_name) = @_;
+  return $_driver_registry{$driver_name};
+}
+
 =head2 register_connector_driver
 
 =over 4
