@@ -68,6 +68,7 @@ sub import {
     autoclean => 1,
     inflate_datetime => 0,
     inflate_json => 0,
+    inflate_jsonb => 0,
     retrieve_defaults => 0,
   );
 
@@ -82,6 +83,9 @@ sub import {
     }
     elsif ($arg eq '-inflate_json') {
       $opts{inflate_json} = 1;
+    }
+    elsif ($arg eq '-inflate_jsonb') {
+      $opts{inflate_jsonb} = 1;
     }
     elsif ($arg eq '-retrieve_defaults') {
       $opts{retrieve_defaults} = 1;
@@ -201,10 +205,13 @@ sub col {
     $info{retrieve_on_insert} = 1 unless exists $info{retrieve_on_insert};
   }
 
-  # If -inflate_json and column is json/jsonb, set up serialization
-  if ($opts && $opts->{inflate_json}) {
+  # If -inflate_json (json+jsonb) or -inflate_jsonb (jsonb only), set up serialization
+  if ($opts) {
     my $dt = $info{data_type} || '';
-    if ($dt eq 'json' || $dt eq 'jsonb') {
+    if ($opts->{inflate_json} && ($dt eq 'json' || $dt eq 'jsonb')) {
+      $info{serializer_class} = 'JSON' unless exists $info{serializer_class};
+    }
+    elsif ($opts->{inflate_jsonb} && $dt eq 'jsonb') {
       $info{serializer_class} = 'JSON' unless exists $info{serializer_class};
     }
   }
