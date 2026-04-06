@@ -3417,6 +3417,33 @@ sub deployment_statements {
   };
 }
 
+=method deploy_defaults
+
+Returns a hash of default arguments merged into every C<< $schema->deploy() >>
+call made by L<DBIO::Test>.  The base implementation returns an empty list;
+drivers override this to declare their requirements without hard-coding driver
+names in test infrastructure.
+
+  # DBIO::MySQL::Storage
+  sub deploy_defaults { return (add_drop_table => 1) }
+
+=cut
+
+sub deploy_defaults { () }
+
+=method deploy_setup
+
+  $storage->deploy_setup($schema);
+
+Called by L<DBIO::Test> immediately before C<< $schema->deploy() >>.  The
+default implementation is a no-op.  Drivers override this to perform any
+one-time database-level setup that must happen before the schema is installed
+(for example, stripping incompatible C<sql_mode> flags on MySQL).
+
+=cut
+
+sub deploy_setup { }
+
 # FIXME deploy() currently does not accurately report sql errors
 # Will always return true while errors are warned
 sub deploy {

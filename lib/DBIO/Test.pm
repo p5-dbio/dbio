@@ -307,6 +307,11 @@ Deploys the test schema. With a real database this runs
 C<< $schema->deploy() >>. With L<DBIO::Test::Storage> this is a no-op
 (the fake storage doesn't need tables).
 
+Driver-specific deploy behaviour (e.g. C<add_drop_table> for MySQL, or
+pre-deploy C<sql_mode> fixups) is declared by the storage class itself via
+L<DBIO::Storage::DBI/deploy_defaults> and L<DBIO::Storage::DBI/deploy_setup>.
+Caller-supplied C<%sqlt_args> take precedence over the storage defaults.
+
 =cut
 
 sub deploy_schema {
@@ -316,27 +321,14 @@ sub deploy_schema {
   # Fake storage doesn't need deployment
   return if __PACKAGE__->_uses_fake_storage($schema);
 
-  my $driver = eval { $schema->storage->dbh->{Driver}{Name} } // '';
+  # Let the storage declare its own deploy requirements — no driver-name
+  # matching here.  Caller-supplied args take precedence over defaults.
+  my %deploy_args = ($schema->storage->deploy_defaults, %$args);
 
-  # MySQL/MariaDB have no transactional DDL and no IF NOT EXISTS on all
-  # statement types, so use add_drop_table to avoid "table already exists"
-  # errors when multiple tests deploy the same schema in sequence.
-  unless (exists $args->{add_drop_table}) {
-    $args->{add_drop_table} = 1 if $driver =~ /^(?:mysql|MariaDB)$/i;
-  }
+  # Pre-deploy setup hook (e.g. MySQL strips incompatible sql_mode flags)
+  $schema->storage->deploy_setup($schema);
 
-  # MySQL 8 strict mode (NO_ZERO_DATE / NO_ZERO_IN_DATE) rejects '0000-00-00'
-  # which the test suite uses to verify datetime_undef_if_invalid behaviour.
-  # Strip those modes from the session so the tests work as intended.
-  if ($driver =~ /^(?:mysql|MariaDB)$/i) {
-    eval {
-      $schema->storage->dbh->do(
-        q{SET SESSION sql_mode = REPLACE(REPLACE(@@SESSION.sql_mode,'NO_ZERO_DATE',''),'NO_ZERO_IN_DATE','')}
-      );
-    };
-  }
-
-  $schema->deploy($args);
+  $schema->deploy(\%deploy_args);
 }
 
 =method populate_schema
