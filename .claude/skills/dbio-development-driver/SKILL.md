@@ -1,6 +1,6 @@
 ---
-name: dbio-driver
-description: "How DBIO database drivers work: registry, auto-detection, storage classes, SQLMaker, capabilities, async — guide for driver developers"
+name: dbio-development-driver
+description: "How to develop a DBIO database driver: registry, storage class, SQLMaker, capabilities, async, Cake integration — developer guide"
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -18,7 +18,7 @@ User code
   → DBIO::Schema (connection)
     → Driver Registry (auto-detect from DSN)
       → Storage class (DB-specific DBI logic)
-        → SQLMaker (SQL dialect)
+        → SQLMaker (SQL dialect + operator extensions)
         → Capability system (feature detection)
 ```
 
@@ -49,7 +49,7 @@ __PACKAGE__->register_driver('Pg' => __PACKAGE__);
 5. Reblesses storage object into that class
 6. Calls `_rebless()` hook for driver-specific init
 
-**Manual override** (skips auto-detection):
+**Manual override** (skips auto-detection, used in Schema component):
 
 ```perl
 sub connection {
@@ -65,7 +65,7 @@ A driver distribution provides up to 4 components:
 
 ### 1. Schema Component (`DBIO::DriverName`)
 
-The entry point — users load this into their schema.
+The entry point — users load this into their schema class.
 
 ```perl
 package DBIO::DriverName;
@@ -125,23 +125,49 @@ sub bind_attribute_by_data_type { ... }
 
 ### 3. SQLMaker (`DBIO::DriverName::SQLMaker`) — optional
 
-Override SQL dialect differences. Only needed if the database deviates from ANSI SQL.
+Override SQL dialect differences or register custom operators via `special_ops`.
 
 ```perl
 package DBIO::DriverName::SQLMaker;
 # ABSTRACT: SQL dialect for DriverName
 use base 'DBIO::SQLMaker';
 
-sub _build_limit { ... }    # LIMIT/OFFSET syntax
-sub _quote_char { ... }     # Identifier quoting (backticks, double-quotes)
+# Disable unsupported syntax
+sub _lock_select { '' }   # e.g. SQLite has no SELECT ... FOR UPDATE
+
+# Custom operators via special_ops (see below)
+sub new {
+  my $class = shift;
+  my %opts = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
+  push @{ $opts{special_ops} }, {
+    regex   => qr/^my_op$/i,
+    handler => '_where_op_my_op',
+  };
+  $class->next::method(\%opts);
+}
+
+sub _where_op_my_op {
+  my ($self, $col, $op, $val) = @_;
+  my $quoted = $self->_quote($col);
+  return ("$quoted MY_OP ?", $val);
+}
 
 1;
 ```
 
-Examples from real drivers:
-- **PostgreSQL**: uses base SQLMaker, sets `quote_char` to `"`
-- **SQLite**: custom SQLMaker that disables `SELECT ... FOR UPDATE`
-- **Oracle**: custom SQLMaker for Oracle-specific syntax (ROWNUM, FETCH FIRST)
+**`special_ops` handler signature:** `($self, $col_unquoted, $op, $val)`
+— call `$self->_quote($col)` yourself. Return `($sql, @bind)`.
+
+**`special_ops` regex** matches against the operator string (the key inside
+`{ op => val }`), NOT the field name.
+
+Real driver examples:
+
+| Driver | SQLMaker | What it adds |
+|--------|----------|-------------|
+| PostgreSQL | `DBIO::PostgreSQL::SQLMaker` | JSONB operators (`@>`, `?`, `@?`, ...) via `special_ops` |
+| SQLite | `DBIO::SQLite::SQLMaker` | Disables `SELECT ... FOR UPDATE` |
+| Oracle | `DBIO::Oracle::SQLMaker` | `CONNECT BY`, `PRIOR`, identifier shortening, `RETURNING INTO` |
 
 ### 4. Result Component (`DBIO::DriverName::Result`) — optional
 
@@ -267,10 +293,11 @@ DBIO-DriverName/
         Result.pm                  # Result component (optional)
   t/
     00-load.t                      # Load tests (no DB needed)
-    01-sqlmaker.t                  # SQL generation tests (no DB needed)
+    20-sqlmaker.t                  # SQL generation tests (no DB needed)
     10-integration.t               # Requires live DB
   dist.ini                         # [@DBIO] plugin bundle
   cpanfile                         # Dependencies
+  .proverc                         # -Ilib -I../dbio/lib (workspace-local)
 ```
 
 ## Naming Convention
@@ -280,16 +307,25 @@ DBIO-DriverName/
 | Distribution | `DBIO-DriverName` | `DBIO-PostgreSQL` |
 | Schema component | `DBIO::DriverName` | `DBIO::PostgreSQL` |
 | Storage class | `DBIO::DriverName::Storage` | `DBIO::PostgreSQL::Storage` |
-| SQLMaker | `DBIO::DriverName::SQLMaker` | `DBIO::SQLite::SQLMaker` |
+| SQLMaker | `DBIO::DriverName::SQLMaker` | `DBIO::PostgreSQL::SQLMaker` |
 | DBD driver used | `DBD::X` | `DBD::Pg`, `DBD::mysql` |
 | Async variant | `DBIO::DriverName::Async` | `DBIO::PostgreSQL::Async` |
 
 ## Testing
 
-- **Offline tests** (no DB): SQLMaker output, SQL generation, module loading
-- **Integration tests**: require env vars (`DBIOTEST_PG_DSN`, `TEST_DBIO_POSTGRESQL_DSN`)
+- **Offline tests** (no DB): SQLMaker SQL generation, module loading — always required
+- **Integration tests**: require a live database connection via env vars (see the driver's `CLAUDE.md` or `t/` for the exact var names)
 - Always provide offline tests — they run in CI without database setup
-- Test with local DBIO core: `prove -l -I../dbio/lib t/`
+- `.proverc` in each driver repo adds `-I../dbio/lib` automatically
+
+```perl
+# Offline SQLMaker test pattern:
+my $schema = DBIO::Test->init_schema(
+  no_deploy    => 1,
+  storage_type => 'DBIO::DriverName::Storage',
+);
+is_same_sql_bind( $rs->search(...)->as_query, $expected_sql, \@bind, 'description' );
+```
 
 ## Build System
 
@@ -297,8 +333,6 @@ All drivers use `[@DBIO]` Dist::Zilla bundle:
 
 ```ini
 name = DBIO-DriverName
-author = DBIO & DBIx::Class Authors
-license = Perl_5
 
 [@DBIO]
 ```
