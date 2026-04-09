@@ -20,7 +20,7 @@ This module provides methods to apply DDL changes to your database using SQL
 diff files. Normally these diff files would be created using
 L<DBIO::Schema/create_ddl_dir>.
 
-A table called I<dbix_class_schema_versions> is created and maintained by the
+A table called I<dbio_schema_versions> is created and maintained by the
 module. This is used to determine which version your database is currently at.
 Similarly the $VERSION in your DBIO schema class is used to determine the
 current DBIO schema version.
@@ -123,7 +123,7 @@ done all that you can do this:
   $schema->upgrade();
 
 In the case of an unversioned database the above code will create the
-dbix_class_schema_versions table and write version 0.000 to it, then
+dbio_schema_versions table and write version 0.000 to it, then
 upgrade will then apply the diff we talked about creating in the previous paragraph
 and then you're good to go.
 
@@ -138,7 +138,6 @@ use base 'DBIO::Schema';
 
 use DBIO::Carp;
 use DBIO::Version;
-use DBIO::VersionCompat;
 use Time::HiRes qw/gettimeofday/;
 use Try::Tiny;
 use Scalar::Util 'weaken';
@@ -172,7 +171,7 @@ are disabled by default).
 
 =back
 
-Call this to initialise a previously unversioned database. The table 'dbix_class_schema_versions' will be created which will be used to store the database version.
+Call this to initialise a previously unversioned database. The table 'dbio_schema_versions' will be created which will be used to store the database version.
 
 Takes one argument which should be the version that the database is currently at. Defaults to the return value of L</schema_version>.
 
@@ -280,7 +279,7 @@ all relevant updates are applied.
 
 The individual update steps are performed by using
 L</upgrade_single_step>, which will apply the update and also
-update the dbix_class_schema_versions table.
+update the dbio_schema_versions table.
 
 =cut
 
@@ -355,7 +354,7 @@ does nothing.
 It requires an SQL diff file to exist in your I<upgrade_directory>,
 normally you will have created this using L<DBIO::Schema/create_ddl_dir>.
 
-If successful the dbix_class_schema_versions table is updated with
+If successful the dbio_schema_versions table is updated with
 the I<target_version>.
 
 This method may be called repeatedly by the upgrade method to
@@ -402,7 +401,7 @@ sub upgrade_single_step
   $self->backup() if($self->do_backup);
   $self->txn_do(sub { $self->do_upgrade() });
 
-  # set row in dbix_class_schema_versions table
+  # set row in dbio_schema_versions table
   $self->_set_db_version({version => $target_version});
 }
 
@@ -475,7 +474,7 @@ sub apply_statement {
 =head2 get_db_version
 
 Returns the version that your database is currently at. This is determined by the values in the
-dbix_class_schema_versions table that C<upgrade> and C<install> write to.
+dbio_schema_versions table that C<upgrade> and C<install> write to.
 
 =cut
 
@@ -521,9 +520,7 @@ sub backup
 =head2 connection
 
 Overloaded method. This checks the DBIO schema version against the DB version and
-warns if they are not the same or if the DB is unversioned. It also provides
-compatibility between the old versions table (SchemaVersions) and the new one
-(dbix_class_schema_versions).
+warns if they are not the same or if the DB is unversioned.
 
 To avoid the checks on connect, set the environment var DBIO_NO_VERSION_CHECK
 or alternatively you can set the
@@ -575,16 +572,6 @@ sub _on_connect
       !exists $conn_attrs->{ignore_version}
     )
   );
-
-  # check for legacy versions table and move to new if exists
-  unless ($self->_source_exists($vtable)) {
-    my $vtable_compat = DBIO::VersionCompat->connect(sub { $w_storage->dbh })->resultset('TableCompat');
-    if ($self->_source_exists($vtable_compat)) {
-      $self->{vschema}->deploy;
-      map { $vtable->new_result({ installed => $_->Installed, version => $_->Version })->insert } $vtable_compat->all;
-      $self->storage->_get_dbh->do("DROP TABLE " . $vtable_compat->result_source->from);
-    }
-  }
 
   my $pversion = $self->get_db_version();
 

@@ -4,7 +4,7 @@ use base 'DBIO::Core';
 use strict;
 use warnings;
 
-__PACKAGE__->table('dbix_class_schema_versions');
+__PACKAGE__->table('dbio_schema_versions');
 
 __PACKAGE__->add_columns(
   version => {
