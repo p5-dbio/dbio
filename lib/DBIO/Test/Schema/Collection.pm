@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::Collection;
+package DBIO::Test::Schema::Collection;
 # ABSTRACT: Test result class for the collection table
 
 use warnings;

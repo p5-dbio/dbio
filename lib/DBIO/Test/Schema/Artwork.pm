@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::Artwork;
+package DBIO::Test::Schema::Artwork;
 # ABSTRACT: Test result class for the cd_artwork table
 
 use warnings;

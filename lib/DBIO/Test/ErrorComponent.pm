@@ -1,6 +1,5 @@
 #   belongs to t/run/90ensure_class_loaded.tl
-package # hide from PAUSE
-    DBIO::Test::ErrorComponent;
+package DBIO::Test::ErrorComponent;
 # ABSTRACT: Test component that fails to load due to missing true value
 use warnings;
 use strict;

@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::ForceForeign;
+package DBIO::Test::Schema::ForceForeign;
 # ABSTRACT: Test result class for the forceforeign table
 
 use warnings;

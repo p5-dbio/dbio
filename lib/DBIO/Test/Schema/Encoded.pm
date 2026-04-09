@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::Encoded;
+package DBIO::Test::Schema::Encoded;
 # ABSTRACT: Test result class for the encoded table
 
 use strict;

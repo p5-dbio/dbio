@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::Link;
+package DBIO::Test::Schema::Link;
 # ABSTRACT: Test result class for the link table
 
 use strict;

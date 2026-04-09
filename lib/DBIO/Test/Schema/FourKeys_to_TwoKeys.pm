@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::FourKeys_to_TwoKeys;
+package DBIO::Test::Schema::FourKeys_to_TwoKeys;
 # ABSTRACT: Test result class for the fourkeys_to_twokeys table
 
 use warnings;

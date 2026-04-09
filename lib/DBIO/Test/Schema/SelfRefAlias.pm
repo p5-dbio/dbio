@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::SelfRefAlias;
+package DBIO::Test::Schema::SelfRefAlias;
 # ABSTRACT: Test result class for the self_ref_alias table
 
 use warnings;

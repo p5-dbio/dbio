@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::BooksInLibrary;
+package DBIO::Test::Schema::BooksInLibrary;
 # ABSTRACT: Test result class for the books table
 
 use warnings;

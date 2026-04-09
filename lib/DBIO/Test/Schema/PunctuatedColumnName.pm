@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::PunctuatedColumnName;
+package DBIO::Test::Schema::PunctuatedColumnName;
 # ABSTRACT: Test result class for columns with punctuated names
 
 use warnings;

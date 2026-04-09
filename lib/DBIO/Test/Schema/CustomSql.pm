@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::CustomSql;
+package DBIO::Test::Schema::CustomSql;
 # ABSTRACT: Test result class using a custom SQL query as source
 
 use warnings;

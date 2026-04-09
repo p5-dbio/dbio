@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::LyricVersion;
+package DBIO::Test::Schema::LyricVersion;
 # ABSTRACT: Test result class for the lyric_versions table
 
 use warnings;

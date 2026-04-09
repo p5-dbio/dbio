@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::Employee;
+package DBIO::Test::Schema::Employee;
 # ABSTRACT: Test result class for the employee table with ordering
 
 use warnings;

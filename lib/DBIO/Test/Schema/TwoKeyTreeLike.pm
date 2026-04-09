@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::TwoKeyTreeLike;
+package DBIO::Test::Schema::TwoKeyTreeLike;
 # ABSTRACT: Test result class for the twokeytreelike table
 
 use warnings;

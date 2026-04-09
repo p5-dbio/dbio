@@ -421,8 +421,7 @@ sub dbh_do {
 # ---- Fake statement handle ----
 
 {
-  package # hide from PAUSE
-    DBIO::Test::Storage::FakeSth;
+  package DBIO::Test::Storage::FakeSth;
 
   sub new {
     my ($class, $rows) = @_;
@@ -449,8 +448,7 @@ sub dbh_do {
 # ---- Fake cursor ----
 
 {
-  package # hide from PAUSE
-    DBIO::Test::Storage::FakeCursor;
+  package DBIO::Test::Storage::FakeCursor;
 
   use base 'DBIO::Cursor';
 

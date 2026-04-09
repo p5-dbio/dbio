@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::Year2000CDs;
+package DBIO::Test::Schema::Year2000CDs;
 # ABSTRACT: Test virtual view result class for 2000 CDs
 
 use warnings;

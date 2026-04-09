@@ -1,6 +1,5 @@
-package # hide from PAUSE
+package DBIO::Loader::Utils;
 # ABSTRACT: Utility functions for the Loader
-    DBIO::Loader::Utils;
 
 use strict;
 use warnings;

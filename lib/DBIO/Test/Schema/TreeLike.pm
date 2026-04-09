@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::TreeLike;
+package DBIO::Test::Schema::TreeLike;
 # ABSTRACT: Test result class for the treelike table
 
 use warnings;

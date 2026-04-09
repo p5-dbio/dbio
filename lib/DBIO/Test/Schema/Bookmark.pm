@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::Bookmark;
+package DBIO::Test::Schema::Bookmark;
 # ABSTRACT: Test result class for the bookmark table
 
 use strict;

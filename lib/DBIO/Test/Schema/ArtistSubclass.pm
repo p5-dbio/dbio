@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::ArtistSubclass;
+package DBIO::Test::Schema::ArtistSubclass;
 # ABSTRACT: Test result subclass of the artist table
 
 use warnings;

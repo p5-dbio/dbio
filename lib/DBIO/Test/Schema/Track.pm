@@ -1,5 +1,4 @@
-package # hide from PAUSE
-    DBIO::Test::Schema::Track;
+package DBIO::Test::Schema::Track;
 # ABSTRACT: Test result class for the track table
 
 use warnings;
