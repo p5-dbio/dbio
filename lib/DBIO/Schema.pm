@@ -1212,6 +1212,18 @@ FK.
 sub deploy {
   my ($self, $sqltargs, $dir) = @_;
   $self->throw_exception("Can't deploy without storage") unless $self->storage;
+
+  # If the storage class advertises a native Deploy class
+  # (e.g. DBIO::PostgreSQL::Deploy), use it instead of the SQL::Translator
+  # codepath. The native classes know their database properly and avoid
+  # the lossy abstract-DDL roundtrip.
+  if (my $deploy_class = $self->storage->can('dbio_deploy_class')
+      && $self->storage->dbio_deploy_class) {
+    eval "require $deploy_class; 1"
+      or $self->throw_exception("Cannot load $deploy_class: $@");
+    return $deploy_class->new(schema => $self)->install;
+  }
+
   $self->storage->deploy($self, undef, $sqltargs, $dir);
 }
 

@@ -5,10 +5,20 @@ Revision history for DBIO
         - Add first-class AccessBroker support via Schema->connect($broker)
         - Refresh broker-derived DBI connect info on reconnect
         - Add transaction-safety metadata and unsafe broker transaction guards
+        - Schema->deploy() now routes to the storage's native
+          dbio_deploy_class when available (used by DBIO::PostgreSQL,
+          DBIO::SQLite and DBIO::MySQL), falling back to the
+          SQL::Translator path for drivers that do not declare one
 
     * Changes
         - Normalize +Absolute::Storage names in Schema->connection
         - Remove DBIO::_ENV_ pseudo-package; all callers now use DBIO::Util helpers directly
+        - Rename schema version tracking table dbix_class_schema_versions
+          to dbio_schema_versions; remove DBIO::VersionCompat and
+          DBIO::Version::TableCompat (clean break, no DBIC upgrade path)
+        - Remove all "package # hide from PAUSE" tricks; MetaNoIndex in
+          dist.ini now covers all internal DBIO::Test::* helper namespaces
+        - DBIO::Loader::Utils is no longer hidden from PAUSE
 
     * Fixes
         - Prevent repeated TxnScopeGuard DESTROY invocations from attempting a second rollback
