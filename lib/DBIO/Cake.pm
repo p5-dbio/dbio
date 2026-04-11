@@ -73,6 +73,7 @@ sub import {
   );
 
   my @components;
+  my $storage_class = 'DBIO::Storage::DBI';
 
   while (my $arg = shift @args) {
     if ($arg eq '-V2') {
@@ -82,7 +83,7 @@ sub import {
       # Driver shortcut: -Pg, -MySQL, -SQLite etc.
       # Uses the DBIO::Storage::DBI driver registry to find the storage class,
       # calls cake_defaults() on it to get driver-recommended options.
-      my $storage_class = _resolve_driver_defaults($1);
+      $storage_class = _resolve_driver_defaults($1);
       my %driver_opts = $storage_class->cake_defaults;
       @opts{keys %driver_opts} = values %driver_opts;
     }
@@ -106,6 +107,8 @@ sub import {
     }
   }
 
+  $opts{_storage_class} = $storage_class;
+
   # Enable strict and warnings in caller
   strict->import;
   warnings->import;
@@ -121,9 +124,21 @@ sub import {
 
   # Always load Timestamp for col_created/col_updated/cols_updated_created
   push @components, 'Timestamp';
-  if ($opts{inflate_datetime}) {
-    push @components, 'InflateColumn::DateTime';
+
+  # Collect components from the type registry based on active options
+  my %seen_components;
+  require DBIO::Storage::DBI;
+  for my $type_name ($storage_class->all_type_names) {
+    my $info = $storage_class->type_info($type_name) or next;
+    for my $opt (@{ $info->{cake_options} || [] }) {
+      if ($opts{$opt}) {
+        $seen_components{$_}++ for @{ $info->{components} || [] };
+        last;
+      }
+    }
   }
+  push @components, keys %seen_components;
+
   $caller->load_components(@components);
 
   # Store per-caller options
@@ -226,14 +241,18 @@ sub col {
     $info{retrieve_on_insert} = 1 unless exists $info{retrieve_on_insert};
   }
 
-  # If -inflate_json (json+jsonb) or -inflate_jsonb (jsonb only), set up serialization
+  # Apply col_attrs from the type registry for active options
   if ($opts) {
     my $dt = $info{data_type} || '';
-    if ($opts->{inflate_json} && ($dt eq 'json' || $dt eq 'jsonb')) {
-      $info{serializer_class} = 'JSON' unless exists $info{serializer_class};
-    }
-    elsif ($opts->{inflate_jsonb} && $dt eq 'jsonb') {
-      $info{serializer_class} = 'JSON' unless exists $info{serializer_class};
+    my $storage_class = $opts->{_storage_class} || 'DBIO::Storage::DBI';
+    if (my $type_info = $storage_class->type_info($dt)) {
+      for my $opt (@{ $type_info->{cake_options} || [] }) {
+        if ($opts->{$opt}) {
+          my $attrs = $type_info->{col_attrs} || {};
+          $info{$_} //= $attrs->{$_} for keys %$attrs;
+          last;
+        }
+      }
     }
   }
 

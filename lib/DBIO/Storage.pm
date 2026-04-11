@@ -889,6 +889,70 @@ be specifying the metadata yourself if you need it.
 
 sub columns_info_for { die "Virtual method!" }
 
+# Type registry: maps type names to behavior descriptors, keyed by class so
+# subclasses can add or override entries. Use type_info() for MRO-aware lookup.
+my %_type_registry;
+
+=method register_type
+
+  DBIO::PostgreSQL::Storage->register_type('jsonb', {
+    cake_options => [qw(inflate_json inflate_jsonb)],
+    components   => ['InflateColumn::Serializer'],
+    col_attrs    => { serializer_class => 'JSON' },
+  });
+
+Registers type metadata for use by L<DBIO::Cake> and other DBIO subsystems.
+Driver distributions call this in their module body to declare how their
+specific types should be handled. Subclass registrations inherit from and
+can override parent class registrations via normal MRO lookup.
+
+=cut
+
+sub register_type {
+  my ($class, $type_name, $info) = @_;
+  $_type_registry{$class}{$type_name} = $info;
+}
+
+=method type_info
+
+  my $info = DBIO::PostgreSQL::Storage->type_info('jsonb');
+
+Returns the type metadata for a given type name, walking up the MRO
+so subclasses inherit and can override base type definitions.
+Returns C<undef> if the type is not registered.
+
+=cut
+
+sub type_info {
+  my ($class, $type_name) = @_;
+  for my $pkg (@{ mro::get_linear_isa($class) }) {
+    return $_type_registry{$pkg}{$type_name}
+      if exists $_type_registry{$pkg}
+      && exists $_type_registry{$pkg}{$type_name};
+  }
+  return undef;
+}
+
+=method all_type_names
+
+  my @types = DBIO::PostgreSQL::Storage->all_type_names;
+
+Returns all type names registered for this class and its ancestors
+(deduplicated, most-derived class wins).
+
+=cut
+
+sub all_type_names {
+  my ($class) = @_;
+  my %seen;
+  for my $pkg (@{ mro::get_linear_isa($class) }) {
+    $seen{$_}++ for keys %{ $_type_registry{$pkg} || {} };
+  }
+  return keys %seen;
+}
+
+1;
+
 =head1 ENVIRONMENT VARIABLES
 
 =head2 DBIO_TRACE

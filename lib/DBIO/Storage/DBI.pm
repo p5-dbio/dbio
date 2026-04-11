@@ -1386,6 +1386,21 @@ sub register_connector_driver {
   $_connector_registry{$dbms_name} = $storage_class;
 }
 
+# Standard SQL type registrations for DBIO::Cake.
+# Driver subclasses add or override entries for their own types.
+__PACKAGE__->register_type('json', {
+  cake_options => [qw(inflate_json)],
+  components   => ['InflateColumn::Serializer'],
+  col_attrs    => { serializer_class => 'JSON' },
+});
+
+for my $dt (qw(date datetime timestamp time timetz timestamptz interval)) {
+  __PACKAGE__->register_type($dt, {
+    cake_options => ['inflate_datetime'],
+    components   => ['InflateColumn::DateTime'],
+  });
+}
+
 sub _determine_driver {
   my ($self) = @_;
 
