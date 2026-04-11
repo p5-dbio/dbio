@@ -631,7 +631,8 @@ sub idx {
         $sqlt_table->add_index(
           name   => $idx->{name},
           fields => $idx->{fields},
-          (exists $idx->{type} ? (type => $idx->{type}) : ()),
+          (exists $idx->{type}    ? (type    => $idx->{type})    : ()),
+          (exists $idx->{options} ? (options => $idx->{options}) : ()),
         );
       }
     };
@@ -1046,8 +1047,16 @@ just add this one line and you're done.
   idx name_idx => ['name'];
   idx composite_idx => ['last_name', 'first_name'], type => 'unique';
   idx tags_idx => ['tags'], using => 'gin';
+  idx draft_only => ['key'],
+      type    => 'unique',
+      options => [{ where => 'version IS NULL' }];
 
 Declares an index to be created during deployment via C<sqlt_deploy_hook>.
+
+The C<options> key passes producer-specific index options through to
+L<SQL::Translator::Schema::Index>. This is useful for PostgreSQL partial
+indexes (C<WHERE ...>) and index methods (C<USING gin>). See
+L<SQL::Translator::Producer::PostgreSQL> for supported option keys.
 
 =head1 SEE ALSO
 

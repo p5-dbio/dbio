@@ -124,6 +124,28 @@ use Test::More;
   unique code_uniq => ['code'];
 }
 
+# --- Versioned: idx with options (partial index) ----------
+{
+  package TestComp::Result::Versioned;
+  use DBIO::Cake;
+
+  table 'versioned';
+  col id         => serial;
+  col key        => varchar(50);
+  col version    => integer, null;
+  primary_key 'id';
+
+  # Two partial unique indexes:
+  #  (key, version) where version is not null → published rows
+  #  (key)          where version is null     → single draft per key
+  idx versioned_published => ['key', 'version'],
+      type    => 'unique',
+      options => [{ where => 'version IS NOT NULL' }];
+  idx versioned_draft => ['key'],
+      type    => 'unique',
+      options => [{ where => 'version IS NULL' }];
+}
+
 # --- ManyToMany: link table test --------------------------
 {
   package TestComp::Result::Tag;
@@ -319,6 +341,45 @@ use Test::More;
 {
   my @uniq = TestComp::Result::UniqueTest->unique_constraints;
   cmp_ok(scalar @uniq, '>=', 2, 'UniqueTest: has unique constraints');
+}
+
+# --- idx with options (partial unique indexes) ------------
+{
+  my $src = TestComp::Result::Versioned->result_source_instance;
+  my $idxs = $src->{_cake_indexes} || [];
+  is(scalar @$idxs, 2, 'Versioned: two indexes registered');
+
+  my ($published) = grep { $_->{name} eq 'versioned_published' } @$idxs;
+  ok($published, 'Versioned: published index present');
+  is($published->{type}, 'unique', 'Versioned: published is unique');
+  is_deeply($published->{fields}, ['key', 'version'],
+    'Versioned: published fields');
+  is_deeply($published->{options},
+    [{ where => 'version IS NOT NULL' }],
+    'Versioned: published options pass through');
+
+  my ($draft) = grep { $_->{name} eq 'versioned_draft' } @$idxs;
+  ok($draft, 'Versioned: draft index present');
+  is_deeply($draft->{options},
+    [{ where => 'version IS NULL' }],
+    'Versioned: draft options pass through');
+
+  # End-to-end: invoke sqlt_deploy_hook against a real SQLT table
+  # and verify the index ended up with options on the sqlt side.
+  require SQL::Translator::Schema::Table;
+  my $sqlt_table = SQL::Translator::Schema::Table->new(name => 'versioned');
+  $sqlt_table->add_field(name => 'id',      data_type => 'integer');
+  $sqlt_table->add_field(name => 'key',     data_type => 'varchar');
+  $sqlt_table->add_field(name => 'version', data_type => 'integer');
+  TestComp::Result::Versioned->sqlt_deploy_hook($sqlt_table);
+
+  my @sqlt_indexes = $sqlt_table->get_indices;
+  is(scalar @sqlt_indexes, 2, 'sqlt_table: two indexes added');
+  my ($sqlt_pub) = grep { $_->name eq 'versioned_published' } @sqlt_indexes;
+  ok($sqlt_pub, 'sqlt: published index present');
+  my @opts = $sqlt_pub->options;
+  is_deeply(\@opts, [{ where => 'version IS NOT NULL' }],
+    'sqlt: published options reached the SQLT::Index');
 }
 
 # --- Namespace cleanup ---
