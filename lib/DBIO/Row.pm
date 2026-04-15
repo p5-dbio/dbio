@@ -7,6 +7,8 @@ use warnings;
 use base qw/DBIO/;
 
 use Scalar::Util 'blessed';
+use List::Util ();
+use Sub::Util ();
 use Try::Tiny;
 use DBIO::Carp;
 use DBIO::Util qw(is_literal_value);
@@ -279,6 +281,10 @@ sub new {
     $new->{_inflated_column} = $inflated if $inflated;
   }
 
+  # StorageValues (integrated helper): per-row snapshot slot.
+  # Zero-cost when no column declares keep_storage_value.
+  $new->_storage_values({});
+
   return $new;
 }
 
@@ -467,6 +473,9 @@ sub insert {
 
   $rollback_guard->commit if $rollback_guard;
 
+  # StorageValues (integrated helper): snapshot the now-stored values.
+  $self->store_storage_values if @{$self->storage_value_columns};
+
   return $self;
 }
 
@@ -549,6 +558,85 @@ this method.
 sub update {
   my ($self, $upd) = @_;
 
+  # ProxyResultSetMethod (integrated helper): strip proxy slots from the
+  # dirty-column set so UPDATE statements never include them. "delete
+  # local" localises the deletion for the scope of this sub, so the
+  # original dirty flags are restored when update returns.
+  $self->{_dirty_columns} ||= {};
+  delete local @{$self->{_dirty_columns}}{@{$self->_proxy_slots||[]}};
+
+  # OnColumnChange (integrated helper): short-circuit when nothing is
+  # registered. When callbacks exist, build the before/around/after
+  # chain, then delegate to _update_body via around-wrapper; the whole
+  # orchestration is a no-op if none of the registered columns are dirty.
+  my $has_change_cbs =
+       $self->_before_change
+    || $self->_around_change
+    || $self->_after_change;
+
+  if ($has_change_cbs) {
+    $self->set_inflated_columns($upd) if $upd;
+
+    my %dirty = $self->get_dirty_columns
+      or return $self;
+
+    my @all_before = @{$self->_before_change || []};
+    my @all_around = @{$self->_around_change || []};
+    my @all_after  = @{$self->_after_change  || []};
+
+    my @before = grep { defined $dirty{$_->{column}} } @all_before;
+    my @around = grep { defined $dirty{$_->{column}} } @all_around;
+    my @after  = grep { defined $dirty{$_->{column}} } @all_after;
+
+    my $allow_override = $self->on_column_change_allow_override_args;
+    my $final = $allow_override
+      ? sub { $self->_update_body }
+      : sub { $self->_update_body($upd) };
+
+    for (reverse @around) {
+      my $fn  = $_->{method};
+      my $old = $self->get_storage_value($_->{column});
+      my $new = $dirty{$_->{column}};
+      my $old_final = $final;
+      $final = sub { $self->$fn($old_final, $old, $new) };
+    }
+
+    my $txn_wrap = List::Util::first {
+      defined $dirty{$_->{column}} && $_->{txn_wrap}
+    } @all_before, @all_around, @all_after;
+
+    my $guard;
+    $guard = $self->result_source->schema->txn_scope_guard if $txn_wrap;
+
+    for (@before) {
+      my $fn  = $_->{method};
+      my $old = $self->get_storage_value($_->{column});
+      my $new = $dirty{$_->{column}};
+      $self->$fn($old, $new);
+    }
+
+    my $ret = $final->();
+
+    for (@after) {
+      my $fn  = $_->{method};
+      my $old = $self->get_storage_value($_->{column});
+      my $new = $dirty{$_->{column}};
+      $self->$fn($old, $new);
+    }
+
+    $guard->commit if $txn_wrap;
+
+    return $ret;
+  }
+
+  return $self->_update_body($upd);
+}
+
+# Core update logic, extracted so OnColumnChange (above) can wrap it
+# with before/around/after callbacks without mutual recursion.
+sub _update_body {
+  my ($self, $upd) = @_;
+
   $self->set_inflated_columns($upd) if $upd;
 
   my %to_update = $self->get_dirty_columns
@@ -567,6 +655,10 @@ sub update {
   $self->{_dirty_columns} = {};
   $self->{related_resultsets} = {};
   delete $self->{_column_data_in_storage};
+
+  # StorageValues (integrated helper): refresh snapshot post-UPDATE.
+  $self->store_storage_values if @{$self->storage_value_columns};
+
   return $self;
 }
 
@@ -1155,6 +1247,11 @@ is set by default on C<has_many> relationships and unset on all others.
 
 sub copy {
   my ($self, $changes) = @_;
+
+  # ProxyResultSetMethod (integrated helper): proxied values are not
+  # real columns and must not be carried into the copy.
+  delete local @{$self->{_column_data}}{@{$self->_proxy_slots||[]}};
+
   $changes ||= {};
   my $col_data = { $self->get_columns };
 
@@ -1319,6 +1416,10 @@ sub inflate_result {
   }
 
   $new->in_storage (1);
+
+  # StorageValues (integrated helper): snapshot freshly-inflated values.
+  $new->store_storage_values if @{$new->storage_value_columns};
+
   return $new;
 }
 
@@ -1668,6 +1769,260 @@ sub self_rs {
 
 # --- clean_rs: get unfiltered ResultSet for this row's source ---
 sub clean_rs { shift->result_source->resultset }
+
+# ------------------------------------------------------------
+# StorageValues
+# ------------------------------------------------------------
+
+=head2 StorageValues
+
+Per-column opt-in snapshot of the values as last seen in storage.
+Mark a column with C<< keep_storage_value => 1 >> and DBIO will record
+its current stored value at C<new>, C<insert>, C<update> and
+C<inflate_result> time. The snapshot uses the column accessor, so
+inflated / filtered values are captured rather than raw storage values.
+
+  __PACKAGE__->add_column(title => {
+    data_type          => 'varchar',
+    keep_storage_value => 1,
+  });
+
+  $row->title('New');
+  $row->get_storage_value('title'); # the old value
+  $row->update;
+  $row->get_storage_value('title'); # now 'New'
+
+=cut
+
+__PACKAGE__->mk_group_accessors(inherited => '_storage_value_columns');
+__PACKAGE__->mk_group_accessors(inherited => '_storage_values');
+
+=method _has_storage_value
+
+Returns true if the given column opts in via C<keep_storage_value>.
+Override on a Result class to enable snapshotting by other criteria
+(e.g. "all integer columns").
+
+=cut
+
+sub _has_storage_value { $_[0]->column_info($_[1])->{keep_storage_value} }
+
+=method storage_value_columns
+
+Arrayref of columns that will be snapshotted on this row.
+
+=cut
+
+sub storage_value_columns {
+  my $self = shift;
+  if (!$self->_storage_value_columns) {
+    $self->_storage_value_columns([
+      grep $self->_has_storage_value($_),
+        $self->result_source->columns
+    ]);
+  }
+  return $self->_storage_value_columns;
+}
+
+=method store_storage_values
+
+Refresh the snapshot from the current accessor values.
+
+=cut
+
+sub store_storage_values {
+  my $self = shift;
+  $self->_storage_values({
+    map {
+      my $acc = ($self->column_info($_)->{accessor} || $_);
+      $_ => $self->$acc
+    } @{$self->storage_value_columns}
+  });
+  $self->_storage_values;
+}
+
+=method get_storage_value
+
+  $row->get_storage_value('title')
+
+Returns the snapshotted value for a column.
+
+=cut
+
+sub get_storage_value { $_[0]->_storage_values->{$_[1]} }
+
+# ------------------------------------------------------------
+# OnColumnChange
+# ------------------------------------------------------------
+
+=head2 OnColumnChange
+
+Register C<before_column_change>, C<after_column_change>, and
+C<around_column_change> callbacks on a Result class. Callbacks fire
+from L</update> only if the named column is actually dirty. The "old"
+value comes from L</get_storage_value>, so pair this with
+C<< keep_storage_value => 1 >> on the column if you need a real
+previous value; otherwise it will be C<undef>.
+
+  __PACKAGE__->before_column_change(
+    amount => { method => 'bank_transfer', txn_wrap => 1 },
+  );
+
+Callback signatures:
+
+  before: $self->$method($old, $new)
+  after:  $self->$method($old, $new)   # $old may now equal $new
+  around: $self->$method($next, $old, $new)
+
+C<before> callbacks fire in definition order, C<after> callbacks fire
+in reverse order, C<around> callbacks wrap in definition order (the
+innermost being the first declared). If any registered arg has
+C<< txn_wrap => 1 >> the whole update is wrapped in a
+C<txn_scope_guard>.
+
+See L<DBIx::Class::Helper::Row::OnColumnChange/on_column_change_allow_override_args>
+for C<on_column_change_allow_override_args> semantics.
+
+=cut
+
+__PACKAGE__->mk_group_accessors(inherited => $_)
+  for qw(_before_change _around_change _after_change);
+
+sub _register_column_change {
+  my ($self, $slot, $prepend, $column, $args) = @_;
+  $self->throw_exception('method is a required parameter')
+    unless $args->{method};
+  $args->{column}   = $column;
+  $args->{txn_wrap} = !!$args->{txn_wrap};
+  $self->$slot([]) unless $self->$slot;
+  if ($prepend) {
+    unshift @{$self->$slot}, $args;
+  } else {
+    push @{$self->$slot}, $args;
+  }
+  return;
+}
+
+=method before_column_change
+
+  __PACKAGE__->before_column_change(col => { method => ..., txn_wrap => 0 });
+
+=cut
+
+sub before_column_change {
+  $_[0]->throw_exception(
+    'Invalid number of arguments. One $column => $args pair at a time.'
+  ) unless @_ == 3;
+  my ($self, $column, $args) = @_;
+  $self->_register_column_change('_before_change', 0, $column, $args);
+}
+
+=method around_column_change
+
+  __PACKAGE__->around_column_change(col => { method => ..., txn_wrap => 0 });
+
+=cut
+
+sub around_column_change {
+  $_[0]->throw_exception(
+    'Invalid number of arguments. One $column => $args pair at a time.'
+  ) unless @_ == 3;
+  my ($self, $column, $args) = @_;
+  $self->_register_column_change('_around_change', 0, $column, $args);
+}
+
+=method after_column_change
+
+  __PACKAGE__->after_column_change(col => { method => ..., txn_wrap => 0 });
+
+=cut
+
+sub after_column_change {
+  $_[0]->throw_exception(
+    'Invalid number of arguments. One $column => $args pair at a time.'
+  ) unless @_ == 3;
+  my ($self, $column, $args) = @_;
+  $self->_register_column_change('_after_change', 1, $column, $args);
+}
+
+=method on_column_change_allow_override_args
+
+Override and return true on your Result class if a C<before_column_change>
+callback should be able to replace values passed to C<update($upd)>.
+Defaults to false to preserve historic behaviour.
+
+=cut
+
+sub on_column_change_allow_override_args { 0 }
+
+# ------------------------------------------------------------
+# ProxyResultSetMethod
+# ------------------------------------------------------------
+
+=head2 ProxyResultSetMethod
+
+Expose a C<with_foo> ResultSet method as a row accessor with a
+transparent fallback: if the column was already selected via the
+ResultSet method it is returned from the cached row data; otherwise
+the ResultSet method is re-run for this row.
+
+  package MyApp::Schema::ResultSet::Foo;
+  sub with_friend_count { ... }
+
+  package MyApp::Schema::Result::Foo;
+  __PACKAGE__->proxy_resultset_method('friend_count');
+
+  $foo_rs->first->friend_count;           # lazy fetch
+  $foo_rs->with_friend_count->first->friend_count;  # cached
+
+The generated accessor stores the fetched value under the slot name in
+C<_column_data> as a cache. Proxied slots are excluded from C<copy>
+and C<update> so they are never written as actual columns.
+
+=cut
+
+__PACKAGE__->mk_group_accessors(inherited => '_proxy_slots');
+
+=method proxy_resultset_method
+
+  __PACKAGE__->proxy_resultset_method($name, {
+    slot             => $slot,             # defaults to $name
+    resultset_method => $rs_method,        # defaults to "with_$name"
+  });
+
+=cut
+
+sub proxy_resultset_method {
+  my ($self, $name, $attr) = @_;
+  $attr ||= {};
+
+  my $rs_method = $attr->{resultset_method} || "with_$name";
+  my $slot      = $attr->{slot} || $name;
+
+  $self->_proxy_slots([]) unless $self->_proxy_slots;
+  push @{$self->_proxy_slots}, $slot;
+
+  my $fq = $self . '::' . $name;
+  my $body = sub {
+    my ($row) = @_;
+    unless ($row->has_column_loaded($slot)) {
+      $row->{_column_data}{$slot} = undef;
+      $row->set_column(
+        $slot,
+        $row->self_rs
+            ->search(undef, { columns => [] })
+            ->$rs_method
+            ->get_column($slot)
+            ->next,
+      );
+    }
+    return $row->get_column($slot);
+  };
+
+  no strict 'refs';
+  *{$fq} = Sub::Util::set_subname($fq, $body);
+  return;
+}
 
 =head2 id
 
