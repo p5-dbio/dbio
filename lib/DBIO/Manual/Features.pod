@@ -228,31 +228,19 @@ Create a database from your DBIO schema.
 
 See L<DBIO::Schema/deploy>.
 
-See also: L<DBIO::DeploymentHandler>
-
 =head2 Schema::Loader
 
-Create a DBIO schema from your database.
+Create a DBIO schema by introspecting an existing database.
 
- package Frew::Schema;
+ use DBIO::Loader qw( make_schema_at );
 
- use strict;
- use warnings;
+ make_schema_at(
+    'MyApp::Schema',
+    { naming => 'v7', debug => $ENV{DBIO_TRACE} },
+    [ $dsn, $user, $pass ],
+ );
 
- use base 'DBIO::Schema::Loader';
-
- __PACKAGE__->loader_options({
-    naming => 'v7',
-    debug  => $ENV{DBIO_TRACE},
- });
-
- 1;
-
- # elsewhere...
-
- my $schema = Frew::Schema->connect( $dsn, $user, $pass );
-
-See L<DBIO::Schema::Loader> and L<DBIO::Schema::Loader::Base/CONSTRUCTOR OPTIONS>.
+See L<DBIO::Loader> and L<DBIO::Loader::Base/CONSTRUCTOR OPTIONS>.
 
 =head2 Populate
 
@@ -336,18 +324,6 @@ natively into L<DBIO::Row> and require no C<load_components> call:
 =item set_on_create
 
 =item set_on_update
-
-=back
-
-=head2 Extensibility example: Kioku
-
-=over 1
-
-=item See L<DBIO::Schema::KiokuDB>
-
-=item Kioku is the new hotness
-
-=item Mix RDBMS with Object DB
 
 =back
 
