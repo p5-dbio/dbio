@@ -17,6 +17,26 @@ our %_pod_inherit_config =
 
 =method many_to_many
 
+=method _m2m_metadata
+
+Accessor for a HASH ref where each key is the name of a many-to-many
+relationship declared on the Result class, and the value is a HASH ref
+describing that relationship:
+
+  $class->_m2m_metadata->{roles} = {
+    accessor         => 'roles',
+    relation         => 'user_roles',
+    foreign_relation => 'role',
+    attrs            => $rel_attrs,   # only present if a 4th arg was given
+    rs_method        => 'roles_rs',
+    add_method       => 'add_to_roles',
+    set_method       => 'set_roles',
+    remove_method    => 'remove_from_roles',
+  };
+
+Installed lazily on the Result class the first time C<many_to_many> is
+called. Provides the same API as L<DBIx::Class::IntrospectableM2M>.
+
 =cut
 
 sub many_to_many {
@@ -29,6 +49,27 @@ sub many_to_many {
   $class->throw_exception(
     "missing foreign relation in many-to-many"
   ) unless $f_rel;
+
+  $class->mk_classdata('_m2m_metadata' => {})
+    unless $class->can('_m2m_metadata');
+
+  my $store = $class->_m2m_metadata;
+  carp("Overwriting existing many-to-many metadata for '$meth'")
+    if exists $store->{$meth};
+
+  $class->_m2m_metadata({
+    %$store,
+    $meth => {
+      accessor         => $meth,
+      relation         => $rel,
+      foreign_relation => $f_rel,
+      (@_ > 4 ? (attrs => $rel_attrs) : ()),
+      rs_method        => "${meth}_rs",
+      add_method       => "add_to_${meth}",
+      set_method       => "set_${meth}",
+      remove_method    => "remove_from_${meth}",
+    },
+  });
 
   {
     no strict 'refs';
