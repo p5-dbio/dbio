@@ -300,27 +300,28 @@ See L<DBIO::ResultSet/create>
 DBIO helped pioneer fast MI in Perl 5 with Class::C3, so it is made to
 allow extensions to nearly every part of it.
 
-=head2 Extensibility example: DBIO::Helpers
+=head2 Extensibility example: Row helpers (integrated into DBIO::Row)
+
+The following helpers from F<DBIx::Class::Helpers> are integrated
+natively into L<DBIO::Row> and require no C<load_components> call:
 
 =over 1
 
-=item L<DBIO::Helper::ResultSet::IgnoreWantarray>
+=item L<DBIO::Row/TO_JSON> — serializable hashref, excludes text/blob columns
 
-=item L<DBIO::Helper::ResultSet::Random>
+=item L<DBIO::Row/serializable_columns> — list of serializable columns
 
-=item L<DBIO::Helper::ResultSet::SetOperations>
+=item L<DBIO::Row/self_rs> — ResultSet for a single row
 
-=item L<DBIO::Helper::Row::JoinTable>
+=item L<DBIO::Row/get_storage_value> — original DB value before in-memory changes
 
-=item L<DBIO::Helper::Row::NumifyGet>
+=item L<DBIO::Row/before_column_change> — fire callback before a column is updated
 
-=item L<DBIO::Helper::Row::SubClass>
+=item L<DBIO::Row/after_column_change> — fire callback after a column is updated
 
-=item L<DBIO::Helper::Row::ToJSON>
+=item L<DBIO::Row/around_column_change> — wrap update with a column-aware around hook
 
-=item L<DBIO::Helper::Row::StorageValues>
-
-=item L<DBIO::Helper::Row::OnColumnChange>
+=item L<DBIO::Row/proxy_resultset_method> — expose ResultSet C<with_> methods as row accessors
 
 =back
 

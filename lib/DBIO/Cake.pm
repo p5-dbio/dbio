@@ -599,11 +599,7 @@ sub idx {
   my ($name, $fields, %options) = @_;
   my $class = _caller_class();
 
-  my $sqlt_info = $class->result_source_instance->{sqlt_deploy_callback}
-    ? $class->result_source_instance->sqlt_deploy_callback
-    : undef;
-
-  # Store index info in sqlt_deploy_hook via source extra
+  # Store index info on the source for later pickup by the hooks below.
   my $source = $class->result_source_instance;
   my $indexes = $source->{_cake_indexes} ||= [];
   push @$indexes, {
@@ -612,7 +608,9 @@ sub idx {
     %options,
   };
 
-  # Install or update the sqlt_deploy_hook
+  # ── SQLT path (SQL::Translator-based deployment) ─────────────
+  # Install sqlt_deploy_hook on the class once; it reads _cake_indexes
+  # at deploy time and calls $sqlt_table->add_index(...).
   unless ($source->{_cake_hook_installed}) {
     $source->{_cake_hook_installed} = 1;
     my $orig_hook = $class->can('sqlt_deploy_hook');
@@ -635,6 +633,43 @@ sub idx {
           (exists $idx->{options} ? (options => $idx->{options}) : ()),
         );
       }
+    };
+  }
+
+  # ── PostgreSQL native DDL path (DBIO::PostgreSQL::DDL) ───────
+  # Install a pg_indexes class method once; it reads _cake_indexes
+  # at DDL time and returns a hashref in the format DBIO::PostgreSQL::DDL
+  # expects. The 'pg' option on idx() carries PG-specific keys
+  # (where, using, with, expression) that are passed through as-is.
+  # If the class already defined pg_indexes manually, the existing
+  # definitions are preserved and Cake-declared indexes are merged in.
+  unless ($source->{_cake_pg_indexes_installed}) {
+    $source->{_cake_pg_indexes_installed} = 1;
+    my $orig_pg_indexes = $class->can('pg_indexes');
+
+    no strict 'refs';
+    no warnings 'redefine';
+    *{"${class}::pg_indexes"} = sub {
+      my $invocant = shift;
+      my $src = (ref $invocant && $invocant->isa('DBIO::ResultSource'))
+        ? $invocant
+        : (ref $invocant ? ref($invocant) : $invocant)->result_source_instance;
+      my %result = $orig_pg_indexes ? %{ $orig_pg_indexes->($invocant, @_) || {} } : ();
+      my $idxs = $src->{_cake_indexes} || [];
+      for my $idx (@$idxs) {
+        my %entry = (
+          columns => $idx->{fields},
+          (($idx->{type} // '') =~ /^unique$/i ? (unique => 1) : ()),
+        );
+        if (my $pg = $idx->{pg}) {
+          $entry{where}      = $pg->{where}      if exists $pg->{where};
+          $entry{using}      = $pg->{using}      if exists $pg->{using};
+          $entry{with}       = $pg->{with}       if exists $pg->{with};
+          $entry{expression} = $pg->{expression} if exists $pg->{expression};
+        }
+        $result{$idx->{name}} = \%entry;
+      }
+      return \%result;
     };
   }
 }
@@ -1048,15 +1083,37 @@ just add this one line and you're done.
   idx composite_idx => ['last_name', 'first_name'], type => 'unique';
   idx tags_idx => ['tags'], using => 'gin';
   idx draft_only => ['key'],
-      type    => 'unique',
-      options => [{ where => 'version IS NULL' }];
+      type => 'unique',
+      pg   => { where => 'version IS NULL' };
 
-Declares an index to be created during deployment via C<sqlt_deploy_hook>.
+Declares an index. Cake installs two hooks on the Result class so that
+C<idx> works transparently in both deployment pipelines:
 
-The C<options> key passes producer-specific index options through to
-L<SQL::Translator::Schema::Index>. This is useful for PostgreSQL partial
-indexes (C<WHERE ...>) and index methods (C<USING gin>). See
-L<SQL::Translator::Producer::PostgreSQL> for supported option keys.
+=over
+
+=item * C<sqlt_deploy_hook> — used by the L<SQL::Translator>-based
+deployment (the default for most DBIO schemas). The C<options> key
+passes producer-specific options through to
+L<SQL::Translator::Schema::Index>.
+
+=item * C<pg_indexes> — used by L<DBIO::PostgreSQL::DDL> when the schema
+loads the C<PostgreSQL> component. The C<pg> key carries
+PostgreSQL-specific options (C<where>, C<using>, C<with>, C<expression>)
+and is passed through to the native PG DDL emitter.
+
+=back
+
+If the class already defines C<pg_indexes> by hand, those definitions
+are preserved and Cake-declared indexes are merged on top.
+
+=head3 PostgreSQL partial indexes
+
+  idx agent_published => ['key', 'version'],
+      type => 'unique',
+      pg   => { where => 'version IS NOT NULL' };
+  idx agent_draft => ['key'],
+      type => 'unique',
+      pg   => { where => 'version IS NULL' };
 
 =head1 SEE ALSO
 

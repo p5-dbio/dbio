@@ -124,7 +124,7 @@ use Test::More;
   unique code_uniq => ['code'];
 }
 
-# --- Versioned: idx with options (partial index) ----------
+# --- Versioned: idx with options + pg (partial index) -----
 {
   package TestComp::Result::Versioned;
   use DBIO::Cake;
@@ -135,15 +135,39 @@ use Test::More;
   col version    => integer, null;
   primary_key 'id';
 
-  # Two partial unique indexes:
-  #  (key, version) where version is not null → published rows
-  #  (key)          where version is null     → single draft per key
+  # Two partial unique indexes via both pipelines:
+  #   options => SQL::Translator producer
+  #   pg      => DBIO::PostgreSQL::DDL native
   idx versioned_published => ['key', 'version'],
       type    => 'unique',
-      options => [{ where => 'version IS NOT NULL' }];
+      options => [{ where => 'version IS NOT NULL' }],
+      pg      => { where => 'version IS NOT NULL' };
   idx versioned_draft => ['key'],
       type    => 'unique',
-      options => [{ where => 'version IS NULL' }];
+      options => [{ where => 'version IS NULL' }],
+      pg      => { where => 'version IS NULL' };
+}
+
+# --- VersionedMerge: Cake idx + hand-written pg_indexes coexist ---
+{
+  package TestComp::Result::VersionedMerge;
+  use DBIO::Cake;
+
+  table 'versioned_merge';
+  col id  => serial;
+  col key => varchar(50);
+  primary_key 'id';
+
+  # Hand-written pg_indexes BEFORE any idx() call — Cake must merge, not replace.
+  sub pg_indexes {
+    return {
+      manual_idx => { columns => ['key'], using => 'hash' },
+    };
+  }
+
+  idx cake_idx => ['key'],
+      type => 'unique',
+      pg   => { where => 'key IS NOT NULL' };
 }
 
 # --- ManyToMany: link table test --------------------------
@@ -343,7 +367,7 @@ use Test::More;
   cmp_ok(scalar @uniq, '>=', 2, 'UniqueTest: has unique constraints');
 }
 
-# --- idx with options (partial unique indexes) ------------
+# --- idx with options/pg (partial unique indexes) ---------
 {
   my $src = TestComp::Result::Versioned->result_source_instance;
   my $idxs = $src->{_cake_indexes} || [];
@@ -357,15 +381,16 @@ use Test::More;
   is_deeply($published->{options},
     [{ where => 'version IS NOT NULL' }],
     'Versioned: published options pass through');
+  is_deeply($published->{pg},
+    { where => 'version IS NOT NULL' },
+    'Versioned: published pg pass through');
 
   my ($draft) = grep { $_->{name} eq 'versioned_draft' } @$idxs;
   ok($draft, 'Versioned: draft index present');
-  is_deeply($draft->{options},
-    [{ where => 'version IS NULL' }],
-    'Versioned: draft options pass through');
+  is_deeply($draft->{pg}, { where => 'version IS NULL' },
+    'Versioned: draft pg pass through');
 
-  # End-to-end: invoke sqlt_deploy_hook against a real SQLT table
-  # and verify the index ended up with options on the sqlt side.
+  # SQLT path: end-to-end via sqlt_deploy_hook
   require SQL::Translator::Schema::Table;
   my $sqlt_table = SQL::Translator::Schema::Table->new(name => 'versioned');
   $sqlt_table->add_field(name => 'id',      data_type => 'integer');
@@ -380,6 +405,36 @@ use Test::More;
   my @opts = $sqlt_pub->options;
   is_deeply(\@opts, [{ where => 'version IS NOT NULL' }],
     'sqlt: published options reached the SQLT::Index');
+
+  # PG native path: pg_indexes method was installed by Cake
+  ok(TestComp::Result::Versioned->can('pg_indexes'),
+    'Cake installed pg_indexes on class');
+  my $pg = TestComp::Result::Versioned->pg_indexes;
+  is_deeply($pg->{versioned_published}, {
+    unique  => 1,
+    columns => ['key', 'version'],
+    where   => 'version IS NOT NULL',
+  }, 'pg_indexes: published entry');
+  is_deeply($pg->{versioned_draft}, {
+    unique  => 1,
+    columns => ['key'],
+    where   => 'version IS NULL',
+  }, 'pg_indexes: draft entry');
+}
+
+# --- pg_indexes merging with pre-existing manual method ---
+{
+  my $pg = TestComp::Result::VersionedMerge->pg_indexes;
+  ok($pg->{manual_idx}, 'pg_indexes: pre-existing manual entry preserved');
+  is_deeply($pg->{manual_idx},
+    { columns => ['key'], using => 'hash' },
+    'pg_indexes: manual entry unchanged');
+  ok($pg->{cake_idx}, 'pg_indexes: cake-declared entry also present');
+  is_deeply($pg->{cake_idx}, {
+    unique  => 1,
+    columns => ['key'],
+    where   => 'key IS NOT NULL',
+  }, 'pg_indexes: cake entry merged correctly');
 }
 
 # --- Namespace cleanup ---
