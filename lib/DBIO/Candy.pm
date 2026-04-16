@@ -116,13 +116,14 @@ sub import {
          has_column => $self->gen_has_column($inheritor, $set_table),
          primary_column => $self->gen_primary_column($inheritor, $set_table),
          unique_column => $self->gen_unique_column($inheritor, $set_table),
+         indices => $self->gen_indices($inheritor, $set_table),
          (map { $_ => $self->gen_proxy($inheritor, $set_table) } @methods, @custom_methods),
          (map { $_ => $self->gen_rename_proxy($inheritor, $set_table, %aliases, %custom_aliases) }
             keys %aliases, keys %custom_aliases),
       ],
       groups  => {
          default => [
-            qw(has_column primary_column unique_column), @methods, @custom_methods, keys %aliases, keys %custom_aliases
+            qw(has_column primary_column unique_column indices), @methods, @custom_methods, keys %aliases, keys %custom_aliases
          ],
       },
       installer  => $self->installer,
@@ -238,6 +239,19 @@ sub gen_has_column {
       my $column = shift;
       $set_table->();
       $i->add_columns($column => { @_ })
+    }
+  }
+}
+
+# Sugar wrapper around the indices() class method installed by
+# DBIO::ResultSourceProxy::Table — available to both vanilla and Candy.
+sub gen_indices {
+  my ($self, $inheritor, $set_table) = @_;
+  sub {
+    my $i = $inheritor;
+    sub {
+      $set_table->();
+      $i->indices(@_);
     }
   }
 }
@@ -544,6 +558,20 @@ Defines a column and adds it to the primary key in a single call.
  };
 
 Defines a column and adds a unique constraint on it in a single call.
+
+=head2 indices
+
+ indices(
+   name_idx       => 'name',
+   name_email_idx => ['name', 'email'],
+ );
+
+Declares one or more secondary indexes on the table. Field lists may be a
+single column name or an arrayref of column names. Equivalent to the
+L<DBICx::Indexing> component on DBIx::Class. The indexes are picked up by
+both the SQL::Translator deploy path (via C<sqlt_deploy_hook>) and the
+native PostgreSQL deploy path (via C<pg_indexes>), so they end up in the
+generated DDL regardless of which deploy method is in use.
 
 =head1 SETTING DEFAULT IMPORT OPTIONS
 
