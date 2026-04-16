@@ -4,7 +4,7 @@ package DBIO::Relationship::Base;
 use strict;
 use warnings;
 
-use base qw/DBIO/;
+use base qw/DBIO::Base/;
 
 use Scalar::Util qw/weaken blessed/;
 use Try::Tiny;

@@ -4,7 +4,7 @@ package DBIO::Storage;
 use strict;
 use warnings;
 
-use base qw/DBIO/;
+use base qw/DBIO::Base/;
 use mro 'c3';
 
 {

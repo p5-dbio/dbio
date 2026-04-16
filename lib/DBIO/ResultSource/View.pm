@@ -6,7 +6,7 @@ use warnings;
 
 use DBIO::ResultSet;
 
-use base qw/DBIO/;
+use base qw/DBIO::Base/;
 __PACKAGE__->load_components(qw/ResultSource/);
 __PACKAGE__->mk_group_accessors(
     'simple' => qw(is_virtual view_definition deploy_depends_on) );

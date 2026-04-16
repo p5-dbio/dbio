@@ -8,7 +8,7 @@ use DBIO::Util qw(sigwarn_silencer qsub);
 use IO::Handle ();
 use Time::HiRes ();
 
-use base 'DBIO';
+use base 'DBIO::Base';
 use namespace::clean;
 
 __PACKAGE__->mk_group_accessors(simple => qw(

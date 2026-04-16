@@ -2,7 +2,7 @@ package DBIO::Ordered;
 # ABSTRACT: Modify the position of objects in an ordered list.
 use strict;
 use warnings;
-use base qw( DBIO );
+use base qw( DBIO::Base );
 
 =head1 SYNOPSIS
 

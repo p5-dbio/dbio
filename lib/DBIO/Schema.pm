@@ -4,7 +4,7 @@ package DBIO::Schema;
 use strict;
 use warnings;
 
-use base 'DBIO';
+use base 'DBIO::Base';
 
 use DBIO::Carp;
 use Try::Tiny;

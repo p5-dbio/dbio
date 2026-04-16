@@ -4,7 +4,7 @@ package DBIO::Row;
 use strict;
 use warnings;
 
-use base qw/DBIO/;
+use base qw/DBIO::Base/;
 
 use Scalar::Util 'blessed';
 use List::Util ();

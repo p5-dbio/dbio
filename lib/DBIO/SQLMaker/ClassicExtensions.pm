@@ -30,7 +30,7 @@ Currently the enhancements over L<SQL::Abstract> are:
 =cut
 
 # to pull in CAG and the frame-boundary-markers
-use base 'DBIO';
+use base 'DBIO::Base';
 use DBIO::Carp;
 use namespace::clean;
 

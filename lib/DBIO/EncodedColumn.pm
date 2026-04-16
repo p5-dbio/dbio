@@ -4,7 +4,7 @@ package DBIO::EncodedColumn;
 use strict;
 use warnings;
 
-use base qw/DBIO/;
+use base qw/DBIO::Base/;
 
 use Digest ();
 use MIME::Base64 ();

@@ -4,7 +4,7 @@ package DBIO::ResultSource;
 use strict;
 use warnings;
 
-use base qw/DBIO::ResultSource::RowParser DBIO/;
+use base qw/DBIO::ResultSource::RowParser DBIO::Base/;
 
 use DBIO::ResultSet;
 use DBIO::ResultSourceHandle;

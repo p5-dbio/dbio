@@ -3,7 +3,7 @@ package DBIO::ResultSet;
 
 use strict;
 use warnings;
-use base qw/DBIO/;
+use base qw/DBIO::Base/;
 use DBIO::Carp;
 use DBIO::ResultSetColumn;
 use Scalar::Util qw/blessed weaken reftype/;

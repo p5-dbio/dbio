@@ -4,7 +4,7 @@ package DBIO::Test::ForeignComponent;
 use warnings;
 use strict;
 
-use base qw/ DBIO /;
+use base qw/ DBIO::Base /;
 
 __PACKAGE__->load_components( qw/ +DBIO::Test::ForeignComponent::TestComp / );
 

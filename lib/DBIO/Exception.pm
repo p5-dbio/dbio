@@ -59,7 +59,7 @@ sub throw {
         # the dbic-wide classdata patterns
         my ($ln, $calling) = DBIO::Carp::__find_caller(
           '^' . caller() . '$',
-          'DBIO',
+          'DBIO::Base',
         );
 
         $msg = "${calling}${msg} ${ln}\n";

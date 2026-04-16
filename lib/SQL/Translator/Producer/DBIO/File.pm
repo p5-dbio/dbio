@@ -72,7 +72,7 @@ DATA
 
 package ${dbixschema}::${tname};
 # ABSTRACT: DBIO file producer
-use base 'DBIO';
+use base 'DBIO::Base';
 use strict;
 use warnings;
 

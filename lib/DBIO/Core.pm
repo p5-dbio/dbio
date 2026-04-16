@@ -4,7 +4,7 @@ package DBIO::Core;
 use strict;
 use warnings;
 
-use base qw/DBIO/;
+use base qw/DBIO::Base/;
 
 __PACKAGE__->load_components(qw/
   Timestamp

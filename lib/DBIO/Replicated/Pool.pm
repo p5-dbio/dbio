@@ -4,7 +4,7 @@ package DBIO::Replicated::Pool;
 use strict;
 use warnings;
 
-use base 'DBIO';
+use base 'DBIO::Base';
 use Scalar::Util 'reftype';
 use Try::Tiny;
 use DBI ();

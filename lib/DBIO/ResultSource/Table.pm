@@ -6,7 +6,7 @@ use warnings;
 
 use DBIO::ResultSet;
 
-use base qw/DBIO/;
+use base qw/DBIO::Base/;
 __PACKAGE__->load_components(qw/ResultSource/);
 
 =head1 SYNOPSIS

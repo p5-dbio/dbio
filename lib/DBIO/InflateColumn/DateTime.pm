@@ -3,7 +3,7 @@ package DBIO::InflateColumn::DateTime;
 
 use strict;
 use warnings;
-use base qw/DBIO/;
+use base qw/DBIO::Base/;
 use DBIO::Carp;
 use Try::Tiny;
 use namespace::clean;

@@ -39,7 +39,7 @@ load them.
 Making your own component is very easy.
 
   package DBIO::MyComp;
-  use base qw(DBIO);
+  use base qw(DBIO::Base);
   # Create methods, accessors, load other components, etc.
   1;
 

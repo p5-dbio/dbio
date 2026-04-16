@@ -6,61 +6,49 @@ use warnings;
 
 our $VERSION = '0.900000';
 
-use DBIO::Util;
-use mro 'c3';
+use DBIO::Base ();
 
-use DBIO::Optional::Dependencies;
+sub import {
+  my ($class, @args) = @_;
+  my $caller = caller;
 
-use base qw/DBIO::Componentised DBIO::AccessorGroup/;
-use DBIO::StartupCheck;
-use DBIO::Exception;
+  my ($role, @opts);
+  for my $arg (@args) {
+    if (defined $arg && $arg =~ /^-/) { push @opts, $arg }
+    elsif (!defined $role)            { $role = $arg }
+    else                              { push @opts, $arg }
+  }
 
-__PACKAGE__->mk_group_accessors(inherited => '_skip_namespace_frames');
-__PACKAGE__->_skip_namespace_frames('^DBIO|^SQL::Abstract|^Try::Tiny|^Class::Accessor::Grouped|^Context::Preserve');
+  unless (defined $role) {
+    if    ($caller =~ /::Result::[^:]+$/)    { $role = 'Core' }
+    elsif ($caller =~ /::ResultSet::[^:]+$/) { $role = 'ResultSet' }
+    else                                      { $role = 'Core' }
+  }
 
-# Formerly used to detect multiple DESTROY() invocations on the same object.
-# This was added in DBIx::Class (commit e1d9e578, 2015) to protect against broken
-# Perl/toolchain combinations (especially old Devel::StackTrace) that could cause
-# destructors to be called more than once - a dangerous global condition.
-#
-# The detection had a performance cost: on every DESTROY it iterated over the entire
-# destruction registry. With many objects this adds up (O(n) per destroy).
-#
-# Removed because modern Perl (5.14+) doesn't have these issues, and the overhead
-# is not acceptable for large-scale row object destruction.
-#
-# If you encounter "multiple DESTROY" issues in production, your Perl or module
-# stack is broken - fix that instead of re-enabling this.
-#sub DESTROY { &DBIO::Util::detected_reinvoked_destructor }
+  my $base = "DBIO::$role";
+  eval "require $base; 1"
+    or die "use DBIO '$role': cannot load $base: $@";
 
-sub mk_classdata {
-  shift->mk_classaccessor(@_);
+  {
+    no strict 'refs';
+    push @{"${caller}::ISA"}, $base unless $caller->isa($base);
+  }
+
+  strict->import;
+  warnings->import;
+
+  _apply_shortcut($caller, $_) for @opts;
 }
 
-sub mk_classaccessor {
-  my $self = shift;
-  $self->mk_group_accessors('inherited', $_[0]);
-  $self->set_inherited(@_) if @_ > 1;
-}
-
-sub component_base_class { 'DBIO' }
-
-sub MODIFY_CODE_ATTRIBUTES {
-  my ($class,$code,@attrs) = @_;
-  $class->mk_classdata('__attr_cache' => {})
-    unless $class->can('__attr_cache');
-  $class->__attr_cache->{$code} = [@attrs];
-  return ();
-}
-
-sub _attr_cache {
-  my $self = shift;
-  my $cache = $self->can('__attr_cache') ? $self->__attr_cache : {};
-
-  return {
-    %$cache,
-    %{ $self->maybe::next::method || {} },
-  };
+sub _apply_shortcut {
+  my ($caller, $opt) = @_;
+  if ($opt eq '-pg') {
+    eval "package $caller; use DBIO::PostgreSQL; 1"
+      or die "use DBIO -pg: $@";
+  }
+  else {
+    die "use DBIO: unknown shortcut '$opt'";
+  }
 }
 
 1;
@@ -77,16 +65,16 @@ L<dbiodump>, provided by L<DBIO::Loader>.
 =head2 Schema class
 
   package MyApp::Schema;
-  use base qw/DBIO::Schema/;
+  use DBIO 'Schema';
 
   __PACKAGE__->load_namespaces();
 
   1;
 
-=head2 Vanilla style (classic)
+=head2 Vanilla style (import sugar)
 
   package MyApp::Schema::Result::Artist;
-  use base qw/DBIO::Core/;
+  use DBIO;    # Role is auto-detected from the package name: Core
 
   __PACKAGE__->table('artist');
   __PACKAGE__->add_columns(qw/ artistid name /);
@@ -94,6 +82,12 @@ L<dbiodump>, provided by L<DBIO::Loader>.
   __PACKAGE__->has_many(cds => 'MyApp::Schema::Result::CD', 'artistid');
 
   1;
+
+The classic equivalent (still supported):
+
+  package MyApp::Schema::Result::Artist;
+  use base 'DBIO::Core';
+  ...
 
 =head2 Candy style (import sugar)
 
@@ -163,7 +157,7 @@ for building queries without giving up database-native behavior.
 
 Three styles are available for defining result classes:
 L<DBIO::Cake> (DDL-like DSL), L<DBIO::Candy> (import sugar), and the
-classic Vanilla style (C<< use base 'DBIO::Core' >>).
+classic Vanilla style (C<use DBIO;> or C<< use base 'DBIO::Core' >>).
 
 Database-specific features are provided by native driver distributions
 (L<DBIO::PostgreSQL>, L<DBIO::MySQL>, L<DBIO::SQLite>, etc.) that speak
@@ -189,6 +183,45 @@ Key features:
 
 B<DBIO is pre-1.0.> The core API is substantial and usable, but some edges
 are still being refined. Please report anything that looks wrong or surprising.
+
+=head1 USE-AS-PRAGMA
+
+Since C<DBIO.pm> itself is a sugar pragma (analogous to C<Moose.pm>), it can
+be used directly to declare a DBIO class. The role to inherit from is
+auto-detected from the package name, or can be specified explicitly.
+
+  package MyApp::Schema::Result::Artist;
+  use DBIO;                    # -> @ISA = ('DBIO::Core')
+
+  package MyApp::Schema::ResultSet::Artist;
+  use DBIO;                    # -> @ISA = ('DBIO::ResultSet')
+
+  package MyApp::Schema;
+  use DBIO 'Schema';           # -> @ISA = ('DBIO::Schema')
+
+  package MyApp::Schema::Result::Photo;
+  use DBIO 'Core';             # explicit override
+
+Shortcuts can be combined with role selection, separated by leading dashes:
+
+  use DBIO -pg;                # Core + load DBIO::PostgreSQL component
+  use DBIO 'Schema', -pg;      # Schema + load DBIO::PostgreSQL component
+
+Role auto-detection rules:
+
+=over 4
+
+=item * package matches C<< /::Result::WORD$/ >> E<rarr> role C<Core>
+
+=item * package matches C<< /::ResultSet::WORD$/ >> E<rarr> role C<ResultSet>
+
+=item * anything else E<rarr> role C<Core> (the most common case)
+
+=back
+
+C<use DBIO;> additionally enables C<strict> and C<warnings> in the caller,
+matching the behavior of L<DBIO::Candy>, L<DBIO::Cake>, L<DBIO::Moo> and
+L<DBIO::Moose>.
 
 =head1 WHERE TO START
 
@@ -217,6 +250,9 @@ integrated into core
 =item * Native driver distributions for each database (L<DBIO::PostgreSQL>,
 L<DBIO::MySQL>, L<DBIO::SQLite>) replace the monolithic DBIx::Class storage
 layer; SQL::Translator is no longer required for schema management
+
+=item * Meta-infrastructure has been split into L<DBIO::Base> (inherited by
+all internal classes); C<DBIO.pm> is now a pure sugar pragma
 
 =back
 

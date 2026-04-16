@@ -4,7 +4,7 @@ package DBIO::Cursor;
 use strict;
 use warnings;
 
-use base qw/DBIO/;
+use base qw/DBIO::Base/;
 
 =head1 SYNOPSIS
 

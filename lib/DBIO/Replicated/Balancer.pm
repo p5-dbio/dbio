@@ -4,7 +4,7 @@ package DBIO::Replicated::Balancer;
 use strict;
 use warnings;
 
-use base 'DBIO';
+use base 'DBIO::Base';
 use Scalar::Util 'blessed';
 use namespace::clean;
 

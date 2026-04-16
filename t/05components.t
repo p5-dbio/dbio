@@ -10,7 +10,7 @@ ok( DBIO::Test::ForeignComponent->foreign_test_method, 'foreign component' );
 
 #   Test for inject_base to filter out duplicates
 {   package DBIO::Test::_InjectBaseTest;
-    use base qw/ DBIO /;
+    use base qw/ DBIO::Base /;
     package DBIO::Test::_InjectBaseTest::A;
     package DBIO::Test::_InjectBaseTest::B;
     package DBIO::Test::_InjectBaseTest::C;
@@ -26,7 +26,7 @@ is_deeply( \@DBIO::Test::_InjectBaseTest::ISA,
         DBIO::Test::_InjectBaseTest::A
         DBIO::Test::_InjectBaseTest::B
         DBIO::Test::_InjectBaseTest::C
-        DBIO
+        DBIO::Base
     /],
     'inject_base filters duplicates'
 );

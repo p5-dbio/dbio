@@ -42,19 +42,32 @@ Patch C<DBIO::isa> to acknowledge C<DBIx::Class::*> package names.
 sub _install_isa_patch {
   return if $isa_patched;
 
-  # If DBIO isn't loaded yet, patch will be applied later
-  # when _setup_existing_modules detects it
-  my $orig_isa = DBIO->can('isa') or return;
+  # DBIO::Base is the meta-infra parent of every internal class;
+  # patching its isa propagates via MRO to DBIO::Core/Row/Schema/...
+  # The direct *DBIO::isa patch keeps `DBIO->isa('DBIx::Class')` working.
+  my $orig_isa = DBIO::Base->can('isa') or return;
   $isa_patched = 1;
 
-  no warnings 'redefine';
-  *DBIO::isa = sub {
+  my $patch = sub {
     return 1 if $orig_isa->(@_);
-    if (defined $_[1] && (my $mapped = $_[1]) =~ s/^DBIx::Class(?=::|$)/DBIO/) {
-      return $orig_isa->($_[0], $mapped);
+    if (defined $_[1]) {
+      if ($_[1] eq 'DBIx::Class') {
+        # Any class in the DBIO world is considered a DBIx::Class
+        my $class = ref($_[0]) || $_[0];
+        return 1 if $class eq 'DBIO' || $class eq 'DBIO::Base';
+        return 1 if $orig_isa->($_[0], 'DBIO::Base');
+        return '';
+      }
+      if ($_[1] =~ /^DBIx::Class::(.+)$/) {
+        return $orig_isa->($_[0], "DBIO::$1");
+      }
     }
     return '';
   };
+
+  no warnings 'redefine';
+  *DBIO::Base::isa = $patch;
+  *DBIO::isa       = $patch;
 }
 
 # For a given DBIO package, set up the DBIx::Class equivalent
@@ -95,7 +108,18 @@ sub _setup_existing_modules {
     (my $dbix_pkg = $dbix_file) =~ s{/}{::}g;
     $dbix_pkg =~ s{\.pm$}{};
 
-    _setup_dbix_package($dbix_pkg, $dbic_pkg);
+    # The naked DBIx::Class name historically carried the meta-infra
+    # (Componentised, AccessorGroup, mk_classdata, component_base_class...).
+    # After the DBIO/DBIO::Base split that machinery lives in DBIO::Base,
+    # so DBIx::Class (the alias) must inherit from there, not from
+    # DBIO.pm (which is now just a sugar pragma).
+    if ($dbic_pkg eq 'DBIO') {
+      require DBIO::Base;
+      _setup_dbix_package($dbix_pkg, 'DBIO::Base');
+    }
+    else {
+      _setup_dbix_package($dbix_pkg, $dbic_pkg);
+    }
     $INC{$dbix_file} = $INC{$file};
   }
 
@@ -150,7 +174,15 @@ sub _dbic_inc_hook {
       warn "DBIO::Compat::DBIxClass: Failed to load ${dbic_pkg}: $@";
       return;
     };
-    _setup_dbix_package($dbix_pkg, $dbic_pkg);
+    # Naked DBIO is the sugar pragma; the meta-infra DBIx::Class
+    # historically matches lives in DBIO::Base.
+    if ($dbic_pkg eq 'DBIO') {
+      require DBIO::Base;
+      _setup_dbix_package($dbix_pkg, 'DBIO::Base');
+    }
+    else {
+      _setup_dbix_package($dbix_pkg, $dbic_pkg);
+    }
     $INC{$file} = $INC{$dbic_file};
 
     # Return minimal stub to satisfy the require

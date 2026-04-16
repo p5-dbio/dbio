@@ -3,7 +3,7 @@ package DBIO::Relationship::ProxyMethods;
 
 use strict;
 use warnings;
-use base 'DBIO';
+use base 'DBIO::Base';
 use DBIO::Util 'quote_sub';
 use namespace::clean;
 

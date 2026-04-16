@@ -5,7 +5,7 @@ package DBIO::UUIDColumns;
 use strict;
 use warnings;
 
-use base qw/DBIO/;
+use base qw/DBIO::Base/;
 
 __PACKAGE__->mk_group_accessors('inherited', qw/uuid_auto_columns uuid_maker/);
 __PACKAGE__->uuid_class(__PACKAGE__->_find_uuid_module);

@@ -8,6 +8,8 @@
 
 =item L<DBIO::Manual::QuickStart> - Up and running with DBIO in 10 minutes.
 
+=item L<DBIO::Manual::Heritage> - Everything that changed from DBIx::Class to DBIO.
+
 =item L<DBIO::Manual::Intro> - More detailed introduction to setting up and using DBIO.
 
 =item L<DBIO::Manual::SQLHackers> - How to use DBIO if you know SQL (external, available on CPAN)

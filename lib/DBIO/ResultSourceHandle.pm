@@ -4,7 +4,7 @@ package DBIO::ResultSourceHandle;
 use strict;
 use warnings;
 
-use base qw/DBIO/;
+use base qw/DBIO::Base/;
 
 use DBIO::Util qw(help_url);
 use Try::Tiny;

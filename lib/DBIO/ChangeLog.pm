@@ -4,7 +4,7 @@ package DBIO::ChangeLog;
 use strict;
 use warnings;
 
-use base 'DBIO';
+use base 'DBIO::Base';
 
 use JSON::PP ();
 use Scalar::Util 'blessed';

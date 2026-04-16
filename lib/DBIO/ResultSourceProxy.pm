@@ -4,7 +4,7 @@ package DBIO::ResultSourceProxy;
 use strict;
 use warnings;
 
-use base 'DBIO';
+use base 'DBIO::Base';
 
 use Scalar::Util 'blessed';
 use DBIO::Util 'quote_sub';
