@@ -253,6 +253,14 @@ sub _build_changelog_source {
 
   $source->set_primary_key(@{ $def->{primary_key} });
 
+  # Install the result_source_instance classdata on the dynamic class and
+  # point it at the source we just built. Without this, DBIO::Row and
+  # anything else asking the class for its source can't find it — table()
+  # is normally what sets this up, but we built the source manually.
+  $result_class->mk_classdata('result_source_instance')
+    unless $result_class->can('result_source_instance');
+  $result_class->result_source_instance($source);
+
   return $source;
 }
 
