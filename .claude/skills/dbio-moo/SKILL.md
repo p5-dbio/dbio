@@ -6,168 +6,115 @@ allowed-tools: Read, Grep, Glob
 model: sonnet
 ---
 
-DBIO::Moo bridges Moo and DBIO so that Moo attributes and DBIO columns coexist without conflict. Optional — Moo is listed as `suggests` in cpanfile.
+Bridge: Moo attrs + DBIO columns coexist. Optional (`suggests` in cpanfile).
 
-## What `use DBIO::Moo` Does
+## What `use DBIO::Moo` does
 
-1. Activates `use Moo` in the calling package
-2. Sets `DBIO::Core` as the base class via `extends`
-3. Installs `FOREIGNBUILDARGS` that filters constructor arguments — only DBIO-known keys (columns, relationships, `-` prefixed internals) are forwarded to `DBIO::Row::new`
+1. `use Moo` in caller
+2. `extends 'DBIO::Core'`
+3. Installs `FOREIGNBUILDARGS` — filters constructor args, only DBIO-known keys (columns, rels, `-` internals) forwarded to `DBIO::Row::new`
 
-Without FOREIGNBUILDARGS, `DBIO::Row::new` calls `store_column` for every key and dies on unknown columns (e.g. Moo attrs).
+Without filter: `DBIO::Row::new` calls `store_column` per key, dies on unknown columns (Moo attrs).
 
-## The Two Construction Paths
+## Two construction paths
 
-| Path | When | Moo `new()` runs? |
-|------|------|-------------------|
-| `new()` | `create()`, `new_result()` | **Yes** — Moo constructor runs, calls FOREIGNBUILDARGS, forwards filtered args to `DBIO::Row::new` |
-| `inflate_result()` | `find`, `search`, `all` — any DB fetch | **No** — blesses a hash directly, bypasses `new()` entirely |
+| Path | Trigger | Moo `new()` runs? |
+|---|---|---|
+| `new()` | `create()`, `new_result()` | yes — FOREIGNBUILDARGS filters, then `DBIO::Row::new` |
+| `inflate_result()` | `find`/`search`/`all` (any DB fetch) | NO — blesses hash, bypasses `new()` |
 
-## The Lazy Requirement
+## Lazy is mandatory
 
-Moo attributes with defaults **must** be `lazy => 1`. Non-lazy defaults are set during `new()`, which doesn't run for `inflate_result` rows.
+Moo attrs with defaults **must** be `lazy => 1`. Non-lazy defaults set in `new()`, missed by `inflate_result`.
 
 ```perl
-# WRONG — default is undef on DB-fetched rows
-has score => (is => 'rw', default => sub { 0 });
-
-# CORRECT — default computed on first access
-has score => (is => 'rw', lazy => 1, default => sub { 0 });
-
-# Also correct — is => 'lazy' is inherently lazy
-has display_name => (is => 'lazy');
-sub _build_display_name { 'Artist: ' . $_[0]->name }
+# WRONG — undef on DB-fetched rows
+has score => (is=>'rw', default=>sub{0});
+# CORRECT
+has score => (is=>'rw', lazy=>1, default=>sub{0});
+has display_name => (is=>'lazy');   # 'lazy' is inherently lazy
+sub _build_display_name { 'Artist: '.$_[0]->name }
 ```
 
-## Result Class — Plain (Vanilla columns)
+## Result class — Vanilla columns
 
 ```perl
 package MyApp::Schema::Result::Artist;
 use DBIO::Moo;
-
 __PACKAGE__->table('artist');
 __PACKAGE__->add_columns(
-  id   => { data_type => 'integer', is_auto_increment => 1 },
-  name => { data_type => 'varchar', size => 100 },
+  id   => { data_type=>'integer', is_auto_increment=>1 },
+  name => { data_type=>'varchar', size=>100 },
 );
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->has_many(cds => 'MyApp::Schema::Result::CD', 'artist_id');
-
-has display_name => (is => 'lazy');
-sub _build_display_name { 'Artist: ' . $_[0]->name }
-
-has score => (is => 'rw', lazy => 1, default => sub { 0 });
-
+has display_name => (is=>'lazy');
+sub _build_display_name { 'Artist: '.$_[0]->name }
 1;
 ```
 
-## Result Class — with Cake
-
-Load `DBIO::Moo` FIRST, then `DBIO::Cake` (Cake keywords need DBIO::Core in the inheritance chain):
+## With Cake — Moo FIRST, then Cake
 
 ```perl
-package MyApp::Schema::Result::Artist;
 use DBIO::Moo;
 use DBIO::Cake;
-
 table 'artist';
-
 col id   => integer auto_inc;
 col name => varchar(100);
-
 primary_key 'id';
-
 has_many cds => 'MyApp::Schema::Result::CD', 'artist_id';
-
-has display_name => (is => 'lazy');
-sub _build_display_name { 'Artist: ' . $_[0]->name }
-
-1;
+has display_name => (is=>'lazy');
 ```
 
-## Result Class — with Candy
+## With Candy
 
 ```perl
-package MyApp::Schema::Result::Artist;
 use DBIO::Moo;
 use DBIO::Candy;
-
 table 'artist';
-
-column id => {
-  data_type         => 'integer',
-  is_auto_increment => 1,
-};
-
-column name => {
-  data_type => 'varchar',
-  size      => 100,
-};
-
+column id   => { data_type=>'integer', is_auto_increment=>1 };
+column name => { data_type=>'varchar', size=>100 };
 primary_key 'id';
-
-has display_name => (is => 'lazy');
-sub _build_display_name { 'Artist: ' . $_[0]->name }
-
-1;
+has display_name => (is=>'lazy');
 ```
 
-## Schema Class with Moo
-
-Schema classes can also use Moo for schema-level attributes:
+## Schema class
 
 ```perl
 package MyApp::Schema;
-
 use Moo;
 extends 'DBIO::Schema';
-
-has verbose => (is => 'rw', lazy => 1, default => sub { 0 });
-
+has verbose => (is=>'rw', lazy=>1, default=>sub{0});
 __PACKAGE__->load_namespaces;
-
 1;
 ```
 
-## Custom ResultSet with Moo
+## Custom ResultSet
 
-FOREIGNBUILDARGS is a simple pass-through — `DBIO::ResultSet::new` takes positional args and doesn't reject unknown keys:
+`DBIO::ResultSet::new` takes positional args, doesn't reject unknown keys → trivial pass-through:
 
 ```perl
 package MyApp::Schema::ResultSet::Artist;
-
 use Moo;
 extends 'DBIO::ResultSet';
-
-# Pass constructor args through to DBIO::ResultSet::new unchanged
 sub FOREIGNBUILDARGS { my ($class, @args) = @_; return @args }
-
-has default_limit => (is => 'rw', lazy => 1, default => sub { 100 });
-
-sub active  { $_[0]->search({ active => 1 }) }
-sub by_name { $_[0]->search({ name => $_[1] }) }
-
+has default_limit => (is=>'rw', lazy=>1, default=>sub{100});
+sub active  { $_[0]->search({active=>1}) }
+sub by_name { $_[0]->search({name=>$_[1]}) }
 1;
 ```
 
-Set on the Result class:
-```perl
-__PACKAGE__->resultset_class('MyApp::Schema::ResultSet::Artist');
-```
+Wire up: `__PACKAGE__->resultset_class('MyApp::Schema::ResultSet::Artist');`
 
-## Unknown Keys Are Silently Dropped
+## Gotcha
 
-FOREIGNBUILDARGS filters out everything that isn't a column, relationship, or `-` prefixed key. It cannot distinguish a Moo attr from a typo — both are dropped before `DBIO::Row::new` sees them.
+FOREIGNBUILDARGS silently drops keys that aren't column/rel/`-prefix`. Cannot tell Moo attr from typo — both vanish before `DBIO::Row::new`.
 
-## Test Schemas
-
-Shared test schemas in `DBIO::Test::Schema::*`:
+## Test schemas
 
 | Schema | Style |
-|--------|-------|
-| `DBIO::Test::Schema::Moo` | Moo + Vanilla (add_columns) |
-| `DBIO::Test::Schema::MooCake` | Moo + Cake DDL |
+|---|---|
+| `DBIO::Test::Schema::Moo` | Moo + Vanilla |
+| `DBIO::Test::Schema::MooCake` | Moo + Cake |
 
-Each has Artist + CD, `has_many`/`belongs_to`, one custom ResultSet (Artist), one default (CD).
-
-Core tests (`dbio/t/moo.t`, `dbio/t/moo-cake.t`) use `DBIO::Test::Storage` (fake, no DB). Driver tests (`dbio-sqlite/t/moo-cake.t`) test the real DB round-trip.
+Each: Artist + CD, has_many/belongs_to, custom ResultSet (Artist), default (CD). Core tests use `DBIO::Test::Storage` (fake); driver tests do real DB round-trip.
