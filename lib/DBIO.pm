@@ -43,7 +43,9 @@ sub import {
 sub _apply_shortcut {
   my ($caller, $opt) = @_;
   if ($opt eq '-pg') {
-    eval "package $caller; use DBIO::PostgreSQL; 1"
+    eval "require DBIO::PostgreSQL::Result; 1"
+      or die "use DBIO -pg: cannot load DBIO::PostgreSQL::Result: $@";
+    eval { $caller->load_components('PostgreSQL::Result'); 1 }
       or die "use DBIO -pg: $@";
   }
   else {
