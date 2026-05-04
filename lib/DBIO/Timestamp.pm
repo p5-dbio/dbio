@@ -130,47 +130,67 @@ __END__
   __PACKAGE__->load_components(qw/Timestamp/);
   __PACKAGE__->table('article');
   __PACKAGE__->add_columns(
-    id    => { data_type => 'integer', is_auto_increment => 1 },
-    title => { data_type => 'varchar', size => 255 },
-  );
-  __PACKAGE__->cols_updated_created;
-  __PACKAGE__->set_primary_key('id');
-
-Or with explicit column definitions:
-
-  __PACKAGE__->add_columns(
+    id         => { data_type => 'integer',  is_auto_increment => 1 },
+    title      => { data_type => 'varchar',  size => 255 },
     created_at => { data_type => 'datetime', set_on_create => 1 },
     updated_at => { data_type => 'datetime', set_on_create => 1, set_on_update => 1 },
   );
+  __PACKAGE__->set_primary_key('id');
+
+Or use the helpers to declare both standard columns in one go:
+
+  __PACKAGE__->cols_updated_created;
 
 =head1 DESCRIPTION
 
-Automatically sets timestamp columns on insert and update. Columns with
-C<set_on_create> are populated when a new row is inserted. Columns with
-C<set_on_update> are refreshed on every update.
+Automatically populates timestamp columns on insert and update. Columns
+flagged with C<< set_on_create =E<gt> 1 >> are filled in when a new row
+is inserted; columns flagged with C<< set_on_update =E<gt> 1 >> are
+refreshed on every update.
 
-Explicitly provided values are respected (noclobber on create; update
-always refreshes).
+Explicit values are respected: create is no-clobber, update always
+refreshes.
+
+=head1 COLUMN FLAGS
+
+=over 4
+
+=item C<< set_on_create =E<gt> 1 >>
+
+The column receives a fresh timestamp on insert if no value was supplied.
+
+=item C<< set_on_update =E<gt> 1 >>
+
+The column is refreshed on every update.
+
+=back
 
 =head1 HELPER METHODS
 
 =over 4
 
-=item C<col_created($name)> -- adds a C<set_on_create> timestamp column (default: C<created_at>)
+=item C<col_created($name)>
 
-=item C<col_updated($name)> -- adds a C<set_on_create + set_on_update> timestamp column (default: C<updated_at>)
+Adds a C<set_on_create> timestamp column. Default name: C<created_at>.
 
-=item C<cols_updated_created> -- adds both in one call
+=item C<col_updated($name)>
+
+Adds a column with both C<set_on_create> and C<set_on_update>. Default
+name: C<updated_at>.
+
+=item C<cols_updated_created>
+
+Adds both standard columns in one call.
 
 =back
 
-These work in all three styles:
+=head1 OVERRIDABLE METHODS
 
-  # Vanilla
-  __PACKAGE__->cols_updated_created;
+=over 4
 
-  # Candy
-  cols_updated_created;
+=item C<get_timestamp>
 
-  # Cake
-  cols_updated_created;
+Returns a L<DateTime> object for the current time. Override in your
+Result class to customize, e.g. to set a specific timezone.
+
+=back

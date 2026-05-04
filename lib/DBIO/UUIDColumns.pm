@@ -115,15 +115,42 @@ __END__
 
 =head1 DESCRIPTION
 
-Automatically populates columns marked with C<uuid_on_create> with a
-freshly generated UUID at insert time. Existing values are respected --
+Automatically populates columns flagged with C<< uuid_on_create =E<gt> 1 >>
+with a freshly generated UUID on insert. Existing values are respected --
 only undefined columns receive a generated UUID.
 
-The generator backend is selected once per class via L</uuid_class>.
-By default the first installed backend among L<Data::UUID>, L<UUID>,
-and L<UUID::Random> is used. If none of these are installed, loading
-this component throws an exception.
+The generator backend is selected per class via L</uuid_class>. By
+default the first installed backend among L<Data::UUID>, L<UUID>, and
+L<UUID::Random> is used. Loading this component throws if none of these
+modules are available.
 
 Based on L<DBIx::Class::UUIDColumns> by Chia-liang Kao and Chris Laco.
+
+=head1 COLUMN FLAGS
+
+=over 4
+
+=item C<< uuid_on_create =E<gt> 1 >>
+
+The column receives a freshly generated UUID on insert if no value was
+supplied.
+
+=back
+
+=head1 OVERRIDABLE METHODS
+
+=over 4
+
+=item C<get_uuid>
+
+Returns one freshly generated UUID string from the configured backend.
+Override in your Result class to customize.
+
+=item C<uuid_class($class)>
+
+Class-level accessor for the generator backend. Pass a class name to
+switch backend (e.g. C<'Data::UUID'>).
+
+=back
 
 =cut

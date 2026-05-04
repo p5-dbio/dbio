@@ -480,11 +480,6 @@ sub _track_storage_value {
   );
 }
 
-=head1 EXTENDING
-
-Override the methods below if you use sparse (non-linear) or non-numeric
-position values, e.g. when working with materialized path columns.
-
 =method _position_from_value
 
   my $num_pos = $item->_position_from_value($pos_value);
@@ -701,6 +696,34 @@ Set on the position column. Specifies the placeholder value used while
 a row is mid-move, so unique constraints involving the position column
 are not violated. Defaults to C<0>; set to C<undef> if your positions
 start at 0.
+
+=back
+
+=head1 OVERRIDABLE METHODS
+
+Override these in your Result class if you use sparse (non-linear) or
+non-numeric position values, e.g. when working with materialized path
+columns.
+
+=over 4
+
+=item C<_position_from_value($value)>
+
+Maps a stored position value to an absolute numeric position. Default:
+identity.
+
+=item C<_position_value($position)>
+
+Inverse of the above. Default: identity.
+
+=item C<_next_position_value($value)>
+
+Returns the next position value after C<$value>. Default: C<$value + 1>.
+
+=item C<_initial_position_value>
+
+Class data with the position value used for the first row of a group.
+Defaults to C<1>.
 
 =back
 
