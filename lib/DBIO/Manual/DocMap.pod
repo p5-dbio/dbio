@@ -10,6 +10,8 @@
 
 =item L<DBIO::Manual::Heritage> - Everything that changed from DBIx::Class to DBIO.
 
+=item L<DBIO::Manual::Migration> - Step-by-step migration of an existing DBIx::Class codebase.
+
 =item L<DBIO::Manual::Intro> - More detailed introduction to setting up and using DBIO.
 
 =item L<DBIO::Manual::SQLHackers> - How to use DBIO if you know SQL (external, available on CPAN)

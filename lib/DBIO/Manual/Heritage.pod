@@ -15,11 +15,10 @@ B<DBIO> stands for I<DBI Objects>. The namespace C<DBIO::> replaces
 C<DBIx::Class::> throughout. Every module, every test, every tool has been
 renamed accordingly.
 
-A runtime compatibility shim — L<DBIO::Compat::DBIxClass> — maps
-C<DBIx::Class::*> package names to C<DBIO::*> via an C<@INC> hook and
-patches C<isa()> so that C<< $obj->isa('DBIx::Class') >> keeps returning
-true. This shim is opt-in; load it explicitly when you need it for legacy
-code.
+DBIO is a clean break — there is no runtime C<DBIx::Class> compatibility
+shim. Existing code is migrated by mechanical rename (C<DBIx::Class::*>
+to C<DBIO::*>) plus the targeted API updates listed in
+L<DBIO::Manual::Migration>.
 
 =head1 FUNDAMENTAL ARCHITECTURE CHANGES
 
@@ -526,33 +525,6 @@ C<DBIO_TEST_*>:
   DBIO_TEST_MYSQL_DSN      MySQL/MariaDB DSN
   DBIO_TEST_SQLITE_DSN     SQLite DSN (rarely needed, usually in-memory)
 
-=head1 COMPATIBILITY LAYER
-
-=head2 DBIO::Compat::DBIxClass
-
-Load this module to make legacy C<DBIx::Class> code run on DBIO without
-source changes:
-
-  use DBIO::Compat::DBIxClass;
-
-Mechanisms:
-
-=over 4
-
-=item An C<@INC> hook redirects C<use DBIx::Class::*> to the corresponding
-C<DBIO::*> module at load time.
-
-=item C<DBIO::Base::isa()> is patched so that C<< $obj->isa('DBIx::Class') >>
-and C<< $obj->isa('DBIx::Class::Row') >> etc. return true for DBIO objects.
-
-=item Already-loaded C<DBIx::Class::*> packages get C<DBIO::*> aliases
-installed into the stash.
-
-=back
-
-The compat layer does not emulate removed features (CDBICompat, deprecated
-limit_dialect, SQL::Abstract::Classic quirks).
-
 =head1 MIGRATION QUICK-REFERENCE
 
   DBIx::Class concept               DBIO equivalent
@@ -582,7 +554,7 @@ limit_dialect, SQL::Abstract::Classic quirks).
 
 =item L<DBIO::Manual::DocMap> — full documentation map
 
-=item L<DBIO::Compat::DBIxClass> — legacy compatibility layer
+=item L<DBIO::Manual::Migration> — step-by-step DBIx::Class to DBIO conversion
 
 =item L<DBIO::Base> — meta-infrastructure base class
 

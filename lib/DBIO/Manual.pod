@@ -45,8 +45,9 @@ Lists of modules by task to help you find the correct document.
 
 Got trouble? Let us shoot it for you.
 
-If you're using the CDBI Compat layer, we suggest reading the L<Class::DBI>
-documentation. It should behave the same way.
+=head2 L<DBIO::Manual::Migration>
+
+Step-by-step guide for migrating an existing L<DBIx::Class> codebase to DBIO.
 
 =head2 L<DBIO::Manual::Component>
 
