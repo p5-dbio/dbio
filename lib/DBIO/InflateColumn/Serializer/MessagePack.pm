@@ -35,7 +35,30 @@ The data structures you assign to "data_column" will be saved in the database
 in MessagePack format. MessagePack is a compact binary serialization format,
 ideal for columns where space efficiency matters.
 
-Requires L<Data::MessagePack>.
+=head1 DESCRIPTION
+
+MessagePack backend for L<DBIO::InflateColumn::Serializer>. Loaded
+automatically when a column declares
+C<< serializer_class => 'MessagePack' >>.
+
+=head1 COLUMN INFO
+
+=over 4
+
+=item C<< serializer_class => 'MessagePack' >>
+
+Selects this backend.
+
+=item C<< size => $n >>
+
+Optional. Serialised payload is checked against C<size> on deflate;
+over-long payloads throw.
+
+=back
+
+=head1 DEPENDENCIES
+
+L<Data::MessagePack>. Not a hard dependency of DBIO; install separately.
 
 =method get_freezer
 

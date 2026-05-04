@@ -34,6 +34,31 @@ And you can recover your data structure with:
 
 The data structures you assign to C<data_column> are saved in YAML format.
 
+=head1 DESCRIPTION
+
+YAML backend for L<DBIO::InflateColumn::Serializer>. Loaded
+automatically when a column declares
+C<< serializer_class => 'YAML' >>.
+
+=head1 COLUMN INFO
+
+=over 4
+
+=item C<< serializer_class => 'YAML' >>
+
+Selects this backend.
+
+=item C<< size => $n >>
+
+Optional. Serialised payload is checked against C<size> on deflate;
+over-long payloads throw.
+
+=back
+
+=head1 DEPENDENCIES
+
+L<YAML>. Not a hard dependency of DBIO; install separately.
+
 =method get_freezer
 
 Called by L<DBIO::InflateColumn::Serializer> to get the routine that serializes

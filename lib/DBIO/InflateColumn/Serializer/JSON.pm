@@ -38,6 +38,35 @@ The data structures you assign to "data_column" will be saved in the database in
 Any arguments included in C<serializer_options> are passed to the
 L<JSON::MaybeXS> constructor used for serialization and deserialization.
 
+=head1 DESCRIPTION
+
+JSON backend for L<DBIO::InflateColumn::Serializer>. Loaded
+automatically when a column declares
+C<< serializer_class => 'JSON' >>.
+
+=head1 COLUMN INFO
+
+=over 4
+
+=item C<< serializer_class => 'JSON' >>
+
+Selects this backend.
+
+=item C<< serializer_options => \%opts >>
+
+Passed verbatim to L<JSON::MaybeXS>->new.
+
+=item C<< size => $n >>
+
+Optional. If set, the serialised payload is checked against C<size>
+on deflate; over-long payloads throw.
+
+=back
+
+=head1 DEPENDENCIES
+
+L<JSON::MaybeXS>. Not a hard dependency of DBIO; install separately.
+
 =method get_freezer
 
 Called by L<DBIO::InflateColumn::Serializer> to get the routine that serializes

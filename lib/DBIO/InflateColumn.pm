@@ -228,6 +228,15 @@ sub store_inflated_column {
       C<core> L<DBIO> components; generally there is no need to
       load it directly
 
+=item L<DBIO::InflateColumn::DateTime> - Convenience component that
+      inflates date/datetime/timestamp columns into L<DateTime> objects.
+
+=item L<DBIO::InflateColumn::Serializer> - Inflates serialised data
+      structures (JSON, YAML, MessagePack) stored in a column.
+
+=item L<DBIO::FilterColumn> - Sibling component for filtering plain
+      scalar values (which C<InflateColumn> deliberately passes through).
+
 =back
 
 =cut

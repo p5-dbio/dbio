@@ -248,6 +248,38 @@ sub _pre_deflate_datetime {
 1;
 __END__
 
+=head1 COLUMN INFO
+
+=over 4
+
+=item C<< data_type => 'datetime' | 'timestamp' | 'date' >>
+
+Triggers automatic L<DateTime> inflation/deflation. Variants like
+C<timestamp with time zone>, C<timestamptz>, C<timestamp without time zone>
+and C<smalldatetime> are recognised and routed to the appropriate
+parse/format method on the storage class.
+
+=item C<< inflate_datetime => 1 >> / C<< inflate_date => 1 >>
+
+Forces inflation regardless of C<data_type>. Useful when storing dates
+in C<varchar> columns. Set to C<0> to opt out for a column whose
+C<data_type> would otherwise trigger inflation.
+
+=item C<< timezone => $tz >>, C<< locale => $loc >>
+
+Set on the inflated L<DateTime> object.
+
+=item C<< floating_tz_ok => 1 >>
+
+Suppress the warning when assigning a floating-timezone L<DateTime> to
+a column with a fixed C<timezone>.
+
+=item C<< datetime_undef_if_invalid => 1 >>
+
+Return C<undef> on parse failure instead of throwing.
+
+=back
+
 =head1 USAGE NOTES
 
 If you have a datetime column with an associated C<timezone>, and subsequently

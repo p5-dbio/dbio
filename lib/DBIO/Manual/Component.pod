@@ -106,16 +106,18 @@ for automatic timestamp maintenance.
 
 L<DBIO::EncodedColumn> -- One-way encode columns such as passwords.
 
-L<DBIO::UUIDColumns> -- Implicit UUID columns.
+L<DBIO::UUIDColumns> -- C<uuid_on_create> column flag for automatic
+UUID generation on insert.
 
-L<DBIO::Ordered> -- Maintain a position column over an ordered list of
-rows.
+L<DBIO::Ordered> -- C<position> / C<grouping> column flags to maintain
+a position column over an ordered list of rows.
 
 L<DBIO::HashAccessor> -- Generate get/set/exists/delete/push helpers for
 serialised hash columns.
 
 L<DBIO::ChangeLog> -- Record per-column change history into companion
-ChangeLog tables.
+ChangeLog tables. Per-column C<< changelog => 0 >> flag to exclude
+sensitive fields.
 
 =head1 SEE ALSO
 

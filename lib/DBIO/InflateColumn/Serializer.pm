@@ -90,18 +90,30 @@ The following serializer backends are included:
 The backend modules are loaded on demand. You must install the required
 serialization module separately -- they are not hard dependencies of DBIO.
 
-=head1 USAGE
+=head1 COLUMN INFO
 
-1. Install the serialization module you want to use (e.g. L<JSON::MaybeXS> or L<YAML>)
+=over 4
 
-2. Add C<InflateColumn::Serializer> to C<load_components> in your table class
+=item C<< serializer_class => $name >>
 
-3. Add C<serializer_class =E<gt> SERIALIZER> to the column definition you want
+Selects the backend, e.g. C<JSON>, C<YAML>, C<MessagePack>. The
+matching subclass under C<DBIO::InflateColumn::Serializer::> is loaded
+on demand.
+
+=back
+
+=head1 USAGE NOTES
+
+1. Install the serialization module you want to use (e.g. L<JSON::MaybeXS> or L<YAML>).
+
+2. Add C<InflateColumn::Serializer> to C<load_components> in your Result class.
+
+3. Add C<< serializer_class => SERIALIZER >> to the column definition you want
    to serialize/deserialize.
 
-=head1 NOTES
-
-As stated in the DBIO FAQ: "Be careful not to overuse this capability, however. If you find yourself depending more and more on some data within the inflated column, then it may be time to factor that data out."
+Be careful not to overuse this capability. If you find yourself
+depending more and more on data inside an inflated column, factor it
+out into a real schema.
 
 =head1 SEE ALSO
 
