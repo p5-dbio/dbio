@@ -17,6 +17,7 @@ __PACKAGE__->add_columns(
     },
     position => {
         data_type => 'integer',
+        position  => 1,
     },
     group_id => {
         data_type => 'integer',
@@ -42,7 +43,6 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key('employee_id');
-__PACKAGE__->position_column('position');
 
 # Do not add unique constraints here - different groups are used throughout
 # the ordered tests
