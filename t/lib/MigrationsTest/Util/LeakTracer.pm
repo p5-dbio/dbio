@@ -5,12 +5,12 @@ use strict;
 
 use Carp;
 use Scalar::Util qw(isweak weaken blessed reftype);
-use DBIx::Class::_Util qw(refcount hrefaddr refdesc);
-use DBIx::Class::Optional::Dependencies;
+use DBIO::_Util qw(refcount hrefaddr refdesc);
+use DBIO::Optional::Dependencies;
 use Data::Dumper::Concise;
 use MigrationsTest::Util qw( stacktrace visit_namespaces );
 use constant {
-  CV_TRACING => !MigrationsTest::RunMode->is_plain && DBIx::Class::Optional::Dependencies->req_ok_for ('test_leaks_heavy'),
+  CV_TRACING => !MigrationsTest::RunMode->is_plain && DBIO::Optional::Dependencies->req_ok_for ('test_leaks_heavy'),
   SKIP_SCALAR_REFS => ( "$]" < 5.008004 ),
 };
 

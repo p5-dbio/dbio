@@ -11,7 +11,7 @@ BEGIN {
       last if $frame[1] !~ m|^t/lib/MigrationsTest|;
     }
 
-    die __PACKAGE__ . " must be loaded before DBIx::Class (or modules using DBIx::Class) at $frame[1] line $frame[2]\n";
+    die __PACKAGE__ . " must be loaded before DBIO (or modules using DBIO) at $frame[1] line $frame[2]\n";
   }
 
   if ( $ENV{DBICTEST_VERSION_WARNS_INDISCRIMINATELY} ) {

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 BEGIN {
-  my @subclassing = qw(MigrationsTest::Base DBIx::Class::ResultSet);
+  my @subclassing = qw(MigrationsTest::Base DBIO::ResultSet);
 
   if( ! $ENV{DBICTEST_MOOIFIED_RESULTSETS} ) {
     # plain old vanilla base.pm
@@ -46,7 +46,7 @@ EOM
 }
 
 sub all_hri {
-  return [ shift->search ({}, { result_class => 'DBIx::Class::ResultClass::HashRefInflator' })->all ];
+  return [ shift->search ({}, { result_class => 'DBIO::ResultClass::HashRefInflator' })->all ];
 }
 
 1;

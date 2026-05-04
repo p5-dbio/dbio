@@ -27,7 +27,7 @@ use Config;
 use Carp 'confess';
 use Fcntl ':flock';
 use Scalar::Util qw(blessed refaddr);
-use DBIx::Class::_Util;
+use DBIO::_Util;
 
 use base 'Exporter';
 our @EXPORT_OK = qw(
@@ -118,7 +118,7 @@ sub local_umask {
 {
   package MigrationsTest::Util::UmaskGuard;
   sub DESTROY {
-    &DBIx::Class::_Util::detected_reinvoked_destructor;
+    &DBIO::_Util::detected_reinvoked_destructor;
 
     local ($@, $!);
     eval { defined (umask ${$_[0]}) or die };
@@ -157,7 +157,7 @@ sub check_customcond_args ($) {
     if $args->{rel_name} ne $args->{foreign_relname};
 
   confess "Custom condition argument 'self_resultsource' must be a rsrc instance"
-    unless defined blessed $args->{self_resultsource} and $args->{self_resultsource}->isa('DBIx::Class::ResultSource');
+    unless defined blessed $args->{self_resultsource} and $args->{self_resultsource}->isa('DBIO::ResultSource');
 
   confess "Passed resultsource has no record of the supplied rel_name - likely wrong \$rsrc"
     unless ref $args->{self_resultsource}->relationship_info($args->{rel_name});
@@ -168,7 +168,7 @@ sub check_customcond_args ($) {
     $struct_cnt++;
     for (qw(self_result_object self_rowobj)) {
       confess "Custom condition argument '$_' must be a result instance"
-        unless defined blessed $args->{$_} and $args->{$_}->isa('DBIx::Class::Row');
+        unless defined blessed $args->{$_} and $args->{$_}->isa('DBIO::Row');
     }
 
     confess "Current and legacy self_result_object arguments do not match"

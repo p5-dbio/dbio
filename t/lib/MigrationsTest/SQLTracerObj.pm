@@ -4,7 +4,7 @@ package # moar hide
 use strict;
 use warnings;
 
-use base 'DBIx::Class::Storage::Statistics';
+use base 'DBIO::Storage::Statistics';
 
 sub query_start { push @{$_[0]{sqlbinds}}, [ ($_[1] =~ /^\s*(\S+)/)[0], [ $_[1], @{ $_[2]||[] } ] ] }
 
