@@ -3,125 +3,122 @@
 
 =head1 WHAT IS A COMPONENT
 
-A component is a module that can be added in to your DBIO
-classes to provide extra functionality. A good example is
-L<DBIO::InflateColumn> which automatically inflates/deflates column
-values to and from Perl objects.
+A component is a module that can be added to your DBIO classes to provide
+extra functionality. A good example is L<DBIO::InflateColumn>, which
+automatically inflates and deflates column values to and from Perl objects.
+
+DBIO distinguishes between B<core infrastructure> -- the classes every
+result class transitively inherits from, whether you ask for them or not --
+and B<optional components> that you opt into via C<load_components>.
 
 =head1 USING
 
-Components are loaded using the load_components() method within your
-DBIO classes.
+Optional components are loaded with C<load_components()> on your result
+class:
 
-  package My::Thing;
+  package My::Schema::Result::Thing;
   use base qw( DBIO::Core );
-  __PACKAGE__->load_components(qw/InflateColumn::DateTime TimeStamp/);
+  __PACKAGE__->load_components(qw/InflateColumn::DateTime Timestamp/);
 
-Generally you do not want to specify the full package name
-of a component, instead take off the DBIO:: part of
-it and just include the rest.  If you do want to load a
-component outside of the normal namespace you can do so
-by prepending the component name with a +.
+You usually omit the C<DBIO::> prefix; C<load_components> looks under
+C<DBIO::> by default. To load a component outside that namespace, prefix
+the name with C<+>:
 
   __PACKAGE__->load_components(qw/ +My::Component /);
 
-Once a component is loaded all of its methods, or otherwise,
-that it provides will be available in your class.
-
-The order in which is you load the components may be very
-important, depending on the component. If you are not sure,
-then read the docs for the components you are using and see
-if they mention anything about the order in which you should
-load them.
+The order in which components are loaded matters -- it determines the
+order they appear in the C3 inheritance chain. If a component overrides
+a method also overridden by another component, the one loaded first wins.
+When in doubt, read the docs of the components you are using.
 
 =head1 CREATING COMPONENTS
 
-Making your own component is very easy.
+A component is a class inheriting from L<DBIO::Base>:
 
   package DBIO::MyComp;
   use base qw(DBIO::Base);
-  # Create methods, accessors, load other components, etc.
+  # Add methods, accessors, load other components, etc.
   1;
 
-When a component is loaded it is included in the calling
-class' inheritance chain using L<Class::C3>.  As well as
-providing custom utility methods, a component may also
-override methods provided by other core components, like
-L<DBIO::Row> and others.  For example, you
-could override the insert and delete methods.
+When loaded, the component is injected into the result class' inheritance
+chain via L<Class::C3>. A component can provide new methods, override
+methods provided by other components, or hook into lifecycle methods on
+L<DBIO::Row>:
 
   sub insert {
     my $self = shift;
-    # Do stuff with $self, like set default values.
-    return $self->next::method( @_ );
+    # Do stuff with $self before insert.
+    return $self->next::method(@_);
   }
 
   sub delete {
     my $self = shift;
-    # Do stuff with $self.
-    return $self->next::method( @_ );
+    # Do stuff with $self before delete.
+    return $self->next::method(@_);
   }
 
-Now, the order that a component is loaded is very important.  Components
-that are loaded first are the first ones in the inheritance stack.  So, if
-you override insert() but the DBIO::Row component is loaded first
-then your insert() will never be called, since the DBIO::Row insert()
-will be called first.  If you are unsure as to why a given method is not
-being called try printing out the current linearized MRO.
+Components loaded earlier sit closer to the front of the C<@ISA> chain.
+If you override C<insert()> but L<DBIO::Row> appears in the chain before
+your component, your override is shadowed. To inspect the actual
+resolution order:
 
-  print join ', ' => mro::get_linear_isa('YourClass::Name');
+  print join ', ', mro::get_linear_isa('YourClass::Name');
 
-=head1 EXISTING COMPONENTS
+=head1 CORE INFRASTRUCTURE
 
-=head2 Extra
+These classes are the substrate for every result class. They are loaded
+implicitly by L<DBIO::Core> and you do not list them in
+C<load_components>.
 
-These components provide extra functionality beyond
-basic functionality that you can't live without.
+L<DBIO::Core> -- The standard component bundle that user-facing result
+classes inherit from. Loads the rest of the core infrastructure.
 
-L<DBIO::FormTools> - Build forms with multiple interconnected objects.
+L<DBIO::Row> -- Per-row state, accessors, C<insert>/C<update>/C<delete>,
+the lifecycle hook surface every other component cooperates with.
 
-L<DBIO::HTMLWidget> - Like FromForm but with DBIO and HTML::Widget.
+L<DBIO::PK> -- Primary key handling.
 
-L<DBIO::Ordered> - Modify the position of objects in an ordered list.
+L<DBIO::ResultSourceProxy::Table> -- Provides C<__PACKAGE__-E<gt>table(...)>
+and proxies result-source methods onto the result class.
 
-L<DBIO::QueriesTime> - Display the amount of time it takes to run queries.
+L<DBIO::Relationship> -- Inter-table relationships
+(C<belongs_to>, C<has_many>, C<might_have>, C<many_to_many>).
 
-L<DBIO::EncodedColumn> - One-way encode selected columns such as passwords.
+L<DBIO::InflateColumn> -- Per-column inflate/deflate hook used by both
+core and optional components.
 
-L<DBIO::RandomStringColumns> - Declare virtual columns that return random strings.
+=head1 BUILT-IN OPTIONAL COMPONENTS
 
-L<DBIO::UUIDColumns> - Implicit UUID columns.
+These ship in the DBIO core distribution and are loaded explicitly via
+C<load_components>.
 
-L<DBIO::WebForm> - CRUD methods.
+L<DBIO::InflateColumn::DateTime> -- Inflate date/time columns to
+L<DateTime> objects.
 
-=head2 Experimental
+L<DBIO::InflateColumn::Serializer> -- Serialise complex Perl structures
+into a single column (JSON, Storable, YAML).
 
-These components are under development, their interfaces may
-change, they may not work, etc.  So, use them if you want, but
-be warned.
+L<DBIO::FilterColumn> -- Bidirectional filter callbacks between in-memory
+and storage representations.
 
-L<DBIO::Validation> - Validate all data before submitting to your database.
+L<DBIO::Timestamp> -- C<set_on_create> / C<set_on_update> column flags
+for automatic timestamp maintenance.
 
-=head2 Core
+L<DBIO::EncodedColumn> -- One-way encode columns such as passwords.
 
-These are the components that all, or nearly all, people will use
-without even knowing it.  These components provide most of
-DBIO' functionality.
+L<DBIO::UUIDColumns> -- Implicit UUID columns.
 
-L<DBIO::Core> - Loads various components that "most people" would want.
+L<DBIO::Ordered> -- Maintain a position column over an ordered list of
+rows.
 
-L<DBIO::AccessorGroup> - Lets you build groups of accessors.
+L<DBIO::HashAccessor> -- Generate get/set/exists/delete/push helpers for
+serialised hash columns.
 
-L<DBIO::InflateColumn> - Automatically create objects from column data.
-
-L<DBIO::PK> - This class contains methods for handling primary keys and methods depending on them.
-
-L<DBIO::Relationship> - Inter-table relationships.
-
-L<DBIO::ResultSourceProxy::Table> - Provides a classdata table object and method proxies.
-
-L<DBIO::Row> - Basic row methods.
+L<DBIO::ChangeLog> -- Record per-column change history into companion
+ChangeLog tables.
 
 =head1 SEE ALSO
 
 L<DBIO::Manual::Cookbook>
+
+=cut

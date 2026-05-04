@@ -35,7 +35,7 @@ class uses as its root:
 
 =item L<DBIO::Componentised> — the C<load_components()> machinery
 
-=item L<DBIO::AccessorGroup> — C<mk_group_accessors()>
+=item L<Class::Accessor::Grouped> — C<mk_group_accessors()>
 
 =item Perl subroutine attributes via C<MODIFY_CODE_ATTRIBUTES>
 

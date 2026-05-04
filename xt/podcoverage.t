@@ -131,9 +131,7 @@ my $exceptions = {
     },
 
     'DBIO::Optional::Dependencies'           => { skip => 1 },
-    'DBIO::ClassResolver::PassThrough'       => { skip => 1 },
     'DBIO::Componentised'                    => { skip => 1 },
-    'DBIO::AccessorGroup'                    => { skip => 1 },
     'DBIO::Relationship::*'                  => { skip => 1 },
     'DBIO::ResultSourceProxy'                => { skip => 1 },
     'DBIO::ResultSource::*'                  => { skip => 1 },

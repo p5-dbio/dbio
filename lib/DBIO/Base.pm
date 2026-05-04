@@ -9,9 +9,34 @@ use mro 'c3';
 
 use DBIO::Optional::Dependencies;
 
-use base qw/DBIO::Componentised DBIO::AccessorGroup/;
+use base qw/DBIO::Componentised Class::Accessor::Grouped/;
+use Scalar::Util ();
 use DBIO::StartupCheck;
 use DBIO::Exception;
+
+my $successfully_loaded_components;
+
+sub get_component_class {
+  my $class = $_[0]->get_inherited($_[1]);
+
+  return $class if Scalar::Util::blessed($class);
+
+  if (defined $class and ! $successfully_loaded_components->{$class} ) {
+    $_[0]->ensure_class_loaded($class);
+
+    no strict 'refs';
+    $successfully_loaded_components->{$class}
+      = ${"${class}::__LOADED__BY__DBIO__CAG__COMPONENT_CLASS__"}
+        = do { \(my $anon = 'loaded') };
+    Scalar::Util::weaken($successfully_loaded_components->{$class});
+  }
+
+  $class;
+}
+
+sub set_component_class {
+  shift->set_inherited(@_);
+}
 
 __PACKAGE__->mk_group_accessors(inherited => '_skip_namespace_frames');
 __PACKAGE__->_skip_namespace_frames('^DBIO|^SQL::Abstract|^Try::Tiny|^Class::Accessor::Grouped|^Context::Preserve');
@@ -62,7 +87,7 @@ class needs:
 
 =item * L<DBIO::Componentised> for C<load_components>
 
-=item * L<DBIO::AccessorGroup> for C<mk_group_accessors>
+=item * L<Class::Accessor::Grouped> for C<mk_group_accessors>
 
 =item * C<mk_classdata> / C<mk_classaccessor> shortcuts
 

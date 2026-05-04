@@ -3,17 +3,21 @@ package DBIO::HashAccessor;
 
 use strict;
 use warnings;
-use Package::Stash;
 
 use parent 'DBIO::Row';
+
+sub _install {
+  my ($class, $name, $code) = @_;
+  no strict 'refs';
+  *{"${class}::${name}"} = $code;
+}
 
 sub add_hash_accessor {
   my ( $class, $accessor, $hash ) = @_;
   die 'require accessor and hash name' unless defined $accessor and defined $hash;
   die 'accessor can\'t be named like hash' if $accessor eq $hash;
-  my $st = Package::Stash->new($class);
 
-  $st->add_symbol('&'.$accessor,sub {
+  $class->_install($accessor, sub {
     my ( $self, @args ) = @_;
     die((ref $self).' does not support '.$hash) unless $self->can($hash);
     my %h = %{$self->$hash || {}};
@@ -28,7 +32,7 @@ sub add_hash_accessor {
     }
   });
 
-  $st->add_symbol('&'.$accessor.'_hash',sub {
+  $class->_install($accessor.'_hash', sub {
     my ( $self, $key, @args ) = @_;
     die((ref $self).' does not support '.$hash) unless $self->can($hash);
     my %h = %{$self->$hash || {}};
@@ -45,7 +49,7 @@ sub add_hash_accessor {
     }
   });
 
-  $st->add_symbol('&'.$accessor.'_hash_delete',sub {
+  $class->_install($accessor.'_hash_delete', sub {
     my ( $self, $key, $hash_key ) = @_;
     die((ref $self).' does not support '.$hash) unless $self->can($hash);
     my %h = %{$self->$hash || {}};
@@ -59,7 +63,7 @@ sub add_hash_accessor {
     }
   });
 
-  $st->add_symbol('&'.$accessor.'_push',sub {
+  $class->_install($accessor.'_push', sub {
     my ( $self, $key, @elements ) = @_;
     die((ref $self).' does not support '.$hash) unless $self->can($hash);
     die $accessor.'_push function requires 1 arg' unless defined $key;
@@ -71,7 +75,7 @@ sub add_hash_accessor {
     return @elements;
   });
 
-  $st->add_symbol('&'.$accessor.'_shift',sub {
+  $class->_install($accessor.'_shift', sub {
     my ( $self, $key ) = @_;
     die((ref $self).' does not support '.$hash) unless $self->can($hash);
     die $accessor.'_shift function requires 1 arg' unless defined $key;
@@ -84,7 +88,7 @@ sub add_hash_accessor {
     return $return;
   });
 
-  $st->add_symbol('&'.$accessor.'_in',sub {
+  $class->_install($accessor.'_in', sub {
     my ( $self, $key, $val ) = @_;
     die((ref $self).' does not support '.$hash) unless $self->can($hash);
     die $accessor.'_in function requires 2 args' unless defined $val && defined $key;
@@ -96,7 +100,7 @@ sub add_hash_accessor {
     return 0;
   });
 
-  $st->add_symbol('&'.$accessor.'_in_delete',sub {
+  $class->_install($accessor.'_in_delete', sub {
     my ( $self, $key, $val ) = @_;
     die((ref $self).' does not support '.$hash) unless $self->can($hash);
     die $accessor.'_in_delete function requires 2 args' unless defined $val && defined $key;
@@ -111,7 +115,7 @@ sub add_hash_accessor {
     return;
   });
 
-  $st->add_symbol('&'.$accessor.'_delete',sub {
+  $class->_install($accessor.'_delete', sub {
     my ( $self, $key ) = @_;
     die((ref $self).' does not support '.$hash) unless $self->can($hash);
     die $accessor.'_delete function requires 1 arg' unless defined $key;
@@ -121,7 +125,7 @@ sub add_hash_accessor {
     return $return;
   });
 
-  $st->add_symbol('&'.$accessor.'_exists',sub {
+  $class->_install($accessor.'_exists', sub {
     my ( $self, $key ) = @_;
     die((ref $self).' does not support '.$hash) unless $self->can($hash);
     die $accessor.'_exists function requires 1 arg' unless defined $key;

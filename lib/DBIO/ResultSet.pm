@@ -5291,8 +5291,8 @@ artificially advancing and finishing the resulting L</cursor>.
 
 This is the recommended way of performing resultset limiting when no sane RDBMS
 implementation is available (e.g.
-L<Sybase ASE|DBIO::Sybase::Storage::ASE> using the
-L<Generic Sub Query|DBIO::SQLMaker::LimitDialects/GenericSubQ> hack)
+L<Sybase ASE|DBIO::Sybase::Storage::ASE> using the Generic Sub Query
+hack)
 
 =head2 group_by
 

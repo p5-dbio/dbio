@@ -31,7 +31,6 @@ is_deeply( \@DBIO::Test::_InjectBaseTest::ISA,
     'inject_base filters duplicates'
 );
 
-use_ok('DBIO::AccessorGroup');
 use_ok('DBIO::Componentised');
 
 done_testing;

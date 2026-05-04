@@ -247,7 +247,7 @@ any of your aliases using either of these:
   # Define accessor manually:
   sub name_length { shift->get_column('name_length'); }
 
-  # Or use DBIO::AccessorGroup:
+  # Or use mk_group_accessors:
   __PACKAGE__->mk_group_accessors('column' => 'name_length');
 
 See also L</Using SQL functions on the left hand side of a comparison>.
@@ -447,7 +447,7 @@ See also L<SQL::Abstract/Literal SQL with placeholders and bind values
 =head2 Software Limits
 
 When your RDBMS does not have a working SQL limit mechanism (e.g. Sybase ASE)
-and L<GenericSubQ|DBIO::SQLMaker::LimitDialects/GenericSubQ> is either
+and the GenericSubQ hack is either
 too slow or does not work at all, you can try the
 L<software_limit|DBIO::ResultSet/software_limit>
 L<DBIO::ResultSet> attribute, which skips over records to simulate limits

@@ -9,8 +9,24 @@ use namespace::clean;
 
 =method filter_column
 
-Registers filter callbacks for a column, enabling conversion between
-storage and in-memory representations.
+ __PACKAGE__->filter_column( colname => {
+     filter_from_storage => 'method'|\&coderef,
+     filter_to_storage   => 'method'|\&coderef,
+ })
+
+This is the method that you need to call to set up a filtered column. It takes
+exactly two arguments; the first being the column name the second being a hash
+reference with C<filter_from_storage> and C<filter_to_storage> set to either
+a method name or a code reference. In either case the filter is invoked as:
+
+  $result->$filter_specification ($value_to_filter)
+
+with C<$filter_specification> being chosen depending on whether the
+C<$value_to_filter> is being retrieved from or written to permanent
+storage.
+
+If a specific directional filter is not specified, the original value will be
+passed to/from storage unfiltered.
 
 =cut
 
@@ -69,8 +85,9 @@ sub _column_to_storage {
 
 =method get_filtered_column
 
-Returns the in-memory filtered value for a column, computing and caching it
-from storage value when needed.
+ $obj->get_filtered_column('colname')
+
+Returns the filtered value of the column.
 
 =cut
 
@@ -151,8 +168,9 @@ sub has_column_loaded {
 
 =method set_filtered_column
 
-Sets the in-memory filtered value for a column and marks the row dirty
-according to storage state.
+ $obj->set_filtered_column(colname => 'new_value')
+
+Sets the filtered value of the column.
 
 =cut
 
@@ -245,41 +263,6 @@ This component is meant to be a more powerful, but less DWIM-y,
 L<DBIO::InflateColumn>.  One of the major issues with said component is
 that it B<only> works with references.  Generally speaking anything that can
 be done with L<DBIO::InflateColumn> can be done with this component.
-
-=head1 METHODS
-
-=head2 filter_column
-
- __PACKAGE__->filter_column( colname => {
-     filter_from_storage => 'method'|\&coderef,
-     filter_to_storage   => 'method'|\&coderef,
- })
-
-This is the method that you need to call to set up a filtered column. It takes
-exactly two arguments; the first being the column name the second being a hash
-reference with C<filter_from_storage> and C<filter_to_storage> set to either
-a method name or a code reference. In either case the filter is invoked as:
-
-  $result->$filter_specification ($value_to_filter)
-
-with C<$filter_specification> being chosen depending on whether the
-C<$value_to_filter> is being retrieved from or written to permanent
-storage.
-
-If a specific directional filter is not specified, the original value will be
-passed to/from storage unfiltered.
-
-=head2 get_filtered_column
-
- $obj->get_filtered_column('colname')
-
-Returns the filtered value of the column
-
-=head2 set_filtered_column
-
- $obj->set_filtered_column(colname => 'new_value')
-
-Sets the filtered value of the column
 
 =head1 EXAMPLE OF USE
 

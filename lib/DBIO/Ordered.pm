@@ -92,9 +92,7 @@ All of the move_* methods automatically update the rows involved in
 the query.  This is not configurable and is due to the fact that if you
 move a record it always causes other records in the list to be updated.
 
-=head1 METHODS
-
-=head2 position_column
+=attr position_column
 
   __PACKAGE__->position_column('position');
 
@@ -105,7 +103,7 @@ positional value of each record.  Defaults to "position".
 
 __PACKAGE__->mk_classdata( 'position_column' => 'position' );
 
-=head2 grouping_column
+=attr grouping_column
 
   __PACKAGE__->grouping_column('group_id');
 
@@ -117,7 +115,7 @@ ordered lists within the same table.
 
 __PACKAGE__->mk_classdata( 'grouping_column' );
 
-=head2 null_position_value
+=attr null_position_value
 
   __PACKAGE__->null_position_value(undef);
 
@@ -132,7 +130,7 @@ indeed start from 0.
 
 __PACKAGE__->mk_classdata( 'null_position_value' => 0 );
 
-=head2 siblings
+=method siblings
 
   my $rs = $item->siblings();
   my @siblings = $item->siblings();
@@ -144,25 +142,19 @@ The ordering is a backwards-compatibility artifact - if you need
 a resultset with no ordering applied use C<_siblings>
 
 =cut
-=method siblings
-
-=cut
 
 sub siblings {
     my $self = shift;
     return $self->_siblings->search ({}, { order_by => $self->position_column } );
 }
 
-=head2 previous_siblings
+=method previous_siblings
 
   my $prev_rs = $item->previous_siblings();
   my @prev_siblings = $item->previous_siblings();
 
 Returns a resultset of all objects in the same group
 positioned before the object on which this method was called.
-
-=cut
-=method previous_siblings
 
 =cut
 
@@ -176,16 +168,13 @@ sub previous_siblings {
     );
 }
 
-=head2 next_siblings
+=method next_siblings
 
   my $next_rs = $item->next_siblings();
   my @next_siblings = $item->next_siblings();
 
 Returns a resultset of all objects in the same group
 positioned after the object on which this method was called.
-
-=cut
-=method next_siblings
 
 =cut
 
@@ -199,16 +188,12 @@ sub next_siblings {
     );
 }
 
-=head2 previous_sibling
+=method previous_sibling
 
   my $sibling = $item->previous_sibling();
 
 Returns the sibling that resides one position back.  Returns 0
 if the current object is the first one.
-
-=cut
-
-=method previous_sibling
 
 =cut
 
@@ -224,16 +209,12 @@ sub previous_sibling {
     return defined $psib ? $psib : 0;
 }
 
-=head2 first_sibling
+=method first_sibling
 
   my $sibling = $item->first_sibling();
 
 Returns the first sibling object, or 0 if the first sibling
 is this sibling.
-
-=cut
-
-=method first_sibling
 
 =cut
 
@@ -249,16 +230,12 @@ sub first_sibling {
     return defined $fsib ? $fsib : 0;
 }
 
-=head2 next_sibling
+=method next_sibling
 
   my $sibling = $item->next_sibling();
 
 Returns the sibling that resides one position forward. Returns 0
 if the current object is the last one.
-
-=cut
-
-=method next_sibling
 
 =cut
 
@@ -273,16 +250,12 @@ sub next_sibling {
     return defined $nsib ? $nsib : 0;
 }
 
-=head2 last_sibling
+=method last_sibling
 
   my $sibling = $item->last_sibling();
 
 Returns the last sibling, or 0 if the last sibling is this
 sibling.
-
-=cut
-
-=method last_sibling
 
 =cut
 
@@ -315,7 +288,7 @@ sub _last_sibling_posval {
     return $pos;
 }
 
-=head2 move_previous
+=method move_previous
 
   $item->move_previous();
 
@@ -325,16 +298,12 @@ already the first one.
 
 =cut
 
-=method move_previous
-
-=cut
-
 sub move_previous {
     my $self = shift;
     return $self->move_to ($self->_position - 1);
 }
 
-=head2 move_next
+=method move_next
 
   $item->move_next();
 
@@ -344,17 +313,13 @@ the last in the list.
 
 =cut
 
-=method move_next
-
-=cut
-
 sub move_next {
     my $self = shift;
     return 0 unless defined $self->_last_sibling_posval;  # quick way to check for no more siblings
     return $self->move_to ($self->_position + 1);
 }
 
-=head2 move_first
+=method move_first
 
   $item->move_first();
 
@@ -363,24 +328,16 @@ on success, and 0 if the object is already the first.
 
 =cut
 
-=method move_first
-
-=cut
-
 sub move_first {
     return shift->move_to( 1 );
 }
 
-=head2 move_last
+=method move_last
 
   $item->move_last();
 
 Moves the object to the last position in the list.  Returns 1
 on success, and 0 if the object is already the last one.
-
-=cut
-
-=method move_last
 
 =cut
 
@@ -393,17 +350,13 @@ sub move_last {
     return $self->move_to( $self->_position_from_value ($last_posval) );
 }
 
-=head2 move_to
+=method move_to
 
   $item->move_to( $position );
 
 Moves the object to the specified position.  Returns 1 on
 success, and 0 if the object is already at the specified
 position.
-
-=cut
-
-=method move_to
 
 =cut
 
@@ -475,7 +428,7 @@ sub move_to {
     return 1;
 }
 
-=head2 move_to_group
+=method move_to_group
 
   $item->move_to_group( $group, $position );
 
@@ -487,10 +440,6 @@ already at the specified position of the specified group.
 $group may be specified as a single scalar if only one
 grouping column is in use, or as a hashref of column => value pairs
 if multiple grouping columns are in use.
-
-=cut
-
-=method move_to_group
 
 =cut
 
@@ -560,15 +509,11 @@ sub move_to_group {
     return 1;
 }
 
-=head2 insert
+=method insert
 
 Overrides the DBIO insert() method by providing a default
 position number.  The default will be the number of rows in
 the table +1, thus positioning the new record at the last position.
-
-=cut
-
-=method insert
 
 =cut
 
@@ -589,17 +534,13 @@ sub insert {
     return $self->next::method( @_ );
 }
 
-=head2 update
+=method update
 
 Overrides the DBIO update() method by checking for a change
 to the position and/or group columns.  Movement within a
 group or to another group is handled by repositioning
 the appropriate siblings.  Position defaults to the end
 of a new group if it has been changed to undef.
-
-=cut
-
-=method update
 
 =cut
 
@@ -647,15 +588,11 @@ sub update {
   return $self;
 }
 
-=head2 delete
+=method delete
 
 Overrides the DBIO delete() method by first moving the object
 to the last position, then deleting it, thus ensuring the
 integrity of the positions.
-
-=cut
-
-=method delete
 
 =cut
 
@@ -694,15 +631,12 @@ You would want to override the methods below if you use sparse
 if you are working with preexisting non-normalised position data,
 or if you need to work with materialized path columns.
 
-=head2 _position_from_value
+=method _position_from_value
 
   my $num_pos = $item->_position_from_value ( $pos_value )
 
 Returns the B<absolute numeric position> of an object with a B<position
 value> set to C<$pos_value>. By default simply returns C<$pos_value>.
-
-=cut
-=method _position_from_value
 
 =cut
 
@@ -719,15 +653,12 @@ sub _position_from_value {
     return $val;
 }
 
-=head2 _position_value
+=method _position_value
 
   my $pos_value = $item->_position_value ( $pos )
 
 Returns the B<value> of L</position_column> of the object at numeric
 position C<$pos>. By default simply returns C<$pos>.
-
-=cut
-=method _position_value
 
 =cut
 
@@ -745,7 +676,7 @@ sub _position_value {
     return $pos;
 }
 
-=head2 _initial_position_value
+=attr _initial_position_value
 
   __PACKAGE__->_initial_position_value(0);
 
@@ -758,7 +689,7 @@ L</_next_position_value> below. Defaults to 1.
 
 __PACKAGE__->mk_classdata( '_initial_position_value' => 1 );
 
-=head2 _next_position_value
+=method _next_position_value
 
   my $new_value = $item->_next_position_value ( $position_value )
 
@@ -770,15 +701,12 @@ default method expects C<$position_value> to be numeric, and
 returns C<$position_value + 1>
 
 =cut
-=method _next_position_value
-
-=cut
 
 sub _next_position_value {
     return $_[1] + 1;
 }
 
-=head2 _shift_siblings
+=method _shift_siblings
 
   $item->_shift_siblings ($direction, @between)
 
@@ -792,9 +720,6 @@ Note that if you override this method and have unique constraints
 including the L</position_column> the shift is not a trivial task.
 Refer to the implementation source of the default method for more
 information.
-
-=cut
-=method _shift_siblings
 
 =cut
 
