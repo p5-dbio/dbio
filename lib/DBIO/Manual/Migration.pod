@@ -41,9 +41,14 @@ A typical sweep:
   find lib t -name '*.pm' -o -name '*.pl' -o -name '*.t' \
     | xargs sed -i 's/DBIx::Class/DBIO/g'
 
-This handles 95 % of a vanilla codebase. The remaining steps cover
-the cases where a like-for-like rename is wrong because the API
-itself has changed.
+This handles 95 % of a vanilla codebase. After the sweep, fix up the
+two namespaces whose names changed shape, not just prefix:
+
+  DBIO::_Util  → DBIO::Util       (was DBIx::Class::_Util)
+  DBIO::_ENV_  → drop (was DBIx::Class::_ENV_, machinery removed)
+
+The remaining steps cover the cases where a like-for-like rename is
+wrong because the API itself has changed.
 
 =head1 STEP 2 — DROP CDBICompat AND OTHER REMOVED COMPONENTS
 

@@ -27,7 +27,7 @@ use Config;
 use Carp 'confess';
 use Fcntl ':flock';
 use Scalar::Util qw(blessed refaddr);
-use DBIO::_Util;
+use DBIO::Util;
 
 use base 'Exporter';
 our @EXPORT_OK = qw(
@@ -118,7 +118,7 @@ sub local_umask {
 {
   package MigrationsTest::Util::UmaskGuard;
   sub DESTROY {
-    &DBIO::_Util::detected_reinvoked_destructor;
+    &DBIO::Util::detected_reinvoked_destructor;
 
     local ($@, $!);
     eval { defined (umask ${$_[0]}) or die };
