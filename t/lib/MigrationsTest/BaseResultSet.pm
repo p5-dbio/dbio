@@ -7,7 +7,7 @@ use warnings;
 BEGIN {
   my @subclassing = qw(MigrationsTest::Base DBIO::ResultSet);
 
-  if( ! $ENV{DBICTEST_MOOIFIED_RESULTSETS} ) {
+  if( ! $ENV{DBIO_TEST_MOOIFIED_RESULTSETS} ) {
     # plain old vanilla base.pm
     require base;
     base->import(@subclassing);

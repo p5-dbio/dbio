@@ -14,7 +14,7 @@ BEGIN {
     die __PACKAGE__ . " must be loaded before DBIO (or modules using DBIO) at $frame[1] line $frame[2]\n";
   }
 
-  if ( $ENV{DBICTEST_VERSION_WARNS_INDISCRIMINATELY} ) {
+  if ( $ENV{DBIO_TEST_VERSION_WARNS_INDISCRIMINATELY} ) {
     my $ov = UNIVERSAL->can("VERSION");
 
     require Carp;
@@ -36,7 +36,7 @@ use File::Spec ();
 use File::Temp ();
 use MigrationsTest::Util 'local_umask';
 
-_check_author_makefile() unless $ENV{DBICTEST_NO_MAKEFILE_VERIFICATION};
+_check_author_makefile() unless $ENV{DBIO_TEST_NO_MAKEFILE_VERIFICATION};
 
 # PathTools has a bug where on MSWin32 it will often return / as a tmpdir.
 # This is *really* stupid and the result of having our lockfiles all over

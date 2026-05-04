@@ -18,7 +18,7 @@ BEGIN {
 }
 
 use constant DEBUG_TEST_CONCURRENCY_LOCKS =>
-  ( ($ENV{DBICTEST_DEBUG_CONCURRENCY_LOCKS}||'') =~ /^(\d+)$/ )[0]
+  ( ($ENV{DBIO_TEST_DEBUG_CONCURRENCY_LOCKS}||'') =~ /^(\d+)$/ )[0]
     ||
   0
 ;
@@ -90,8 +90,8 @@ sub await_flock ($$) {
       # will ensure we never actually call write() underneath until the grand
       # timeout is reached (and that's too long). Reproducible via
       #
-      # DBICTEST_VERSION_WARNS_INDISCRIMINATELY=1 \
-      # DBICTEST_RUN_ALL_TESTS=1 \
+      # DBIO_TEST_VERSION_WARNS_INDISCRIMINATELY=1 \
+      # DBIO_TEST_RUN_ALL_TESTS=1 \
       # strace -f \
       # prove -lj10 xt/extra/internals/
       #

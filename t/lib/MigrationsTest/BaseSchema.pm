@@ -22,7 +22,6 @@ sub capture_executed_sql_bind {
   # hack around stupid, stupid API
   no warnings 'redefine';
   local *DBIO::Storage::DBI::_format_for_trace = sub { $_[1] };
-  Class::C3->reinitialize if DBIO::_ENV_::OLD_MRO;
 
 
   local $self->storage->{debugcb};
@@ -108,7 +107,7 @@ sub is_executed_sql_bind {
 our $locker;
 END {
   # we need the $locker to be referenced here for delayed destruction
-  if ($locker->{lock_name} and ($ENV{DBICTEST_LOCK_HOLDER}||0) == $$) {
+  if ($locker->{lock_name} and ($ENV{DBIO_TEST_LOCK_HOLDER}||0) == $$) {
     DEBUG_TEST_CONCURRENCY_LOCKS
       and dbg "$locker->{type} LOCK RELEASED (END): $locker->{lock_name}";
 
@@ -142,53 +141,13 @@ my $weak_registry = {};
 sub connection {
   my( $proto, @args ) = @_;
 
-  if( $ENV{DBICTEST_SWAPOUT_SQLAC_WITH} ) {
-
-    my( $sqlac_like ) = $ENV{DBICTEST_SWAPOUT_SQLAC_WITH} =~ /(.+)/;
-    Class::C3::Componentised->ensure_class_loaded( $sqlac_like );
-
-    require DBIO::SQLMaker::ClassicExtensions;
-    require SQL::Abstract::Classic;
-
-    Class::C3::Componentised->inject_base(
-      'MigrationsTest::SQLAC::SwapOut',
-      'DBIO::SQLMaker::ClassicExtensions',
-      $sqlac_like,
-      'SQL::Abstract::Classic',
-    );
-
-    # perl can be pretty disgusting...
-    push @args, {}
-      unless ref( $args[-1] ) eq 'HASH';
-
-    $args[-1] = { %{ $args[-1] } };
-
-    if( ref( $args[-1]{on_connect_call} ) ne 'ARRAY' ) {
-      $args[-1]{on_connect_call} = [
-        $args[-1]{on_connect_call}
-          ? [ $args[-1]{on_connect_call} ]
-          : ()
-      ];
-    }
-    elsif( ref( $args[-1]{on_connect_call}[0] ) ne 'ARRAY' ) {
-      $args[-1]{on_connect_call} = [ map
-        { [ $_ ] }
-        @{ $args[-1]{on_connect_call} }
-      ];
-    }
-
-    push @{ $args[-1]{on_connect_call} }, (
-      [ rebase_sqlmaker => 'MigrationsTest::SQLAC::SwapOut' ],
-    );
-  }
-
   my $self = $proto->next::method( @args );
 
 # MASSIVE FIXME
 # we can't really lock based on DSN, as we do not yet have a way to tell that e.g.
-# DBICTEST_MSSQL_DSN=dbi:Sybase:server=192.168.0.11:1433;database=dbtst
+# DBIO_TEST_MSSQL_DSN=dbi:Sybase:server=192.168.0.11:1433;database=dbtst
 #  and
-# DBICTEST_MSSQL_ODBC_DSN=dbi:ODBC:server=192.168.0.11;port=1433;database=dbtst;driver=FreeTDS;tds_version=8.0
+# DBIO_TEST_MSSQL_ODBC_DSN=dbi:ODBC:server=192.168.0.11;port=1433;database=dbtst;driver=FreeTDS;tds_version=8.0
 # are the same server
 # hence we lock everything based on sqlt_type or just globally if not available
 # just pretend we are python you know? :)
@@ -209,7 +168,7 @@ sub connection {
   if (
     ! $MigrationsTest::global_exclusive_lock
       and
-    ( ! $ENV{DBICTEST_LOCK_HOLDER} or $ENV{DBICTEST_LOCK_HOLDER} == $$ )
+    ( ! $ENV{DBIO_TEST_LOCK_HOLDER} or $ENV{DBIO_TEST_LOCK_HOLDER} == $$ )
       and
     ref($args[0]) ne 'CODE'
       and
@@ -220,7 +179,7 @@ sub connection {
 
     {
       # guard against infinite recursion
-      local $ENV{DBICTEST_LOCK_HOLDER} = -1;
+      local $ENV{DBIO_TEST_LOCK_HOLDER} = -1;
 
       # we need to work with a forced fresh clone so that we do not upset any state
       # of the main $schema (some tests examine it quite closely)
@@ -294,7 +253,7 @@ sub connection {
       $lock_fh->autoflush(1);
       print $lock_fh $$;
 
-      $ENV{DBICTEST_LOCK_HOLDER} ||= $$;
+      $ENV{DBIO_TEST_LOCK_HOLDER} ||= $$;
 
       $locker = {
         type => $locktype,
