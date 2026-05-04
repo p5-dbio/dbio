@@ -21,10 +21,12 @@ __PACKAGE__->add_columns(
   },
   'cd' => {
     data_type => 'integer',
+    grouping  => 1,
   },
   'position' => {
     data_type => 'int',
     accessor => 'pos',
+    position  => 1,
   },
   'title' => {
     data_type => 'varchar',
@@ -44,9 +46,6 @@ __PACKAGE__->set_primary_key('trackid');
 
 __PACKAGE__->add_unique_constraint([ qw/cd position/ ]);
 __PACKAGE__->add_unique_constraint([ qw/cd title/ ]);
-
-__PACKAGE__->position_column ('position');
-__PACKAGE__->grouping_column ('cd');
 
 # the undef condition in this rel is *deliberate*
 # tests oddball legacy syntax

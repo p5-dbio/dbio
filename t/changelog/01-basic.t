@@ -22,10 +22,9 @@ use DBIO::Test::Storage;
   __PACKAGE__->add_columns(
     id   => { data_type => 'integer', is_auto_increment => 1 },
     name => { data_type => 'varchar', size => 100 },
-    secret => { data_type => 'varchar', size => 255, is_nullable => 1 },
+    secret => { data_type => 'varchar', size => 255, is_nullable => 1, changelog => 0 },
   );
   __PACKAGE__->set_primary_key('id');
-  __PACKAGE__->changelog_exclude_columns(qw/ secret /);
 }
 
 {
@@ -160,14 +159,17 @@ subtest 'delete creates changelog entry' => sub {
   ok(scalar @cl_inserts, 'changelog INSERT was generated for artist delete');
 };
 
-# --- Test: changelog_exclude_columns ---
-subtest 'changelog_exclude_columns' => sub {
-  my @excluded = TestDBIO::CL::Schema::Result::Artist->changelog_exclude_columns;
-  is_deeply([sort @excluded], ['secret'], 'secret is in exclude list');
+# --- Test: changelog column-info exclusion ---
+subtest 'changelog column-info exclusion' => sub {
+  my $artist_excluded = TestDBIO::CL::Schema::Result::Artist
+    ->result_source_instance->columns_info;
+  ok($artist_excluded->{secret}{_changelog_exclude}, 'secret is flagged for changelog exclusion');
+  ok(!$artist_excluded->{name}{_changelog_exclude}, 'name is not excluded');
 
-  # TwoKeyThing has no excludes
-  my @tk_excluded = TestDBIO::CL::Schema::Result::TwoKeyThing->changelog_exclude_columns;
-  is(scalar @tk_excluded, 0, 'TwoKeyThing has no excluded columns');
+  my $tk_info = TestDBIO::CL::Schema::Result::TwoKeyThing
+    ->result_source_instance->columns_info;
+  ok(!grep({ $_->{_changelog_exclude} } values %$tk_info),
+    'TwoKeyThing has no excluded columns');
 };
 
 # --- Test: log_event for custom events ---
