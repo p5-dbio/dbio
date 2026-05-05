@@ -119,7 +119,7 @@ with NULL as the default, and save yourself a SELECT.
 ## This only works because DBIO doesn't yet care to check whether the new_related objects have been passed all their mandatory columns
 ## When doing the later insert, we need to make sure the PKs are set.
 ## using _relationship_data in new and funky ways..
-## check Relationship::CascadeActions and Relationship::Accessor for compat
+## check Relationship::CascadeActions and Relationship::Codegen for compat
 ## tests!
 
 sub __new_related_find_or_new_helper {

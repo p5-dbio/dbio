@@ -8,9 +8,8 @@ use base qw/DBIO::Base/;
 
 __PACKAGE__->load_own_components(qw/
   Helpers
-  Accessor
+  Codegen
   CascadeActions
-  ProxyMethods
   Base
 /);
 
