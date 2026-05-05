@@ -5,7 +5,7 @@ package DBIO::Storage::DBI;
 use strict;
 use warnings;
 
-use base qw/DBIO::Storage::QueryRewrite DBIO::Storage/;
+use base qw/DBIO::Storage::QueryRewrite DBIO::Storage::DBI::Capabilities DBIO::Storage/;
 use mro 'c3';
 
 use DBIO::Carp;
@@ -45,37 +45,7 @@ my @storage_options = qw/
 __PACKAGE__->mk_group_accessors('simple' => @storage_options);
 
 
-# capability definitions, using a 2-tiered accessor system
-# The rationale is:
-#
-# A driver/user may define _use_X, which blindly without any checks says:
-# "(do not) use this capability", (use_dbms_capability is an "inherited"
-# type accessor)
-#
-# If _use_X is undef, _supports_X is then queried. This is a "simple" style
-# accessor, which in turn calls _determine_supports_X, and stores the return
-# in a special slot on the storage object, which is wiped every time a $dbh
-# reconnection takes place (it is not guaranteed that upon reconnection we
-# will get the same rdbms version). _determine_supports_X does not need to
-# exist on a driver, as we ->can for it before calling.
-
-my @capabilities = (qw/
-  insert_returning
-  insert_returning_bound
-
-  multicolumn_in
-
-  placeholders
-  typeless_placeholders
-
-  join_optimizer
-/);
-__PACKAGE__->mk_group_accessors( dbms_capability => map { "_supports_$_" } @capabilities );
-__PACKAGE__->mk_group_accessors( use_dbms_capability => map { "_use_$_" } (@capabilities ) );
-
-# on by default, not strictly a capability (pending rewrite)
-__PACKAGE__->_use_join_optimizer (1);
-sub _determine_supports_join_optimizer { 1 };
+# Capability detection lives in DBIO::Storage::DBI::Capabilities (mixin).
 
 # Each of these methods need _determine_driver called before itself
 # in order to function reliably. We also need to separate accessors
@@ -1109,43 +1079,6 @@ sub _run_connection_actions {
 }
 
 
-
-sub set_use_dbms_capability {
-  $_[0]->set_inherited ($_[1], $_[2]);
-}
-
-sub get_use_dbms_capability {
-  my ($self, $capname) = @_;
-
-  my $use = $self->get_inherited ($capname);
-  return defined $use
-    ? $use
-    : do { $capname =~ s/^_use_/_supports_/; $self->get_dbms_capability ($capname) }
-  ;
-}
-
-sub set_dbms_capability {
-  $_[0]->_dbh_details->{capability}{$_[1]} = $_[2];
-}
-
-sub get_dbms_capability {
-  my ($self, $capname) = @_;
-
-  my $cap = $self->_dbh_details->{capability}{$capname};
-
-  unless (defined $cap) {
-    if (my $meth = $self->can ("_determine$capname")) {
-      $cap = $self->$meth ? 1 : 0;
-    }
-    else {
-      $cap = 0;
-    }
-
-    $self->set_dbms_capability ($capname, $cap);
-  }
-
-  return $cap;
-}
 
 sub _server_info {
   my $self = shift;
