@@ -39,12 +39,15 @@ Throws if no such column is defined on the result source.
 
 sub position_column {
   my $self = shift;
-  my $info = $self->result_source->columns_info;
+  my $source = ref $self
+    ? $self->result_source
+    : $self->result_source_instance;
+  my $info = $source->columns_info;
   for my $col (sort keys %$info) {
     return $col if $info->{$col}{_ordered_position};
   }
   $self->throw_exception(
-    "No position column defined on " . ref($self || $self) .
+    "No position column defined on " . (ref $self || $self) .
     " -- mark a column with `position => 1` in add_columns"
   );
 }
@@ -62,7 +65,10 @@ grouping is configured.
 
 sub grouping_column {
   my $self = shift;
-  my $info = $self->result_source->columns_info;
+  my $source = ref $self
+    ? $self->result_source
+    : $self->result_source_instance;
+  my $info = $source->columns_info;
   my @group = sort grep { $info->{$_}{_ordered_grouping} } keys %$info;
   return undef if !@group;
   return $group[0] if @group == 1;
