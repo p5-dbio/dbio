@@ -41,4 +41,24 @@ sub _build_model {
   die ref($self) . '::_build_model not implemented';
 }
 
+=method _aggregate_by
+
+    my $by_table = $class->_aggregate_by(\@rows, 'table_name');
+
+Groups a flat array of row hashrefs into C<{ $key_value => [\%row, ...] }>.
+Preserves row order within each group. The C<\@rows> arrayref is consumed
+(rows are shifted off); pass a copy if you need the original.
+
+=cut
+
+sub _aggregate_by {
+  my ($class, $rows, $key_field) = @_;
+  my %result;
+  for my $row (@{ $rows // [] }) {
+    my $key = $row->{$key_field} // next;
+    push @{ $result{$key} }, $row;
+  }
+  return \%result;
+}
+
 1;
