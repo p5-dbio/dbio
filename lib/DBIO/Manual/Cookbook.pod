@@ -822,7 +822,7 @@ B<Result-Subclass definition>
     use base 'My::Shared::Model::Result::Baz';
 
     # WARNING: Make sure you call table() again in your subclass,
-    # otherwise DBIO::ResultSourceProxy::Table will not be called
+    # otherwise DBIO::ResultSourceProxy will not be called
     # and the class name is not correctly registered as a source
     __PACKAGE__->table('baz');
 

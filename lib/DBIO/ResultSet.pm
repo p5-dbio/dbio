@@ -262,7 +262,7 @@ instead by doing:
 =back
 
 The resultset constructor. Takes a source object (usually a
-L<DBIO::ResultSourceProxy::Table>) and an attribute hash (see
+L<DBIO::ResultSourceProxy>) and an attribute hash (see
 L</ATTRIBUTES> below).  Does not perform any queries -- these are
 executed as needed by the other methods.
 

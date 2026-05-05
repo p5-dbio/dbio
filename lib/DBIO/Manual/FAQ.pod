@@ -76,7 +76,7 @@ lot later.
 If your database server allows you to run queries across multiple
 databases at once, then so can DBIO. All you need to do is make
 sure you write the database name as part of the
-L<table|DBIO::ResultSourceProxy::Table/table> call. Eg:
+L<table|DBIO::ResultSourceProxy/table> call. Eg:
 
   __PACKAGE__->table('mydb.mytablename');
 
@@ -86,7 +86,7 @@ L<DBIO::Schema/load_namespaces>.
 =item .. use DBIO across PostgreSQL/DB2/Oracle schemas?
 
 Add the name of the schema to the table name, when invoking
-L<table|DBIO::ResultSourceProxy::Table/table>, and make sure the user
+L<table|DBIO::ResultSourceProxy/table>, and make sure the user
 you are about to connect as has permissions to read/write all the
 schemas/tables as necessary.
 

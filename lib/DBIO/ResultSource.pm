@@ -71,8 +71,8 @@ default result source type, so one is created for you when defining a
 result class as described in the synopsis above.
 
 More specifically, the L<DBIO::Core> base class pulls in the
-L<DBIO::ResultSourceProxy::Table> component, which defines
-the L<table|DBIO::ResultSourceProxy::Table/table> method.
+L<DBIO::ResultSourceProxy> component, which defines
+the L<table|DBIO::ResultSourceProxy/table> method.
 When called, C<table> creates and stores an instance of
 L<DBIO::ResultSource::Table>. Luckily, to use tables as result
 sources, you usually do not need to think about any of this machinery.

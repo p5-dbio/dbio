@@ -12,7 +12,7 @@ __PACKAGE__->load_components(qw/
   InflateColumn
   PK
   Row
-  ResultSourceProxy::Table
+  ResultSourceProxy
 /);
 
 1;
@@ -108,7 +108,7 @@ The bundled components currently are:
 
 =item L<DBIO::Row>
 
-=item L<DBIO::ResultSourceProxy::Table> (See also L<DBIO::ResultSource>)
+=item L<DBIO::ResultSourceProxy> (See also L<DBIO::ResultSource>)
 
 =back
 

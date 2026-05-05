@@ -599,7 +599,6 @@ sub idx {
   my ($name, $fields, %options) = @_;
   my $class = _caller_class();
 
-  # Store index info on the source for later pickup by the hooks below.
   my $source = $class->result_source_instance;
   my $indexes = $source->{_cake_indexes} ||= [];
   push @$indexes, {
@@ -608,70 +607,7 @@ sub idx {
     %options,
   };
 
-  # ── SQLT path (SQL::Translator-based deployment) ─────────────
-  # Install sqlt_deploy_hook on the class once; it reads _cake_indexes
-  # at deploy time and calls $sqlt_table->add_index(...).
-  unless ($source->{_cake_hook_installed}) {
-    $source->{_cake_hook_installed} = 1;
-    my $orig_hook = $class->can('sqlt_deploy_hook');
-
-    no strict 'refs';
-    no warnings 'redefine';
-    *{"${class}::sqlt_deploy_hook"} = sub {
-      my ($self_or_class, $sqlt_table) = @_;
-      $orig_hook->($self_or_class, $sqlt_table) if $orig_hook;
-
-      my $src = $self_or_class->isa('DBIO::ResultSource')
-        ? $self_or_class
-        : $self_or_class->result_source_instance;
-      my $idxs = $src->{_cake_indexes} || [];
-      for my $idx (@$idxs) {
-        $sqlt_table->add_index(
-          name   => $idx->{name},
-          fields => $idx->{fields},
-          (exists $idx->{type}    ? (type    => $idx->{type})    : ()),
-          (exists $idx->{options} ? (options => $idx->{options}) : ()),
-        );
-      }
-    };
-  }
-
-  # ── PostgreSQL native DDL path (DBIO::PostgreSQL::DDL) ───────
-  # Install a pg_indexes class method once; it reads _cake_indexes
-  # at DDL time and returns a hashref in the format DBIO::PostgreSQL::DDL
-  # expects. The 'pg' option on idx() carries PG-specific keys
-  # (where, using, with, expression) that are passed through as-is.
-  # If the class already defined pg_indexes manually, the existing
-  # definitions are preserved and Cake-declared indexes are merged in.
-  unless ($source->{_cake_pg_indexes_installed}) {
-    $source->{_cake_pg_indexes_installed} = 1;
-    my $orig_pg_indexes = $class->can('pg_indexes');
-
-    no strict 'refs';
-    no warnings 'redefine';
-    *{"${class}::pg_indexes"} = sub {
-      my $invocant = shift;
-      my $src = (ref $invocant && $invocant->isa('DBIO::ResultSource'))
-        ? $invocant
-        : (ref $invocant ? ref($invocant) : $invocant)->result_source_instance;
-      my %result = $orig_pg_indexes ? %{ $orig_pg_indexes->($invocant, @_) || {} } : ();
-      my $idxs = $src->{_cake_indexes} || [];
-      for my $idx (@$idxs) {
-        my %entry = (
-          columns => $idx->{fields},
-          (($idx->{type} // '') =~ /^unique$/i ? (unique => 1) : ()),
-        );
-        if (my $pg = $idx->{pg}) {
-          $entry{where}      = $pg->{where}      if exists $pg->{where};
-          $entry{using}      = $pg->{using}      if exists $pg->{using};
-          $entry{with}       = $pg->{with}       if exists $pg->{with};
-          $entry{expression} = $pg->{expression} if exists $pg->{expression};
-        }
-        $result{$idx->{name}} = \%entry;
-      }
-      return \%result;
-    };
-  }
+  $class->_install_index_hooks($source);
 }
 
 # --- Timestamp column helpers ---

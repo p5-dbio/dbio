@@ -244,7 +244,7 @@ sub gen_has_column {
 }
 
 # Sugar wrapper around the indices() class method installed by
-# DBIO::ResultSourceProxy::Table — available to both vanilla and Candy.
+# DBIO::ResultSourceProxy — available to both vanilla and Candy.
 sub gen_indices {
   my ($self, $inheritor, $set_table) = @_;
   sub {

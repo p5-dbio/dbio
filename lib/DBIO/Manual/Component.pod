@@ -78,7 +78,7 @@ the lifecycle hook surface every other component cooperates with.
 
 L<DBIO::PK> -- Primary key handling.
 
-L<DBIO::ResultSourceProxy::Table> -- Provides C<__PACKAGE__-E<gt>table(...)>
+L<DBIO::ResultSourceProxy> -- Provides C<__PACKAGE__-E<gt>table(...)>
 and proxies result-source methods onto the result class.
 
 L<DBIO::Relationship> -- Inter-table relationships

@@ -101,7 +101,7 @@ is_deeply $pg->{name_idx},      { columns => ['name'] },
 is_deeply $pg->{name_city_idx}, { columns => ['name', 'city'] },
   'pg_indexes entry for compound index';
 
-# indices is inherited from DBIO::ResultSourceProxy::Table, so it stays
+# indices is inherited from DBIO::ResultSourceProxy, so it stays
 # available as a class method even after Candy's namespace::clean runs.
 ok(TestIdx::Result::Artist->can('indices'),
   'indices class method remains available after sugar cleanup');
