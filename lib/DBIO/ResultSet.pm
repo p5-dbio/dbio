@@ -3868,7 +3868,7 @@ sub _resolved_attrs {
       # The thinking is: if we are collapsing the subquerying prefetch engine will
       # rip stuff apart for us anyway, and we do not want to have a potentially
       # function-converted external order_by
-      # ( there is an explicit if ( collapse && _grouped_by_distinct ) check in DBIHacks )
+      # ( there is an explicit if ( collapse && _grouped_by_distinct ) check in QueryRewrite )
       $attrs->{order_by} = $new_order unless $attrs->{collapse};
     }
   }

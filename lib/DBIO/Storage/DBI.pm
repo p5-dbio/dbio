@@ -5,7 +5,7 @@ package DBIO::Storage::DBI;
 use strict;
 use warnings;
 
-use base qw/DBIO::Storage::DBIHacks DBIO::Storage/;
+use base qw/DBIO::Storage::QueryRewrite DBIO::Storage/;
 use mro 'c3';
 
 use DBIO::Carp;

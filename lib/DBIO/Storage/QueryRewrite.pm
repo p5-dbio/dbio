@@ -1,4 +1,4 @@
-package DBIO::Storage::DBIHacks;
+package DBIO::Storage::QueryRewrite;
 # ABSTRACT: SQL analysis and query rewrite utilities
 
 use strict;
