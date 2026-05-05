@@ -1,5 +1,5 @@
-package DBIO::Relationship::Accessor;
-# ABSTRACT: Generate accessor methods for relationships
+package DBIO::Relationship::Codegen;
+# ABSTRACT: Schema-time relationship method synthesis (accessors and proxies)
 
 use strict;
 use warnings;
@@ -9,8 +9,27 @@ use namespace::clean;
 
 our %_pod_inherit_config =
   (
-   class_map => { 'DBIO::Relationship::Accessor' => 'DBIO::Relationship' }
+   class_map => { 'DBIO::Relationship::Codegen' => 'DBIO::Relationship' }
   );
+
+=head1 DESCRIPTION
+
+Schema-time relationship codegen for L<DBIO::Relationship>. Hooks
+C<register_relationship> to install:
+
+=over 4
+
+=item *
+
+The relationship accessor methods (C<single>, C<filter>, C<multi> styles)
+on the result class. See L</add_relationship_accessor>.
+
+=item *
+
+Proxy attribute accessors that forward through a relationship when the
+declaration includes C<< proxy => ... >>. See L</proxy_to_related>.
+
+=back
 
 =method register_relationship
 
@@ -18,9 +37,15 @@ our %_pod_inherit_config =
 
 sub register_relationship {
   my ($class, $rel, $info) = @_;
+
   if (my $acc_type = $info->{attrs}{accessor}) {
     $class->add_relationship_accessor($rel => $acc_type);
   }
+
+  if (my $proxy_args = $info->{attrs}{proxy}) {
+    $class->proxy_to_related($rel, $proxy_args);
+  }
+
   $class->next::method($rel => $info);
 }
 
@@ -115,6 +140,52 @@ EOC
     $class->throw_exception("No such relationship accessor type '$acc_type'");
   }
 
+}
+
+=method proxy_to_related
+
+=cut
+
+sub proxy_to_related {
+  my ($class, $rel, $proxy_args) = @_;
+  my %proxy_map = $class->_build_proxy_map_from($proxy_args);
+
+  quote_sub "${class}::$_", sprintf( <<'EOC', $rel, $proxy_map{$_} )
+    my $self = shift;
+    my $relobj = $self->%1$s;
+    if (@_ && !defined $relobj) {
+      $relobj = $self->create_related( %1$s => { %2$s => $_[0] } );
+      @_ = ();
+    }
+    $relobj ? $relobj->%2$s(@_) : undef;
+EOC
+    for keys %proxy_map
+}
+
+=method _build_proxy_map_from
+
+=cut
+
+sub _build_proxy_map_from {
+  my ( $class, $proxy_arg ) = @_;
+  my $ref = ref $proxy_arg;
+
+  if ($ref eq 'HASH') {
+    return %$proxy_arg;
+  }
+  elsif ($ref eq 'ARRAY') {
+    return map {
+      (ref $_ eq 'HASH')
+        ? (%$_)
+        : ($_ => $_)
+    } @$proxy_arg;
+  }
+  elsif ($ref) {
+    $class->throw_exception("Unable to process the 'proxy' argument $proxy_arg");
+  }
+  else {
+    return ( $proxy_arg => $proxy_arg );
+  }
 }
 
 1;
