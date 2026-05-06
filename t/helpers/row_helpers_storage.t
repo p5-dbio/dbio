@@ -277,4 +277,58 @@ subtest 'ProxyResultSetMethod: installs accessor, registers slot' => sub {
   } 'copy with a proxy slot value does not die';
 };
 
+# --- DateTime snapshot immutability test -----------------------------
+
+subtest 'StorageValues: DateTime clone prevents snapshot corruption' => sub {
+  eval 'require DateTime; 1' or skip('DateTime not installed', 3);
+
+  {
+    package TestDT::Schema;
+    use base 'DBIO::Schema';
+  }
+
+  {
+    package TestDT::Schema::Result::Event;
+    use base 'DBIO::Core';
+
+    __PACKAGE__->table('event');
+    __PACKAGE__->add_columns(
+      id   => { data_type => 'integer', is_auto_increment => 1 },
+      name => { data_type => 'varchar', size => 100 },
+      occurred_at => {
+        data_type          => 'timestamp with time zone',
+        keep_storage_value => 1,
+      },
+    );
+    __PACKAGE__->set_primary_key('id');
+  }
+
+  TestDT::Schema->register_class(Event => 'TestDT::Schema::Result::Event');
+
+  my $schema = TestDT::Schema->connect(sub { });
+  $schema->storage(DBIO::Test::Storage->new($schema));
+  my $rs = $schema->resultset('Event');
+
+  my $dt_original = DateTime->new(year => 2024, month => 1, day => 15,
+                                   hour => 10, minute => 30, second => 0,
+                                   time_zone => 'UTC');
+
+  my $event = $rs->new_result({ name => 'launch', occurred_at => $dt_original });
+  $event->insert;
+
+  # Snapshot holds a clone — mutation of the original does not corrupt snapshot
+  $dt_original->add(days => 99);
+
+  my $snap = $event->get_storage_value('occurred_at');
+  isnt($snap, $dt_original, 'snapshot is not the same object reference');
+  is($snap->ymd, '2024-01-15', 'snapshot is unaffected by later mutation');
+
+  # Mutation via the stored snapshot does not affect the row
+  my $snap2 = $event->get_storage_value('occurred_at');
+  $snap2->add(months => 6);
+
+  my $snap3 = $event->get_storage_value('occurred_at');
+  is($snap3->ymd, '2024-01-15', 'snapshot mutation does not propagate');
+};
+
 done_testing;

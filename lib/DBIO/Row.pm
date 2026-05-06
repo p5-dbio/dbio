@@ -1835,10 +1835,23 @@ sub store_storage_values {
   $self->_storage_values({
     map {
       my $acc = ($self->column_info($_)->{accessor} || $_);
-      $_ => $self->$acc
+      $_ => _clone_for_storage($self->$acc)
     } @{$self->storage_value_columns}
   });
   $self->_storage_values;
+}
+
+# Clone a value for storage snapshot. DateTime objects are cloned so
+# later mutations don't corrupt the snapshot. Plain scalars/objects
+# without clone are stored as-is (acceptable for numbers, strings,
+# and DBIO Row objects which are inherently snapshot-like).
+sub _clone_for_storage {
+  my ($val) = @_;
+  return $val unless defined $val;
+  if (ref($val) && $val->can('clone')) {
+    return $val->clone;
+  }
+  return $val;
 }
 
 =method get_storage_value
@@ -1849,7 +1862,10 @@ Returns the snapshotted value for a column.
 
 =cut
 
-sub get_storage_value { $_[0]->_storage_values->{$_[1]} }
+sub get_storage_value {
+  my ($self, $col) = @_;
+  return DBIO::Row::_clone_for_storage($self->_storage_values->{$col});
+}
 
 # ------------------------------------------------------------
 # OnColumnChange
