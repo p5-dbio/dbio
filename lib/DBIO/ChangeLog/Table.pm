@@ -4,7 +4,7 @@ package DBIO::ChangeLog::Table;
 use strict;
 use warnings;
 
-use Carp qw(croak);
+use base 'DBIO::Base';
 
 =head1 DESCRIPTION
 
@@ -15,21 +15,22 @@ Provides validation and building helpers for source_definition hashes.
 
 sub validate_definition {
   my ($class, $def) = @_;
-  croak "source_definition must return a hashref"
+  require Carp;
+  Carp::croak("source_definition must return a hashref")
     unless ref $def eq 'HASH';
 
   for my $key (qw/ table columns column_order primary_key /) {
-    croak "source_definition missing required key: $key"
+    Carp::croak("source_definition missing required key: $key")
       unless exists $def->{$key};
   }
 
-  croak "columns must be a hashref"
+  Carp::croak("columns must be a hashref")
     unless ref $def->{columns} eq 'HASH';
 
-  croak "column_order must be an arrayref"
+  Carp::croak("column_order must be an arrayref")
     unless ref $def->{column_order} eq 'ARRAY';
 
-  croak "primary_key must be an arrayref"
+  Carp::croak("primary_key must be an arrayref")
     unless ref $def->{primary_key} eq 'ARRAY';
 
   return $def;
@@ -48,11 +49,3 @@ sub build_source {
 }
 
 1;
-
-__END__
-
-=head1 SEE ALSO
-
-L<DBIO::ChangeLog::Entry>, L<DBIO::ChangeLog::Set>
-
-=cut

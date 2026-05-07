@@ -4,7 +4,6 @@ package DBIO::ChangeLog::Entry;
 use strict;
 use warnings;
 
-use Carp qw(croak);
 use DBIO::ChangeLog::Table;
 
 =head1 DESCRIPTION
@@ -51,7 +50,10 @@ C<datetime>, NOT NULL. Automatically set when the entry is created.
 
 sub source_definition {
   my ($class, %args) = @_;
-  my $table = $args{table} or croak "table is required";
+  my $table = $args{table};
+  require Carp;
+  Carp::croak("source_definition requires 'table' argument")
+    unless defined $table && length $table;
 
   return DBIO::ChangeLog::Table->build_source({
     table   => "${table}_changelog",
