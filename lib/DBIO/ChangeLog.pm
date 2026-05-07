@@ -269,7 +269,7 @@ sub delete {
   $row->log_event('approved', { by => $admin_id, reason => 'verified' });
 
 Creates a custom changelog entry.  The C<changeset_id> is set if called
-inside a L<DBIO::Schema::ChangeLog/txn_do>, otherwise it is C<NULL>.
+inside a L<DBIO::ChangeLog::Schema/txn_do>, otherwise it is C<NULL>.
 
 =cut
 

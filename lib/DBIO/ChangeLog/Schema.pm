@@ -1,4 +1,4 @@
-package DBIO::Schema::ChangeLog;
+package DBIO::ChangeLog::Schema;
 # ABSTRACT: Schema-level change tracking component
 
 use strict;
@@ -15,7 +15,7 @@ use DBIO::ResultSource::Table;
   package MyApp::Schema;
   use base 'DBIO::Schema';
 
-  __PACKAGE__->load_components('Schema::ChangeLog');
+  __PACKAGE__->load_components('ChangeLog::Schema');
 
   # Optional: restrict which sources are tracked (default: all)
   __PACKAGE__->changelog_sources([qw/ Artist Album /]);
