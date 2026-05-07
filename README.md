@@ -17,7 +17,7 @@ A modern fork of [DBIx::Class](https://metacpan.org/pod/DBIx::Class).
 
 The following were extracted from DBIx::Class distributions and merged into core:
 
-- [DBIx::Class::TimeStamp](https://metacpan.org/pod/DBIx::Class::TimeStamp) → `DBIO::Schema::DateTime` (automatic `created_at`/`updated_at` columns)
+- [DBIx::Class::TimeStamp](https://metacpan.org/pod/DBIx::Class::TimeStamp) → `DBIO::Timestamp` (automatic `created_at`/`updated_at` columns via `InflateColumn::DateTime`)
 - [DBIx::Class::Helpers](https://metacpan.org/pod/DBIx::Class::Helpers) → merged into core (resultset utilities, cross-request inflate/deflate, multicontext)
 - [DBIx::Class::Candy](https://metacpan.org/pod/DBIx::Class::Candy) → [DBIO::Candy](https://metacpan.org/pod/DBIO::Candy) (import-based sugar with `table`, `column`, `primary_key`, `has_many`, etc.)
 - [DBIx::Class::ResultDDL](https://metacpan.org/pod/DBIx::Class::ResultDDL) → [DBIO::Cake](https://metacpan.org/pod/DBIO::Cake) (DDL-like DSL with `col id => integer auto_inc`, `varchar(100), null`, etc.)
@@ -25,7 +25,7 @@ The following were extracted from DBIx::Class distributions and merged into core
 **New in DBIO**
 
 - **Replicated Storage** — master/slave replication built into core with [DBIO::Replicated](https://metacpan.org/pod/DBIO::Replicated), access brokers for rotating credentials, read/write splitting
-- **Change Tracking** — automatic insert/update/delete logging via [DBIO::Schema::ChangeLog](https://metacpan.org/pod/DBIO::Schema::ChangeLog) (new component, not in DBIx::Class)
+- **Change Tracking** — automatic insert/update/delete logging via `DBIO::Schema::ChangeLog` (schema component), `DBIO::ChangeLog::Entry` (change record), `DBIO::ChangeLog::Set` (batch changes)
 - **Async Storage Interface** — `all_async`, `first_async`, `count_async`, `create_async` return [Futures](https://metacpan.org/pod/DBIO::Future); async drivers bypass DBI entirely
 - **SQL::Translator Removed** — all drivers use native desired-state deployment via test-deploy-and-compare (introspect live DB, deploy to throwaway, diff the two models) using DB-specific modules
 
@@ -40,8 +40,9 @@ The following were extracted from DBIx::Class distributions and merged into core
 **Change Tracking**
 - Automatic logging of insert/update/delete operations via [DBIO::Schema::ChangeLog](https://metacpan.org/pod/DBIO::Schema::ChangeLog)
 - Per-table tracking configuration
-- [DBIO::ChangeLog::Entry](https://metacpan.org/pod/DBIO::ChangeLog::Entry) — structured change records
-- [DBIO::ChangeLog::Set](https://metacpan.org/pod/DBIO::ChangeLog::Set) — batch changes
+- `DBIO::Schema::ChangeLog` — schema component for automatic insert/update/delete logging
+- `DBIO::ChangeLog::Entry` — structured change records
+- `DBIO::ChangeLog::Set` — batch changes
 
 **Async Interface**
 - `all_async`, `first_async`, `count_async`, `create_async` return [Futures](https://metacpan.org/pod/DBIO::Future)
