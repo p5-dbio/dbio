@@ -6,62 +6,58 @@ A modern fork of [DBIx::Class](https://metacpan.org/pod/DBIx::Class).
 
 ## Key Differences from DBIx::Class
 
-- Namespace: `DBIO::` replaces `DBIx::Class::`
-- [SQL::Abstract](https://metacpan.org/pod/SQL::Abstract) replaces SQL::Abstract::Classic
-- Integrates [DBIx::Class::TimeStamp](https://metacpan.org/pod/DBIx::Class::TimeStamp) and [DBIx::Class::Helpers](https://metacpan.org/pod/DBIx::Class::Helpers) into core
-- Integrates [DBIx::Class::Candy](https://metacpan.org/pod/DBIx::Class::Candy) as [DBIO::Candy](https://metacpan.org/pod/DBIO::Candy) (import-based sugar)
-- Integrates [DBIx::Class::ResultDDL](https://metacpan.org/pod/DBIx::Class::ResultDDL) as [DBIO::Cake](https://metacpan.org/pod/DBIO::Cake) (DDL-like DSL)
-- Replicated storage built into core ([DBIO::Replicated](https://metacpan.org/pod/DBIO::Replicated))
-- Change tracking built into core ([DBIO::ChangeLog](https://metacpan.org/pod/DBIO::ChangeLog))
-- Async storage interface ([DBIO::Storage::Async](https://metacpan.org/pod/DBIO::Storage::Async), [DBIO::Future](https://metacpan.org/pod/DBIO::Future))
-- [SQL::Translator](https://metacpan.org/pod/SQL::Translator) has been removed;
-  all drivers use native desired-state deployment (introspect live DB, deploy
-  to throwaway, diff the two models) via DB-specific modules
+**Namespace**
+- `DBIO::` replaces `DBIx::Class::`
+
+**SQL Generation**
+- [SQL::Abstract](https://metacpan.org/pod/SQL::Abstract) replaces `SQL::Abstract::Classic`
+- Default `LIMIT/OFFSET` syntax; override `apply_limit` per driver for custom dialects
+
+**Integrated Components**
+
+The following were extracted from DBIx::Class distributions and merged into core:
+
+- [DBIx::Class::TimeStamp](https://metacpan.org/pod/DBIx::Class::TimeStamp) → `DBIO::Schema::DateTime` (automatic `created_at`/`updated_at` columns)
+- [DBIx::Class::Helpers](https://metacpan.org/pod/DBIx::Class::Helpers) → merged into core (resultset utilities, cross-request inflate/deflate, multicontext)
+- [DBIx::Class::Candy](https://metacpan.org/pod/DBIx::Class::Candy) → [DBIO::Candy](https://metacpan.org/pod/DBIO::Candy) (import-based sugar with `table`, `column`, `primary_key`, `has_many`, etc.)
+- [DBIx::Class::ResultDDL](https://metacpan.org/pod/DBIx::Class::ResultDDL) → [DBIO::Cake](https://metacpan.org/pod/DBIO::Cake) (DDL-like DSL with `col id => integer auto_inc`, `varchar(100), null`, etc.)
+
+**New in DBIO**
+
+- **Replicated Storage** — master/slave replication built into core with [DBIO::Replicated](https://metacpan.org/pod/DBIO::Replicated), access brokers for rotating credentials, read/write splitting
+- **Change Tracking** — automatic insert/update/delete logging via [DBIO::Schema::ChangeLog](https://metacpan.org/pod/DBIO::Schema::ChangeLog) (new component, not in DBIx::Class)
+- **Async Storage Interface** — `all_async`, `first_async`, `count_async`, `create_async` return [Futures](https://metacpan.org/pod/DBIO::Future); async drivers bypass DBI entirely
+- **SQL::Translator Removed** — all drivers use native desired-state deployment via test-deploy-and-compare (introspect live DB, deploy to throwaway, diff the two models) using DB-specific modules
 
 ## Core Features
 
-- **Replicated Storage** — master/slave replication via [DBIO::Replicated](https://metacpan.org/pod/DBIO::Replicated)
-- **Access Brokers** — `Schema->connect($broker)` with rotating credentials and storage-native connect info via [DBIO::AccessBroker](https://metacpan.org/pod/DBIO::AccessBroker)
-- **Change Tracking** — automatic insert/update/delete logging via [DBIO::ChangeLog](https://metacpan.org/pod/DBIO::ChangeLog)
-- **Async Interface** — `all_async`, `first_async`, `count_async`, `create_async`
-  return [Futures](https://metacpan.org/pod/DBIO::Future); async drivers
-  (e.g. [DBIO-PostgreSQL-Async](https://metacpan.org/pod/DBIO::PostgreSQL::Async))
-  bypass DBI entirely
+**Replicated Storage**
+- Master/slave replication via [DBIO::Replicated](https://metacpan.org/pod/DBIO::Replicated)
+- [DBIO::AccessBroker::Static](https://metacpan.org/pod/DBIO::AccessBroker::Static) — rotating credentials per-schema
+- [DBIO::AccessBroker::Env](https://metacpan.org/pod/DBIO::AccessBroker::Env) — credentials from environment variables
+- Read/write split based on operation type
 
-## Brokered Connections
+**Change Tracking**
+- Automatic logging of insert/update/delete operations via [DBIO::Schema::ChangeLog](https://metacpan.org/pod/DBIO::Schema::ChangeLog)
+- Per-table tracking configuration
+- [DBIO::ChangeLog::Entry](https://metacpan.org/pod/DBIO::ChangeLog::Entry) — structured change records
+- [DBIO::ChangeLog::Set](https://metacpan.org/pod/DBIO::ChangeLog::Set) — batch changes
 
-```perl
-use DBIO::AccessBroker::Static;
+**Async Interface**
+- `all_async`, `first_async`, `count_async`, `create_async` return [Futures](https://metacpan.org/pod/DBIO::Future)
+- [DBIO::PostgreSQL::Async](https://metacpan.org/pod/DBIO::PostgreSQL::Async) — async PostgreSQL via [EV::Pg](https://metacpan.org/pod/EV::Pg) (no DBI, libpq direct)
 
-my $broker = DBIO::AccessBroker::Static->new(
-    dsn      => 'dbi:Pg:dbname=myapp;host=db',
-    username => 'app',
-    password => 'secret',
-);
-
-my $schema = MyApp::Schema->connect($broker);
-```
-
-## Database Drivers (separate distributions)
-
-Active drivers (native desired-state deployment via test-and-compare):
-
-- [**DBIO::PostgreSQL**](https://metacpan.org/pod/DBIO::PostgreSQL) — introspection via pg_catalog, deploy via test-and-compare, RLS, indexes
-- [**DBIO::MySQL**](https://metacpan.org/pod/DBIO::MySQL) — MySQL and MariaDB support
-  (requires [DBD::mysql](https://metacpan.org/pod/DBD::mysql) **or** [DBD::MariaDB](https://metacpan.org/pod/DBD::MariaDB) — install the one that matches your server)
-- [**DBIO::SQLite**](https://metacpan.org/pod/DBIO::SQLite) — SQLite support
-- [**DBIO::DuckDB**](https://metacpan.org/pod/DBIO::DuckDB) — DuckDB support
-- [**DBIO::PostgreSQL::Async**](https://metacpan.org/pod/DBIO::PostgreSQL::Async) — async PostgreSQL via [EV::Pg](https://metacpan.org/pod/EV::Pg) (no DBI)
-
-Extracted drivers (same native deployment pattern):
-
-- [**DBIO::DB2**](https://metacpan.org/pod/DBIO::DB2) · [**DBIO::Firebird**](https://metacpan.org/pod/DBIO::Firebird) · [**DBIO::Informix**](https://metacpan.org/pod/DBIO::Informix) · [**DBIO::MSSQL**](https://metacpan.org/pod/DBIO::MSSQL) · [**DBIO::Oracle**](https://metacpan.org/pod/DBIO::Oracle) · [**DBIO::Sybase**](https://metacpan.org/pod/DBIO::Sybase)
+**Deployment**
+- All drivers implement native desired-state deployment via test-deploy-and-compare
+- No SQL::Translator dependency
+- [DBIO::Deploy](https://metacpan.org/pod/DBIO::Deploy) — base deploy interface
+- [DBIO::SQL::Util](https://metacpan.org/pod/DBIO::SQL::Util) — shared utilities (`_quote_ident`, `_split_statements`)
 
 ## Defining Result Classes
 
-Three ways to define the same result class:
+Three ways to define the same result class, from most verbose to most concise:
 
-### Vanilla (verbose, full control)
+### Vanilla (no sugar, full control)
 
 ```perl
 package MyApp::Schema::Result::Artist;
@@ -76,7 +72,9 @@ __PACKAGE__->has_many(cds => 'MyApp::Schema::Result::CD', 'artist_id');
 1;
 ```
 
-### [DBIO::Candy](https://metacpan.org/pod/DBIO::Candy) (import-based sugar)
+No import magic. Each column defined explicitly via `add_columns`. Use this when you need maximum control or are migrating from plain DBIx::Class.
+
+### [DBIO::Candy](https://metacpan.org/pod/DBIO::Candy) (keyword-based sugar)
 
 ```perl
 package MyApp::Schema::Result::Artist;
@@ -88,6 +86,8 @@ primary_key 'id';
 has_many cds => 'MyApp::Schema::Result::CD', 'artist_id';
 1;
 ```
+
+Imported keywords: `table`, `column`, `primary_key`, `belongs_to`, `has_many`, `has_one`, `might_have`, `many_to_many`, `add_columns`, `inflator`, `deflator`. Drops directly into `use DBIO::Core` namespace.
 
 ### [DBIO::Cake](https://metacpan.org/pod/DBIO::Cake) (DDL-like DSL)
 
@@ -107,6 +107,8 @@ has_many cds => 'MyApp::Schema::Result::CD', 'artist_id';
 1;
 ```
 
+DDL-inspired syntax with bareword chains. Note: bareword-to-bareword chains need no comma (`integer auto_inc`, `text null`); after a number or closing paren, Perl needs a comma (`varchar(100), null`).
+
 Cake with PostgreSQL-specific features:
 
 ```perl
@@ -123,14 +125,10 @@ col tsv        => tsvector null;
 col tags       => array(text), null;
 col created_at => timestamp;                                   # auto set_on_create
 col updated_at => timestamp on_update;                         # auto set_on_create + on_update
-col deleted_at => timestamp null;                              # nullable, no auto-set
+col deleted_at => timestamp null;                               # nullable, no auto-set
 primary_key 'id';
 1;
 ```
-
-Note: bareword-to-bareword chains need no comma (`integer auto_inc`,
-`text null`, `boolean default(1)`). After a number or closing paren,
-Perl needs a comma (`varchar(100), null` or `varchar 100, null`).
 
 ## Migration from DBIx::Class
 
@@ -141,8 +139,56 @@ use DBIx::Class::Candy;               use DBIO::Candy;
 use DBIx::Class::ResultDDL qw/-V2/;   use DBIO::Cake;
 ```
 
-Most code works with a namespace search-and-replace. See individual
-module documentation for detailed migration notes.
+Most code works with a namespace search-and-replace. Key changes:
+
+**Result class base**: `DBIx::Class::Core` → `DBIO::Core` (or `DBIO::Schema` for schema classes)
+
+**SQL::Abstract**: `SQL::Abstract::Classic` is no longer used; `SQL::Abstract` is the default
+
+**Deployment**: SQL::Translator is removed; drivers use native test-deploy-and-compare. See L<DBIO::Manual::Migration> for detailed migration notes.
+
+See L<DBIO::Manual::Migration> for the full migration guide.
+
+## Database Drivers
+
+Drivers are separate CPAN distributions. DBIO core autodetects DSN patterns and loads the appropriate storage.
+
+### Active Drivers
+
+**PostgreSQL** — L<DBIO::PostgreSQL>
+- Introspection via pg_catalog
+- Deploy via test-and-compare
+- RLS (Row Level Security), indexes (expression, covering, partial), full-text search (TSVECTOR)
+- Async via L<DBIO::PostgreSQL::Async> (EV::Pg, no DBI)
+- Enum, JSON, JSONB, UUID, ARRAY, HSTORE, VECTOR, INTERVAL types
+
+**MySQL / MariaDB** — L<DBIO::MySQL>
+- Supports both L<DBD::mysql> and L<DBD::MariaDB>
+- Deploy via test-and-compare
+- FULLTEXT indexes, spatial indexes (GIS)
+
+**SQLite** — L<DBIO::SQLite>
+- In-memory database testing (`dbi:SQLite::memory:`)
+- Deploy via test-and-compare
+- JSON support (SQLite 3.38+), FTS5 full-text search
+
+**DuckDB** — L<DBIO::DuckDB>
+- Embeddable analytical database
+- Deploy via test-and-compare
+- Arrow integration, parquet export, native JSON/JSONB
+
+### Extracted Drivers
+
+These drivers were extracted from the DBIx::Class monolith and now have native deploy:
+
+- **DB2** — L<DBIO::DB2> — IBM DB2 (SYSCAT introspection, RLS)
+- **Firebird** — L<DBIO::Firebird> — Firebird/InterBase (CHARACTER SET, DATE AT TIME ZONE)
+- **Informix** — L<DBIO::Informix> — Informix (SERIAL, BYTE, TEXT types)
+- **MSSQL** — L<DBIO::MSSQL> — Microsoft SQL Server (OUTPUT clause, window functions)
+- **Oracle** — L<DBIO::Oracle> — Oracle (CONNECT BY, hierarchical queries, 30-char identifiers)
+- **Sybase** — L<DBIO::Sybase> — Sybase ASE (temporary databases for deploy, sp_server_info)
+
+All drivers share [DBIO::SQL::Util](https://metacpan.org/pod/DBIO::SQL::Util) for `_quote_ident` and `_split_statements`.
 
 ## Testing
 
@@ -150,6 +196,8 @@ module documentation for detailed migration notes.
 prove -l t/             # Run tests (uses DBIO::Test::Storage, no real DB)
 prove -lv t/test/*.t    # Run core tests verbose
 ```
+
+Core tests use [DBIO::Test::Storage](https://metacpan.org/pod/DBIO::Test::Storage) — a fake/virtual storage that captures SQL and supports mocks. Real database testing belongs in driver distributions.
 
 ## Copyright
 
