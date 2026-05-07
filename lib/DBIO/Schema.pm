@@ -489,18 +489,16 @@ is true.
 =back
 
 An optional sub which you can declare in your own Schema class that will get
-passed the L<SQL::Translator::Schema> object when you deploy the schema via
-L</create_ddl_dir> or L</deploy>.
+called during deployment of the schema via L</deploy>.
 
 For an example of what you can do with this, see
 L<DBIO::Manual::Cookbook/Adding Indexes And Functions To Your SQL>.
 
 Note that sqlt_deploy_hook is called by L</deployment_statements>, which in turn
 is called before L</deploy>. Therefore the hook can be used only to manipulate
-the L<SQL::Translator::Schema> object before it is turned into SQL fed to the
-database. If you want to execute post-deploy statements which can not be generated
-by L<SQL::Translator>, the currently suggested method is to overload L</deploy>
-and use L<dbh_do|DBIO::Storage::DBI/dbh_do>.
+the deployment process before SQL is generated. If you want to execute
+post-deploy statements which can not be generated automatically, the currently
+suggested method is to overload L</deploy> and use L<dbh_do|DBIO::Storage::DBI/dbh_do>.
 
 =head1 METHODS
 

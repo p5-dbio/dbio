@@ -627,9 +627,6 @@ sub _gen_pod {
 
   File::Path::mkpath([$dir]);
 
-  my $sqltver = $class->req_list_for ('deploy')->{'SQL::Translator'}
-    or die "Hrmm? No sqlt dep?";
-
   my @chunks = (
     <<"EOC",
 #########################################################################

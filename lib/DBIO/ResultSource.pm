@@ -965,9 +965,9 @@ sub unique_constraint_columns {
 An accessor to set a callback to be called during deployment of
 the schema via L<DBIO::Schema/deploy>.
 
-B<DEPRECATED:> This callback was designed for the SQL::Translator-based
-deploy and is a no-op in core DBIO. It is retained for API compatibility
-but will not be called by native Deploy implementations.
+B<DEPRECATED:> This callback was designed for legacy deployment and is a
+no-op in core DBIO. It is retained for API compatibility but will not be
+called by native Deploy implementations.
 
 The callback can be set as either a code reference or the name of a
 method in the current result class.

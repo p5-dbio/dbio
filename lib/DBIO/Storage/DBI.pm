@@ -3070,12 +3070,12 @@ sub is_datatype_numeric {
 
 =back
 
-B<DEPRECATED:> This method requires L<SQL::Translator> and will throw an
+B<DEPRECATED:> This method is deprecated and will throw an
 exception if called. Use the native Deploy class on your storage instead.
 
 Creates a SQL file based on the Schema, for each of the specified
 database engines in C<\@databases> in the given directory.
-(note: specify L<SQL::Translator> names, not L<DBI> driver names).
+(note: specify database driver names, not DBI driver names).
 
 Given a previous version number, this will also create a file containing
 the ALTER TABLE statements to transform the previous schema into the
@@ -3087,10 +3087,7 @@ override this method in your schema if you would like a different file
 name format. For the ALTER file, the same format is used, replacing
 $version in the name with "$preversion-$version".
 
-See L<SQL::Translator/METHODS> for a list of values for C<\%sqlt_args>.
-The most common value for this would be C<< { add_drop_table => 1 } >>
-to have the SQL produced include a C<DROP TABLE> statement for each table
-created. For quoting purposes supply C<quote_identifiers>.
+For quoting purposes supply C<quote_identifiers>.
 
 If no arguments are passed, then the following default values are assumed:
 
@@ -3123,7 +3120,7 @@ them.
 
 sub create_ddl_dir {
   my ($self, $schema, $databases, $version, $dir, $preversion, $sqltargs) = @_;
-  $self->throw_exception("create_ddl_dir() requires SQL::Translator and is deprecated. "
+  $self->throw_exception("create_ddl_dir() is deprecated. "
     . "Use the native Deploy class on your storage instead.");
 }
 
@@ -3139,7 +3136,7 @@ Returns the SQL statements for deploying the schema.
 
 If a DDL file exists in the directory (from a prior L</create_ddl_dir>
 call), reads and returns its contents. Otherwise, throws an exception.
-There is no on-the-fly SQL generation without SQL::Translator.
+There is no on-the-fly SQL generation without a Deploy class.
 
 For deployments, use L<DBIO::Schema/deploy> instead, which routes to the
 storage's native Deploy class if available.
@@ -3164,7 +3161,7 @@ sub deployment_statements {
   }
 
   $self->throw_exception("deployment_statements() requires a pre-existing DDL file; "
-    . "SQL::Translator is no longer used for on-the-fly SQL generation. "
+    . "native Deploy classes handle SQL generation. "
     . "Use L<DBIO::Schema/deploy> with a storage that provides a native Deploy class.");
 }
 

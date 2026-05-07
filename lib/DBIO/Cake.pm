@@ -1027,7 +1027,7 @@ C<idx> works transparently in both deployment pipelines:
 
 =over
 
-=item * C<sqlt_deploy_hook> — B<DEPRECATED> hook for SQL::Translator-based
+=item * C<sqlt_deploy_hook> — B<DEPRECATED> hook for legacy
 deployment. The C<options> key passes producer-specific options through.
 
 =item * C<pg_indexes> — used by L<DBIO::PostgreSQL::DDL> when the schema
