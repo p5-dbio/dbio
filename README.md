@@ -14,7 +14,9 @@ A modern fork of [DBIx::Class](https://metacpan.org/pod/DBIx::Class).
 - Replicated storage built into core ([DBIO::Replicated](https://metacpan.org/pod/DBIO::Replicated))
 - Change tracking built into core ([DBIO::ChangeLog](https://metacpan.org/pod/DBIO::ChangeLog))
 - Async storage interface ([DBIO::Storage::Async](https://metacpan.org/pod/DBIO::Storage::Async), [DBIO::Future](https://metacpan.org/pod/DBIO::Future))
-- [SQL::Translator](https://metacpan.org/pod/SQL::Translator) is optional, replaced by DB-specific modules
+- [SQL::Translator](https://metacpan.org/pod/SQL::Translator) has been removed;
+  all drivers use native desired-state deployment (introspect live DB, deploy
+  to throwaway, diff the two models) via DB-specific modules
 
 ## Core Features
 
@@ -42,11 +44,18 @@ my $schema = MyApp::Schema->connect($broker);
 
 ## Database Drivers (separate distributions)
 
-- [**DBIO::PostgreSQL**](https://metacpan.org/pod/DBIO::PostgreSQL) — introspection via pg_catalog, deploy via test-and-compare
+Active drivers (native desired-state deployment via test-and-compare):
+
+- [**DBIO::PostgreSQL**](https://metacpan.org/pod/DBIO::PostgreSQL) — introspection via pg_catalog, deploy via test-and-compare, RLS, indexes
 - [**DBIO::MySQL**](https://metacpan.org/pod/DBIO::MySQL) — MySQL and MariaDB support
   (requires [DBD::mysql](https://metacpan.org/pod/DBD::mysql) **or** [DBD::MariaDB](https://metacpan.org/pod/DBD::MariaDB) — install the one that matches your server)
 - [**DBIO::SQLite**](https://metacpan.org/pod/DBIO::SQLite) — SQLite support
+- [**DBIO::DuckDB**](https://metacpan.org/pod/DBIO::DuckDB) — DuckDB support
 - [**DBIO::PostgreSQL::Async**](https://metacpan.org/pod/DBIO::PostgreSQL::Async) — async PostgreSQL via [EV::Pg](https://metacpan.org/pod/EV::Pg) (no DBI)
+
+Extracted drivers (same native deployment pattern):
+
+- [**DBIO::DB2**](https://metacpan.org/pod/DBIO::DB2) · [**DBIO::Firebird**](https://metacpan.org/pod/DBIO::Firebird) · [**DBIO::Informix**](https://metacpan.org/pod/DBIO::Informix) · [**DBIO::MSSQL**](https://metacpan.org/pod/DBIO::MSSQL) · [**DBIO::Oracle**](https://metacpan.org/pod/DBIO::Oracle) · [**DBIO::Sybase**](https://metacpan.org/pod/DBIO::Sybase)
 
 ## Defining Result Classes
 

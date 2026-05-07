@@ -243,15 +243,20 @@ DBIO is a fork of L<DBIx::Class> with a clean namespace break. Key changes:
 =item * LIMIT/OFFSET via C<apply_limit> on the driver's SQLMaker instead of
 string-based dialect dispatch
 
-=item * L<SQL::Translator> is optional, being replaced by DB-specific deploy
-modules
+=item * L<SQL::Translator> has been removed; schema introspection, diff, and
+deployment are handled by DB-specific native modules
+
+=item * Shared utilities (L<DBIO::SQL::Util>) provide C<_quote_ident> and
+C<_split_statement> for cross-driver use
 
 =item * L<DBIx::Class::TimeStamp> and L<DBIx::Class::Helpers> functionality
 integrated into core
 
 =item * Native driver distributions for each database (L<DBIO::PostgreSQL>,
-L<DBIO::MySQL>, L<DBIO::SQLite>) replace the monolithic DBIx::Class storage
-layer; SQL::Translator is no longer required for schema management
+L<DBIO::MySQL>, L<DBIO::SQLite>, L<DBIO::DuckDB>) use desired-state
+deployment via test-and-compare; extracted drivers
+(L<DBIO::DB2>, L<DBIO::Firebird>, L<DBIO::Informix>, L<DBIO::MSSQL>,
+L<DBIO::Oracle>, L<DBIO::Sybase>) follow the same pattern
 
 =item * Meta-infrastructure has been split into L<DBIO::Base> (inherited by
 all internal classes); C<DBIO.pm> is now a pure sugar pragma
