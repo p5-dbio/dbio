@@ -1203,9 +1203,9 @@ sub deploy {
   $self->throw_exception("Can't deploy without storage") unless $self->storage;
 
   # If the storage class advertises a native Deploy class
-  # (e.g. DBIO::PostgreSQL::Deploy), use it instead of the SQL::Translator
-  # codepath. The native classes know their database properly and avoid
-  # the lossy abstract-DDL roundtrip.
+  # (e.g. DBIO::PostgreSQL::Deploy), use it instead of the
+  # SQL::Translator codepath. The native classes know their database
+  # properly and avoid the lossy abstract-DDL roundtrip.
   if (my $deploy_class = $self->storage->can('dbio_deploy_class')
       && $self->storage->dbio_deploy_class) {
     eval "require $deploy_class; 1"

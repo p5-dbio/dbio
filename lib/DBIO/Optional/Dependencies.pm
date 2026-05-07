@@ -748,8 +748,7 @@ be able to use a specific feature.
 For example if some of the requirements for C<deploy> are not available,
 the returned string could look like:
 
- SQL::Translator >= $sqltver (see $class for details)
-
+ 
 The author is expected to prepend the necessary text to this message before
 returning the actual error seen by the user.
 EOD
