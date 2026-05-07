@@ -103,8 +103,23 @@ and then you're good to go.
 
 =cut
 
+=begin removed
+
+=head1 DEPRECATED
+
+This module is deprecated and will be removed in a future release.
+It uses L<SQL::Translator> for schema diffing, which has been removed from DBIO.
+
+For schema deployment, use your driver's native L<DBIO::Deploy> implementation
+(e.g. L<DBIO::PostgreSQL::Deploy>, L<DBIO::SQLite::Deploy>, L<DBIO::MySQL::Deploy>)
+which uses test-deploy-and-compare instead of SQL diff files.
+
+=end removed
+
+=cut
+
 package DBIO::Schema::Versioned;
-# ABSTRACT: DBIO::Schema plugin for Schema upgrades
+# ABSTRACT: DBIO::Schema plugin for Schema upgrades (DEPRECATED)
 
 use strict;
 use warnings;

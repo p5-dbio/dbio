@@ -1,4 +1,4 @@
-package DBIO::Schema::PopulateMore;
+package DBIO::PopulateMore;
 
 # ABSTRACT: Enhanced populate with cross-source references
 
@@ -13,7 +13,11 @@ use namespace::clean;
   package MyApp::Schema;
   use base 'DBIO::Schema';
 
-  __PACKAGE__->load_components(qw/Schema::PopulateMore/);
+  # Can be loaded as a component or used standalone
+  __PACKAGE__->load_components(qw/PopulateMore/);
+
+  # Or use directly on any schema instance:
+  # DBIO::PopulateMore->populate_more($schema, [...])
 
 Then:
 
@@ -34,12 +38,17 @@ Then:
 
 =head1 DESCRIPTION
 
-This L<DBIO::Schema> component provides an enhanced version of the builtin
+This module provides an enhanced version of the builtin
 L<DBIO::Schema/populate> method. It allows inserting rows across multiple
 result sources in one call, with cross-referencing between them via the
 C<!Index:Source.key> syntax.
 
 Based on L<DBIx::Class::Schema::PopulateMore> by John Napiorkowski.
+
+Unlike other L<DBIO::Schema> components, this module is not a schema
+plugin that inherits from L<DBIO::Schema>. It is a standalone utility
+class that operates on any schema instance. It can be loaded as a
+component via L<DBIO::Schema/load_components>, or used directly.
 
 =head2 Inflators
 
