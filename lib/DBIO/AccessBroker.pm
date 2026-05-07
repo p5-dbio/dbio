@@ -49,20 +49,9 @@ sub connect_info_for {
 sub connect_info_for_storage {
   my ($self, $storage, $mode) = @_;
   $mode //= 'write';
-
-  my $connect_info = $self->connect_info_for($mode);
-
-  return $connect_info if blessed($storage) && $storage->isa('DBIO::Storage::DBI');
-
-  if (blessed($storage) && $storage->isa('DBIO::PostgreSQL::Async::Storage')) {
-    return [ $self->_pg_async_connect_info_from_dbi_info($connect_info), {} ];
-  }
-
-  croak sprintf(
-    "%s can not derive connect info for storage %s",
-    ref($self) || $self,
-    (blessed($storage) ? ref($storage) : 'unknown'),
-  );
+  # Subclasses with storage-native formats override this.
+  # Default: delegate to connect_info_for (DBI-shaped).
+  return $self->connect_info_for($mode);
 }
 
 # Do credentials need rotation?
@@ -104,31 +93,6 @@ sub current_connect_info_for_storage {
     $self->refresh;
   }
   return $self->connect_info_for_storage($storage, $mode);
-}
-
-sub _pg_async_connect_info_from_dbi_info {
-  my ($self, $connect_info) = @_;
-
-  my ($dsn, $user, $pass, $attrs) = @{ $connect_info || [] };
-  my ($params) = ($dsn || '') =~ /^dbi:Pg:(.+)$/i;
-
-  croak sprintf(
-    "%s can not derive async PostgreSQL conninfo from DSN '%s'",
-    ref($self) || $self,
-    (defined $dsn ? $dsn : ''),
-  ) unless defined $params;
-
-  my %conninfo = map {
-    my ($key, $value) = split /=/, $_, 2;
-    $key => $value;
-  } grep { length $_ } split /;/, $params;
-
-  $conninfo{user} = $user if defined $user && length $user;
-  $conninfo{password} = $pass if defined $pass && length $pass;
-  $conninfo{pool_size} = $attrs->{pool_size}
-    if ref($attrs) eq 'HASH' && exists $attrs->{pool_size};
-
-  return \%conninfo;
 }
 
 1;
