@@ -1194,18 +1194,9 @@ This guard was activated beginning"
 
 =back
 
-Attempts to deploy the schema to the current storage using L<SQL::Translator>.
-
-See L<SQL::Translator/METHODS> for a list of values for C<\%sqlt_args>.
-The most common value for this would be C<< { add_drop_table => 1 } >>
-to have the SQL produced include a C<DROP TABLE> statement for each table
-created. For quoting purposes supply C<quote_identifiers>.
-
-Additionally, the DBIO parser accepts a C<sources> parameter as a hash
-ref or an array ref, containing a list of source to deploy. If present, then
-only the sources listed will get deployed. Furthermore, you can use the
-C<add_fk_index> parser parameter to prevent the parser from creating an index for each
-FK.
+Deploys the schema to the current storage. If the storage class provides
+a native Deploy class (via L<DBIO::Storage::DBI/dbio_deploy_class>),
+uses that. Otherwise throws an exception.
 
 =cut
 

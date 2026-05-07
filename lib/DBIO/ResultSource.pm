@@ -194,7 +194,6 @@ the name of the column will be used.
    { data_type => 'integer' }
 
 This contains the column type. It is automatically filled if you use the
-L<SQL::Translator::Producer::DBIO::File> producer, or the
 L<DBIO::Schema::Loader> module.
 
 Currently there is no standard set of values for the data_type. Use
@@ -211,8 +210,7 @@ schema, see L<DBIO::Schema/deploy>.
    { size => [ 9, 6 ] }
 
 For decimal or float values you can specify an ArrayRef in order to
-control precision, assuming your database's
-L<SQL::Translator::Producer> supports it.
+control precision, assuming your database's producer supports it.
 
 =item is_nullable
 
@@ -301,11 +299,9 @@ case this will be done anyway.
 
 =item extra
 
-This is used by L<DBIO::Schema/deploy> and L<SQL::Translator>
-to add extra non-generic data to the column. For example: C<< extra
-=> { unsigned => 1} >> is used by the MySQL producer to set an integer
-column to unsigned. For more details, see
-L<SQL::Translator::Producer::MySQL>.
+Arbitrary extra non-generic data to add to the column. For example:
+C<< extra => { unsigned => 1 } >> is used by the MySQL producer to set an
+integer column to unsigned.
 
 =back
 
@@ -967,8 +963,11 @@ sub unique_constraint_columns {
   } );
 
 An accessor to set a callback to be called during deployment of
-the schema via L<DBIO::Schema/create_ddl_dir> or
-L<DBIO::Schema/deploy>.
+the schema via L<DBIO::Schema/deploy>.
+
+B<DEPRECATED:> This callback was designed for the SQL::Translator-based
+deploy and is a no-op in core DBIO. It is retained for API compatibility
+but will not be called by native Deploy implementations.
 
 The callback can be set as either a code reference or the name of a
 method in the current result class.
@@ -976,30 +975,18 @@ method in the current result class.
 Defaults to L</default_sqlt_deploy_hook>.
 
 Your callback will be passed the $source object representing the
-ResultSource instance being deployed, and the
-L<SQL::Translator::Schema::Table> object being created from it. The
-callback can be used to manipulate the table object or add your own
-customised indexes. If you need to manipulate a non-table object, use
-the L<DBIO::Schema/sqlt_deploy_hook>.
-
-See L<DBIO::Manual::Cookbook/Adding Indexes And Functions To
-Your SQL> for examples.
-
-This sqlt deployment callback can only be used to manipulate
-SQL::Translator objects as they get turned into SQL. To execute
-post-deploy statements which SQL::Translator does not currently
-handle, override L<DBIO::Schema/deploy> in your Schema class
-and call L<dbh_do|DBIO::Storage::DBI/dbh_do>.
+ResultSource instance being deployed. The callback can be used to
+manipulate the table object or add your own customised indexes.
 
 =head2 default_sqlt_deploy_hook
 
 This is the default deploy hook implementation which checks if your
 current Result class has a C<sqlt_deploy_hook> method, and if present
 invokes it B<on the Result class directly>. This is to preserve the
-semantics of C<sqlt_deploy_hook> which was originally designed to expect
-the Result class name and the
-L<$sqlt_table instance|SQL::Translator::Schema::Table> of the table being
-deployed.
+semantics of C<sqlt_deploy_hook> for backwards compatibility.
+
+B<DEPRECATED:> This method is a no-op for native Deploy; it only
+exists for API compatibility.
 
 =cut
 

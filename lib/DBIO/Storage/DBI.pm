@@ -3070,6 +3070,9 @@ sub is_datatype_numeric {
 
 =back
 
+B<DEPRECATED:> This method requires L<SQL::Translator> and will throw an
+exception if called. Use the native Deploy class on your storage instead.
+
 Creates a SQL file based on the Schema, for each of the specified
 database engines in C<\@databases> in the given directory.
 (note: specify L<SQL::Translator> names, not L<DBI> driver names).
@@ -3120,149 +3123,8 @@ them.
 
 sub create_ddl_dir {
   my ($self, $schema, $databases, $version, $dir, $preversion, $sqltargs) = @_;
-
-  unless ($dir) {
-    carp "No directory given, using ./\n";
-    $dir = './';
-  } else {
-      -d $dir
-        or
-      (require File::Path and File::Path::mkpath (["$dir"]))  # mkpath does not like objects (i.e. Path::Class::Dir)
-        or
-      $self->throw_exception(
-        "Failed to create '$dir': " . ($! || $@ || 'error unknown')
-      );
-  }
-
-  $self->throw_exception ("Directory '$dir' does not exist\n") unless(-d $dir);
-
-  $databases ||= ['MySQL', 'SQLite', 'PostgreSQL'];
-  $databases = [ $databases ] if(ref($databases) ne 'ARRAY');
-
-  my $schema_version = $schema->schema_version || '1.x';
-  $version ||= $schema_version;
-
-  $sqltargs = {
-    add_drop_table => 1,
-    ignore_constraint_names => 1,
-    ignore_index_names => 1,
-    quote_identifiers => $self->sql_maker->_quoting_enabled,
-    %{$sqltargs || {}}
-  };
-
-  unless (DBIO::Optional::Dependencies->req_ok_for ('deploy')) {
-    $self->throw_exception("Can't create a ddl file without " . DBIO::Optional::Dependencies->req_missing_for ('deploy') );
-  }
-
-  my $sqlt = SQL::Translator->new( $sqltargs );
-
-  $sqlt->parser('SQL::Translator::Parser::DBIO');
-  my $sqlt_schema = $sqlt->translate({ data => $schema })
-    or $self->throw_exception ($sqlt->error);
-
-  foreach my $db (@$databases) {
-    $sqlt->reset();
-    $sqlt->{schema} = $sqlt_schema;
-    $sqlt->producer($db);
-
-    my $file;
-    my $filename = $schema->ddl_filename($db, $version, $dir);
-    if (-e $filename && ($version eq $schema_version )) {
-      # if we are dumping the current version, overwrite the DDL
-      carp "Overwriting existing DDL file - $filename";
-      unlink($filename);
-    }
-
-    my $output = $sqlt->translate;
-    if(!$output) {
-      carp("Failed to translate to $db, skipping. (" . $sqlt->error . ")");
-      next;
-    }
-    if(!open($file, ">$filename")) {
-      $self->throw_exception("Can't open $filename for writing ($!)");
-      next;
-    }
-    print $file $output;
-    close($file);
-
-    next unless ($preversion);
-
-    require SQL::Translator::Diff;
-
-    my $prefilename = $schema->ddl_filename($db, $preversion, $dir);
-    if(!-e $prefilename) {
-      carp("No previous schema file found ($prefilename)");
-      next;
-    }
-
-    my $difffile = $schema->ddl_filename($db, $version, $dir, $preversion);
-    if(-e $difffile) {
-      carp("Overwriting existing diff file - $difffile");
-      unlink($difffile);
-    }
-
-    my $source_schema;
-    {
-      my $t = SQL::Translator->new($sqltargs);
-      $t->debug( 0 );
-      $t->trace( 0 );
-
-      $t->parser( $db )
-        or $self->throw_exception ($t->error);
-
-      my $out = $t->translate( $prefilename )
-        or $self->throw_exception ($t->error);
-
-      $source_schema = $t->schema;
-
-      $source_schema->name( $prefilename )
-        unless ( $source_schema->name );
-    }
-
-    # The "new" style of producers have sane normalization and can support
-    # diffing a SQL file against a DBIO->SQLT schema. Old style ones don't
-    # And we have to diff parsed SQL against parsed SQL.
-    my $dest_schema = $sqlt_schema;
-
-    unless ( "SQL::Translator::Producer::$db"->can('preprocess_schema') ) {
-      my $t = SQL::Translator->new($sqltargs);
-      $t->debug( 0 );
-      $t->trace( 0 );
-
-      $t->parser( $db )
-        or $self->throw_exception ($t->error);
-
-      my $out = $t->translate( $filename )
-        or $self->throw_exception ($t->error);
-
-      $dest_schema = $t->schema;
-
-      $dest_schema->name( $filename )
-        unless $dest_schema->name;
-    }
-
-    my $diff = do {
-      # FIXME - this is a terrible workaround for
-      # https://github.com/dbsrgits/sql-translator/commit/2d23c1e
-      # Fixing it in this sloppy manner so that we don't hve to
-      # lockstep an SQLT release as well. Needs to be removed at
-      # some point, and SQLT dep bumped
-      local $SQL::Translator::Producer::SQLite::NO_QUOTES
-        if $SQL::Translator::Producer::SQLite::NO_QUOTES;
-
-      SQL::Translator::Diff::schema_diff($source_schema, $db,
-                                         $dest_schema,   $db,
-                                         $sqltargs
-                                       );
-    };
-
-    if(!open $file, ">$difffile") {
-      $self->throw_exception("Can't write to $difffile ($!)");
-      next;
-    }
-    print $file $diff;
-    close($file);
-  }
+  $self->throw_exception("create_ddl_dir() requires SQL::Translator and is deprecated. "
+    . "Use the native Deploy class on your storage instead.");
 }
 
 =head2 deployment_statements
@@ -3273,20 +3135,14 @@ sub create_ddl_dir {
 
 =back
 
-Returns the statements used by L<DBIO::Storage/deploy>
-and L<DBIO::Schema/deploy>.
+Returns the SQL statements for deploying the schema.
 
-The L<SQL::Translator> (not L<DBI>) database driver name can be explicitly
-provided in C<$type>, otherwise the result of L</sqlt_type> is used as default.
+If a DDL file exists in the directory (from a prior L</create_ddl_dir>
+call), reads and returns its contents. Otherwise, throws an exception.
+There is no on-the-fly SQL generation without SQL::Translator.
 
-C<$directory> is used to return statements from files in a previously created
-L</create_ddl_dir> directory and is optional. The filenames are constructed
-from L<DBIO::Schema/ddl_filename>, the schema name and the C<$version>.
-
-If no C<$directory> is specified then the statements are constructed on the
-fly using L<SQL::Translator> and C<$version> is ignored.
-
-See L<SQL::Translator/METHODS> for a list of values for C<$sqlt_args>.
+For deployments, use L<DBIO::Schema/deploy> instead, which routes to the
+storage's native Deploy class if available.
 
 =cut
 
@@ -3307,31 +3163,9 @@ sub deployment_statements {
       return join('', @rows);
   }
 
-  unless (DBIO::Optional::Dependencies->req_ok_for ('deploy') ) {
-    $self->throw_exception("Can't deploy without a ddl_dir or " . DBIO::Optional::Dependencies->req_missing_for ('deploy') );
-  }
-
-  # sources needs to be a parser arg, but for simplicity allow at top level
-  # coming in
-  $sqltargs->{parser_args}{sources} = delete $sqltargs->{sources}
-      if exists $sqltargs->{sources};
-
-  $sqltargs->{quote_identifiers} = $self->sql_maker->_quoting_enabled
-    unless exists $sqltargs->{quote_identifiers};
-
-  my $tr = SQL::Translator->new(
-    producer => "SQL::Translator::Producer::${type}",
-    %$sqltargs,
-    parser => 'SQL::Translator::Parser::DBIO',
-    data => $schema,
-  );
-
-  return preserve_context {
-    $tr->translate
-  } after => sub {
-    $self->throw_exception( 'Unable to produce deployment statements: ' . $tr->error)
-      unless defined $_[0];
-  };
+  $self->throw_exception("deployment_statements() requires a pre-existing DDL file; "
+    . "SQL::Translator is no longer used for on-the-fly SQL generation. "
+    . "Use L<DBIO::Schema/deploy> with a storage that provides a native Deploy class.");
 }
 
 =method deploy_defaults

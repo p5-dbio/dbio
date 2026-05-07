@@ -1027,10 +1027,8 @@ C<idx> works transparently in both deployment pipelines:
 
 =over
 
-=item * C<sqlt_deploy_hook> — used by the L<SQL::Translator>-based
-deployment (the default for most DBIO schemas). The C<options> key
-passes producer-specific options through to
-L<SQL::Translator::Schema::Index>.
+=item * C<sqlt_deploy_hook> — B<DEPRECATED> hook for SQL::Translator-based
+deployment. The C<options> key passes producer-specific options through.
 
 =item * C<pg_indexes> — used by L<DBIO::PostgreSQL::DDL> when the schema
 loads the C<PostgreSQL> component. The C<pg> key carries

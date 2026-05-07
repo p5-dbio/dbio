@@ -367,10 +367,9 @@ created, which calls C<create_related> for the relationship.
 
 =item is_foreign_key_constraint
 
-If you are using L<SQL::Translator> to create SQL for you and you find that it
-is creating constraints where it shouldn't, or not creating them where it
-should, set this attribute to a true or false value to override the detection
-of when to create constraints.
+If you find that DBIO is creating constraints where it shouldn't, or not
+creating them where it should, set this attribute to a true or false value
+to override the detection of when to create constraints.
 
 =item cascade_copy
 
@@ -412,29 +411,26 @@ you must arrange to do this yourself.
 
 =item on_delete / on_update
 
-If you are using L<SQL::Translator> to create SQL for you, you can use these
-attributes to explicitly set the desired C<ON DELETE> or C<ON UPDATE> constraint
-type. If not supplied the SQLT parser will attempt to infer the constraint type by
-interrogating the attributes of the B<opposite> relationship. For any 'multi'
-relationship with C<< cascade_delete => 1 >>, the corresponding belongs_to
-relationship will be created with an C<ON DELETE CASCADE> constraint. For any
-relationship bearing C<< cascade_copy => 1 >> the resulting belongs_to constraint
-will be C<ON UPDATE CASCADE>. If you wish to disable this autodetection, and just
-use the RDBMS' default constraint type, pass C<< on_delete => undef >> or
+Use these attributes to explicitly set the desired C<ON DELETE> or
+C<ON UPDATE> constraint type. For any 'multi' relationship with
+C<< cascade_delete => 1 >>, the corresponding belongs_to relationship
+will be created with an C<ON DELETE CASCADE> constraint. For any relationship
+bearing C<< cascade_copy => 1 >> the resulting belongs_to constraint will be
+C<ON UPDATE CASCADE>. If you wish to disable this autodetection, and just use
+the RDBMS' default constraint type, pass C<< on_delete => undef >> or
 C<< on_delete => '' >>, and the same for C<on_update> respectively.
 
 =item is_deferrable
 
-Tells L<SQL::Translator> that the foreign key constraint it creates should be
-deferrable. In other words, the user may request that the constraint be ignored
-until the end of the transaction. Currently, only the PostgreSQL producer
-actually supports this.
+Indicates that the foreign key constraint should be deferrable. In other
+words, the user may request that the constraint be ignored until the end
+of the transaction. Currently, only the PostgreSQL producer actually
+supports this.
 
 =item add_fk_index
 
-Tells L<SQL::Translator> to add an index for this constraint. Can also be
-specified globally in the args to L<DBIO::Schema/deploy> or
-L<DBIO::Schema/create_ddl_dir>. Default is on, set to 0 to disable.
+If true, adds an index for this constraint. Can also be specified globally
+in the args to L<DBIO::Schema/deploy>. Default is on, set to 0 to disable.
 
 =back
 

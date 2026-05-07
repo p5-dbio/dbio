@@ -108,11 +108,10 @@ my $reqs = {
 
   deploy => {
     req => {
-      'SQL::Translator'           => '0.11018',
     },
     pod => {
       title => 'Storage::DBI::deploy()',
-      desc => 'Modules required for L<DBIO::Storage::DBI/deployment_statements> and L<DBIO::Schema/deploy>',
+      desc => 'Modules required for native Deploy (if no L<DBIO::Storage::DBI/dbio_deploy_class>, throws an exception)',
     },
   },
 
