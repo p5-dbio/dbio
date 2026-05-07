@@ -6,10 +6,24 @@ use warnings;
 
 use base 'DBIO::Base';
 
+=head1 NAME
+
+DBIO::ChangeLog::Table — Shared utilities for changelog source definitions
+
 =head1 DESCRIPTION
 
 Shared utilities for L<DBIO::ChangeLog::Entry> and L<DBIO::ChangeLog::Set>.
 Provides validation and building helpers for source_definition hashes.
+
+=cut
+
+=method validate_definition
+
+  DBIO::ChangeLog::Table->validate_definition(\%def);
+
+Validates that a source_definition hash contains all required keys:
+C<table>, C<columns>, C<column_order>, and C<primary_key>.  Croaks on
+invalid input.
 
 =cut
 
@@ -35,6 +49,17 @@ sub validate_definition {
 
   return $def;
 }
+
+=method build_source
+
+  my $def_hash = DBIO::ChangeLog::Table->build_source(\%def);
+
+Validates the definition and returns a plain hashref with C<table>,
+C<columns>, C<column_order>, and C<primary_key> keys.  Used by
+L<DBIO::ChangeLog::Entry> and L<DBIO::ChangeLog::Set> to build their
+source definitions.
+
+=cut
 
 sub build_source {
   my ($class, $def) = @_;

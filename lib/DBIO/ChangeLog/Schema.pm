@@ -170,12 +170,9 @@ sub txn_do {
 
   $schema->deploy_changelog;
 
-Deploys the changelog tables (C<changelog_set> and all
-C<< <source>_changelog >> tables).  Call this after deploying your
-main schema.
-
-This method iterates over all registered changelog sources and
-creates the corresponding tables via the storage layer.
+Deploys all changelog tables (C<changelog_set> and every
+C<< <source>_changelog >> table) via the storage layer.  Call this after
+deploying your main schema.
 
 =cut
 
@@ -278,5 +275,12 @@ sub _now {
   require POSIX;
   return POSIX::strftime('%Y-%m-%d %H:%M:%S', localtime);
 }
+
+=head1 SEE ALSO
+
+L<DBIO::ChangeLog>, L<DBIO::ChangeLog::Entry>, L<DBIO::ChangeLog::Set>,
+L<DBIO::ChangeLog::Table>
+
+=cut
 
 1;
