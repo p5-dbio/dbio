@@ -22,11 +22,12 @@ can_ok('DBIO::AccessBroker', qw(
 # Static broker tests
 use_ok('DBIO::AccessBroker::Static');
 
-# Construct with DSN
+# Construct with driver-native params
 my $broker = DBIO::AccessBroker::Static->new(
-  dsn      => 'dbi:SQLite:dbname=:memory:',
-  username => '',
-  password => '',
+  host     => 'localhost',
+  dbname   => 'mydb',
+  username => 'user',
+  password => 'pass',
 );
 ok $broker, 'Static broker constructor';
 isa_ok $broker, 'DBIO::AccessBroker';
@@ -35,7 +36,10 @@ isa_ok $broker, 'DBIO::AccessBroker';
 my $write_info = $broker->connect_info_for('write');
 my $read_info  = $broker->connect_info_for('read');
 is_deeply $write_info, $read_info, 'read and write return same info';
-is $write_info->[0], 'dbi:SQLite:dbname=:memory:', 'DSN correct';
+is $write_info->{host}, 'localhost', 'host correct';
+is $write_info->{dbname}, 'mydb', 'dbname correct';
+is $write_info->{user}, 'user', 'user correct';
+is $write_info->{password}, 'pass', 'password correct';
 
 # needs_refresh is always false
 ok !$broker->needs_refresh, 'static never needs refresh';
@@ -46,5 +50,24 @@ ok $broker->is_transaction_safe, 'static broker is transaction safe';
 # current_connect_info_for is convenience (checks refresh + returns info)
 my $current = $broker->current_connect_info_for('write');
 is_deeply $current, $write_info, 'current_connect_info_for same as connect_info_for';
+
+# Test driver-native hashref format
+subtest 'connect_info_for returns driver-native hashref' => sub {
+  my $broker = DBIO::AccessBroker::Static->new(
+    host => '127.0.0.1',
+    port => 5432,
+    dbname => 'mydb',
+    username => 'user',
+    password => 'pass',
+  );
+
+  my $info = $broker->connect_info_for('write');
+  ok(ref $info eq 'HASH', 'returns hashref');
+  is($info->{host}, '127.0.0.1', 'host key present');
+  is($info->{port}, 5432, 'port key present');
+  is($info->{dbname}, 'mydb', 'dbname key present');
+  is($info->{user}, 'user', 'user key present');
+  is($info->{password}, 'pass', 'password key present');
+};
 
 done_testing;

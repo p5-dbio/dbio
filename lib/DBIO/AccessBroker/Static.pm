@@ -6,22 +6,33 @@ use warnings;
 use base 'DBIO::AccessBroker';
 
 __PACKAGE__->mk_group_accessors('simple' => qw(
-  dsn username password dbi_attrs
+  host port dbname username password
 ));
 
 sub new {
   my ($class, %args) = @_;
   my $self = $class->SUPER::new(%args);
-  $self->dsn($args{dsn})           if exists $args{dsn};
+  $self->host($args{host}) if exists $args{host};
+  $self->port($args{port}) if exists $args{port};
+  $self->dbname($args{dbname}) if exists $args{dbname};
   $self->username($args{username} // '');
   $self->password($args{password} // '');
-  $self->dbi_attrs($args{dbi_attrs} // {});
   return $self;
 }
 
 sub connect_info_for {
   my ($self, $mode) = @_;
-  return [$self->dsn, $self->username, $self->password, $self->dbi_attrs];
+  $mode //= 'write';
+
+  my %info = (
+    host     => $self->host,
+    port     => $self->port,
+    dbname   => $self->dbname,
+    user     => $self->username,
+    password => $self->password,
+  );
+
+  return \%info;
 }
 
 sub needs_refresh { 0 }
