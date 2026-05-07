@@ -174,13 +174,31 @@ Deploys the changelog tables (C<changelog_set> and all
 C<< <source>_changelog >> tables).  Call this after deploying your
 main schema.
 
+This method iterates over all registered changelog sources and
+creates the corresponding tables via the storage layer.
+
 =cut
 
 sub deploy_changelog {
   my ($self) = @_;
-  # For now this is a no-op placeholder; actual DDL deployment will
-  # be handled by the storage driver or SQL::Translator integration.
-  # The ResultSources are registered at connection time.
+
+  my @tables;
+
+  if (my $set_source = $self->source('ChangeLog_Set')) {
+    push @tables, $set_source;
+  }
+
+  for my $source_name ($self->sources) {
+    next if $source_name =~ /_ChangeLog$/ || $source_name eq 'ChangeLog_Set';
+    if (my $cl = $self->source($source_name . '_ChangeLog')) {
+      push @tables, $cl;
+    }
+  }
+
+  for my $table (@tables) {
+    $self->storage->deploy($table);
+  }
+
   return $self;
 }
 
@@ -230,13 +248,10 @@ sub _register_changelog_sources {
 sub _build_changelog_source {
   my ($self, $source_name, $def) = @_;
 
-  # Build a result class dynamically
-  my $result_class = "DBIO::ChangeLog::_Auto_::${source_name}";
+  my $result_class = "DBIO::ChangeLog::Result::$source_name";
   {
     no strict 'refs';
-    unless (@{"${result_class}::ISA"}) {
-      @{"${result_class}::ISA"} = ('DBIO::Core');
-    }
+    @{"${result_class}::ISA"} = ('DBIO::Core');
   }
 
   my $source = DBIO::ResultSource::Table->new({
@@ -253,12 +268,7 @@ sub _build_changelog_source {
 
   $source->set_primary_key(@{ $def->{primary_key} });
 
-  # Install the result_source_instance classdata on the dynamic class and
-  # point it at the source we just built. Without this, DBIO::Row and
-  # anything else asking the class for its source can't find it — table()
-  # is normally what sets this up, but we built the source manually.
-  $result_class->mk_classdata('result_source_instance')
-    unless $result_class->can('result_source_instance');
+  $result_class->mk_classdata('result_source_instance');
   $result_class->result_source_instance($source);
 
   return $source;

@@ -1,14 +1,16 @@
 package DBIO::ChangeLog::Set;
-# ABSTRACT: ResultSource for the changelog_set table
+# ABSTRACT: ResultSource definition for the changelog_set table
 
 use strict;
 use warnings;
+
+use DBIO::ChangeLog::Table;
 
 =head1 DESCRIPTION
 
 Defines the result source for the C<changelog_set> table, which groups
 individual changelog entries into logical changesets (typically one per
-transaction via L<DBIO::Schema::ChangeLog/txn_do>).
+transaction via L<DBIO::ChangeLog::Schema/txn_do>).
 
 Each changeset records an optional user and session identifier along
 with a creation timestamp.
@@ -21,11 +23,11 @@ Integer primary key, auto-increment.
 
 =attr user_id
 
-Optional C<varchar(255)>. Set from L<DBIO::Schema::ChangeLog/changelog_user>.
+Optional C<varchar(255)>. Set from L<DBIO::ChangeLog::Schema/changelog_user>.
 
 =attr session_id
 
-Optional C<varchar(255)>. Set from L<DBIO::Schema::ChangeLog/changelog_session>.
+Optional C<varchar(255)>. Set from L<DBIO::ChangeLog::Schema/changelog_session>.
 
 =attr created_at
 
@@ -34,7 +36,7 @@ C<datetime>, NOT NULL. Automatically set when the changeset is created.
 =cut
 
 sub source_definition {
-  return {
+  return DBIO::ChangeLog::Table->build_source({
     table   => 'changelog_set',
     columns => {
       id => {
@@ -58,7 +60,15 @@ sub source_definition {
     },
     column_order  => [qw/ id user_id session_id created_at /],
     primary_key   => ['id'],
-  };
+  });
 }
 
 1;
+
+__END__
+
+=head1 SEE ALSO
+
+L<DBIO::ChangeLog>, L<DBIO::ChangeLog::Schema>, L<DBIO::ChangeLog::Table>
+
+=cut

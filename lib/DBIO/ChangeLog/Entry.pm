@@ -1,15 +1,18 @@
 package DBIO::ChangeLog::Entry;
-# ABSTRACT: Base ResultSource definition for per-source changelog tables
+# ABSTRACT: ResultSource definition for per-source changelog tables
 
 use strict;
 use warnings;
+
+use Carp qw(croak);
+use DBIO::ChangeLog::Table;
 
 =head1 DESCRIPTION
 
 Defines the base column layout for C<< <source>_changelog >> tables.
 Each tracked ResultSource gets its own changelog table with these columns.
 
-The L<DBIO::Schema::ChangeLog> component uses this definition when
+The L<DBIO::ChangeLog::Schema> component uses this definition when
 dynamically creating changelog ResultSource objects at schema composition
 time.
 
@@ -48,10 +51,10 @@ C<datetime>, NOT NULL. Automatically set when the entry is created.
 
 sub source_definition {
   my ($class, %args) = @_;
-  my $source_table = $args{table} or die "table is required";
+  my $table = $args{table} or croak "table is required";
 
-  return {
-    table   => "${source_table}_changelog",
+  return DBIO::ChangeLog::Table->build_source({
+    table   => "${table}_changelog",
     columns => {
       id => {
         data_type         => 'integer',
@@ -82,7 +85,15 @@ sub source_definition {
     },
     column_order  => [qw/ id changeset_id row_id event changes created_at /],
     primary_key   => ['id'],
-  };
+  });
 }
 
 1;
+
+__END__
+
+=head1 SEE ALSO
+
+L<DBIO::ChangeLog>, L<DBIO::ChangeLog::Schema>, L<DBIO::ChangeLog::Table>
+
+=cut

@@ -10,7 +10,7 @@ use DBIO::Test::Storage;
 {
   package TestDBIO::CL::Schema;
   use base 'DBIO::Schema';
-  __PACKAGE__->load_components('Schema::ChangeLog');
+  __PACKAGE__->load_components('ChangeLog::Schema');
 }
 
 {
