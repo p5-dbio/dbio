@@ -19,16 +19,11 @@ sub new {
   my $read  = $args{read}  // croak "ReadWrite broker requires 'read'";
   $read = [$read] if ref $read eq 'HASH';
 
-  $self->_write_info(_normalize_info($write));
-  $self->_read_infos([map { _normalize_info($_) } @$read]);
+  $self->_write_info($write);
+  $self->_read_infos([map { $_ } @$read]);
   $self->_read_index(0);
 
   return $self;
-}
-
-sub _normalize_info {
-  my ($info) = @_;
-  return [$info->{dsn}, $info->{username} // '', $info->{password} // '', $info->{dbi_attrs} // {}];
 }
 
 sub connect_info_for {
