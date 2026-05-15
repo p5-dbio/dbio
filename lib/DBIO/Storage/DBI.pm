@@ -583,9 +583,10 @@ sub connect_info {
 
   if ($self->_is_access_broker_connect_info($info)) {
     $self->set_access_broker($info->[0], 'write');
-    $info = $self->_normalize_connect_info(
-      $self->_current_dbi_connect_info($self->access_broker_mode)
-    );
+    my $broker_info = $self->_current_dbi_connect_info($self->access_broker_mode);
+    # Broker may return hashref or arrayref depending on implementation
+    $broker_info = [$broker_info] if ref $broker_info eq 'HASH';
+    $info = $self->_normalize_connect_info($broker_info);
   }
   else {
     $self->clear_access_broker;
@@ -716,6 +717,13 @@ sub _normalize_connect_info {
       }
     }
     else {
+      # Handle dbname-only hash (e.g. from AccessBroker::Credentials)
+      # Convert dbname to dsn if dsn is missing
+      if (!exists $attrs{dsn} && exists $attrs{dbname}) {
+        $attrs{dsn} = delete $attrs{dbname};
+        # Prepend 'dbi:' if not already a full DSN
+        $attrs{dsn} = "dbi:SQLite:dbname=$attrs{dsn}" unless $attrs{dsn} =~ /^dbi:/i;
+      }
       @args = delete @attrs{qw/dsn user password/};
     }
   }
@@ -1655,9 +1663,10 @@ sub _connect {
   my $self = shift;
 
   if ($self->access_broker) {
-    my $info = $self->_normalize_connect_info(
-      $self->_current_dbi_connect_info($self->access_broker_mode)
-    );
+    my $broker_info = $self->_current_dbi_connect_info($self->access_broker_mode);
+    # Broker returns HASHREF; normalize to ARRAYREF for _normalize_connect_info
+    $broker_info = [$broker_info] if ref $broker_info eq 'HASH';
+    my $info = $self->_normalize_connect_info($broker_info);
 
     my %attrs = (
       %{ $self->_default_dbi_connect_attributes || {} },
