@@ -252,6 +252,38 @@ the storage class from the registry, then calls `cake_defaults()` on it.
 - Handle caching, prepared statement support
 - DBH attribute binding
 
+## AccessBroker Integration
+
+All DBIO drivers support AccessBroker for connection credential management and routing.
+Pass a broker to `Schema->connect($broker)` instead of raw DSN.
+
+**See `dbio-core` skill for complete AccessBroker documentation including:**
+- Broker interface (`connect_info_for`, `needs_refresh`, `has_read_write_routing`, etc.)
+- Implemented brokers (Static, ReadWrite, Vault, Credentials)
+- Credential data object
+- Storage integration flow
+
+### Storage Integration
+
+Storage detects broker via `_is_access_broker_connect_info([$broker])` → true if single blessed element. Then:
+
+1. `set_access_broker($broker, 'write')` — attaches broker to storage
+2. `_current_dbi_connect_info($mode)` → `current_access_broker_connect_info($mode)`
+3. Broker returns HASHREF → Storage normalizes to internal format
+4. Connection proceeds with broker-provided credentials
+
+### Rotating Credentials
+
+All drivers support rotating credentials via Vault broker or Credentials broker.
+When credentials rotate, the storage re-fetches connection info on next connect.
+
+For async drivers with connection pools, pool refresh works via `_conninfo_provider`:
+
+```perl
+# Pool refresh: when new pooled connection needed, _conninfo_provider fetches fresh
+# conninfo from broker via current_connect_info_for_storage($storage, $mode)
+```
+
 ## Async Drivers
 
 Async drivers bypass DBI entirely, using native async database protocols.
@@ -259,26 +291,43 @@ Async drivers bypass DBI entirely, using native async database protocols.
 | Aspect | DBI Driver | Async Driver |
 |--------|-----------|--------------|
 | Base class | `DBIO::Storage::DBI` | `DBIO::Storage::Async` |
-| Protocol | DBD (DBI) | Native async (e.g., EV::Pg/libpq) |
+| Protocol | DBD (DBI) | Native async (e.g., EV::Pg/libpq, EV::MariaDB) |
 | Returns | Blocking values | Future objects |
 | Connection | Single DBH | Connection pool |
 | Batching | No | Pipeline mode (multiple queries/round-trip) |
 
-**Async driver must implement:**
+### Required Methods
 
 ```perl
-sub future_class { ... }        # Event-loop-specific Future class
-sub pool { ... }                # Connection pool
-sub select_async { ... }        # Non-blocking query → Future
-sub select_single_async { ... } # Non-blocking single-row → Future
+package DBIO::DriverName::Async::Storage;
+use base 'DBIO::Storage::Async';
+
+sub future_class { 'Future' }   # Event-loop-specific Future class
+sub pool { ... }                 # Connection pool (returns Future)
+sub select_async { ... }         # Non-blocking query → Future
+sub select_single_async { ... }  # Non-blocking single-row → Future
 ```
 
-Async features (PostgreSQL::Async):
+### Async-Specific AccessBroker Notes
+
+Async drivers use AccessBroker for connection pool management:
+
+- Pool refresh: when a new pooled connection is created, `_conninfo_provider` fetches fresh conninfo from the broker via `current_connect_info_for_storage($storage, $mode)`
+- Storage-aware variant `connect_info_for_storage($storage, $mode)` available for pool-aware credential selection
+
+### Implemented Async Drivers
+
+**DBIO::PostgreSQL::Async** (EV::Pg, libpq):
 - LISTEN/NOTIFY (event-driven, not polling)
 - COPY IN/OUT (bulk data transfer)
-- Prepared statement caching
+- Pipeline mode (up to 64 in-flight queries)
 - Transaction pinning (pin to pool connection)
-- Sync methods still work (block event loop — for compatibility)
+- Sync methods work by blocking via `->get` on underlying Future
+
+**DBIO::MySQL::Async** (EV::MariaDB, MariaDB C client):
+- Pipeline mode (up to 64 in-flight queries)
+- Transaction pinning (pin to transaction context)
+- Sync methods work by blocking via `->get` on underlying Future
 
 ## Distribution Layout
 
