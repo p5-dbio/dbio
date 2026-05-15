@@ -51,9 +51,9 @@ sub new {
     my $databases = $args{databases} // [qw(pg mysql)];
 
     # Validate database names
-    my %valid = map { $_ => 1 } qw(pg mysql);
+    my %valid = map { $_ => 1 } qw(pg mysql pg-ext duckdb);
     for my $db (@$databases) {
-        croak "Unknown database: $db (valid: pg, mysql)" unless $valid{$db};
+        croak "Unknown database: $db (valid: pg, mysql, pg-ext, duckdb)" unless $valid{$db};
     }
 
     require Kubernetes::REST::Kubeconfig;
@@ -105,6 +105,22 @@ my %DB_SPECS = (
         pass          => 'dbiotest',
         env_prefix    => 'DBIO_TEST_PG',
     },
+    'pg-ext' => {
+        name       => 'pg-ext',
+        image      => 'src.ci/srv/postgres:18',
+        port       => 5432,
+        svc_name   => 'pg-ext-svc',
+        env        => [
+            { name => 'POSTGRES_PASSWORD', value => 'dbiotest' },
+            { name => 'POSTGRES_DB',       value => 'postgres' },
+            { name => 'POSTGRES_HOST_AUTH_METHOD', value => 'scram-sha-256' },
+        ],
+        readiness_cmd => [qw(pg_isready -U postgres)],
+        dsn_template  => 'dbi:Pg:database=postgres;host=%s;port=%s',
+        user          => 'postgres',
+        pass          => 'dbiotest',
+        env_prefix    => 'DBIO_TEST_PG_EXT',
+    },
     mysql => {
         name       => 'mysql',
         image      => 'mysql:8.0',
@@ -122,6 +138,26 @@ my %DB_SPECS = (
         user          => 'root',
         pass          => 'dbiotest',
         env_prefix    => 'DBIO_TEST_MYSQL',
+    },
+    duckdb => {
+        name       => 'duckdb',
+        image      => 'duckdb/duckdb:latest',
+        port       => 5432,
+        svc_name   => 'duckdb-svc',
+        env        => [
+            { name => 'DUCKDB_PASSWORD', value => 'dbiotest' },
+        ],
+        readiness_probe => {
+            tcpSocket => { port => 5432 },
+            initialDelaySeconds => 5,
+            periodSeconds       => 3,
+            timeoutSeconds      => 2,
+            failureThreshold    => 10,
+        },
+        dsn_template  => 'dbi:DuckDB:database=dbio_test;host=%s;port=%s',
+        user          => 'duckdb',
+        pass          => 'dbiotest',
+        env_prefix    => 'DBIO_TEST_DUCKDB',
     },
 );
 
@@ -172,13 +208,16 @@ sub _deploy_db {
                 image => $spec->{image},
                 ports => [{ containerPort => $spec->{port} }],
                 env   => $spec->{env},
-                readinessProbe => {
-                    exec => { command => $spec->{readiness_cmd} },
-                    initialDelaySeconds => 5,
-                    periodSeconds       => 3,
-                    timeoutSeconds      => 2,
-                    failureThreshold    => 30,
-                },
+                ( $spec->{readiness_probe}
+                  ? ( readinessProbe => $spec->{readiness_probe} )
+                  : ( readinessProbe => {
+                        exec => { command => $spec->{readiness_cmd} },
+                        initialDelaySeconds => 5,
+                        periodSeconds       => 3,
+                        timeoutSeconds      => 2,
+                        failureThreshold    => 30,
+                    } )
+                ),
             }],
         },
     );

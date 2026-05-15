@@ -30,7 +30,7 @@ k8s-test - Run DBIO tests against Kubernetes-provisioned databases
     --cover                 Run with Devel::Cover and generate report
     --namespace NAME        Use specific namespace name
     --image IMAGE           Docker image for cluster mode (default: dbio-test:latest)
-    --db pg,mysql           Which databases to provision (default: pg,mysql)
+    --db pg,mysql,pg-ext,duckdb  Which databases to provision (default: pg,mysql)
     --timeout SECS          Readiness timeout in seconds (default: 120)
 
 =head1 DESCRIPTION
